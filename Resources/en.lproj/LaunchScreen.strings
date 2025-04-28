@@ -1,0 +1,12 @@
+welcomeMessage = "Hi";
+getStarted = "GET STARTED";
+logInLoc = "LOG IN";
+emailLoc = "EMAIL";
+passwordLoc = "PASSWORD";
+enterLoc = "ENTER";
+forgotPasswordQuestionLoc = "FORGOT PASSWORD? RECOVER HERE";
+newHereQuestionLoc = "CREATE AN ACCOUNT";
+forgotPasswordLoc = "FORGOT PASSWORD";
+singUpLoc = "Sign up";
+backToLoginLoc = "BACK TO LOGIN";
+rootControllerNotFoundLoc = "";

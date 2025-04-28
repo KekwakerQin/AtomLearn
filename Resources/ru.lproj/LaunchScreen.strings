@@ -1,0 +1,12 @@
+welcomeMessage = "Привет";
+getStarted = "Начать";
+logInLoc = "Войти";
+emailLoc = "Электронная почта";
+passwordLoc = "Пароль";
+enterLoc = "Готово";
+forgotPasswordQuestionLoc = "Восстановить пароль";
+newHereQuestionLoc = "Создать аккаунт.";
+forgotPasswordLoc = "Забыл пароль";
+singUpLoc = "Регистрация";
+backToLoginLoc = "Вернуться к авторизации";
+rootControllerNotFoundLoc = "";

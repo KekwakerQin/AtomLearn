@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bucket
+   uuid = "AD28C961-84FC-472B-B56B-588F5CFC1E23"
+   type = "1"
+   version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "889B9AED-E9A8-41C8-9F3E-A25CBD16595E"
+            shouldBeEnabled = "No"
+            nameForDebugger = "print(&quot;Cache_cleared&quot;)"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Sources/Services/Cache/CacheCleaner.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "15"
+            endingLineNumber = "15"
+            landmarkName = "removeCacheFromCards()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
+</Bucket>
