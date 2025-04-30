@@ -64,7 +64,7 @@ final class BoardDetailViewController: UIViewController {
     
     private func setupLayot() {
         view.backgroundColor = UIColor(named: "BackgroundColor")
-
+        
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
@@ -108,7 +108,7 @@ final class BoardDetailViewController: UIViewController {
 
 extension BoardDetailViewController: BoardDetailViewProtocol {
     func displayBoardInfo(title: String, description: String) {
-        titleLabel.text = title
+        titleLabel.text = String(cards.count)
         descriptionLabel.text = description
     }
     

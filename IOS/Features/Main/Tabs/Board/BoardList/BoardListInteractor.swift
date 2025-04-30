@@ -73,10 +73,9 @@ final class BoardListInteractor: BoardListInteractorInputProtocol {
         service.deleteBoards(for: userID)
             .subscribe(onSuccess: { [weak self] in
                 print("Все доски удалены")
-                self?.fetchBoards()
                 CardPreloadManager.shared.resetQueue()
                 self?.cacheCleaner.removeAllCache()
-
+                self?.fetchBoards()
             }, onFailure: { [weak self] error in
                 self?.presenter?.didFailCreatingBoard(error)
             })
