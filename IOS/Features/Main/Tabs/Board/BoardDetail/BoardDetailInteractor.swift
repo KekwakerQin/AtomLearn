@@ -35,7 +35,10 @@ final class BoardDetailInteractor: BoardDetailInteractorInputProtocol {
         cardListener = service.listenerCards(for: boardID) { [weak self] result in
             switch result {
             case .success(let cards):
-                self?.cacheManager.cacheCards(cards)
+                let cachedIDs = Set(self?.cacheManager.getCachedCards(for: self?.boardID ?? "").map(\.id) ?? [])
+                let newCards = cards.filter { !cachedIDs.contains($0.id) }
+                
+                self?.cacheManager.cacheCards(newCards)
                 self?.presenter?.didFetchCards(cards)
             case .failure(let error):
                 self?.presenter?.didFailFetchingCards(error)

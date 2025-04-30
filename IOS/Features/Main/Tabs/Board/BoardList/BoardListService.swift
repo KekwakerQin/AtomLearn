@@ -51,7 +51,7 @@ final class BoardService: BoardServiceProtocol {
                     let boards = try documents.map { try $0.data(as: Board.self) }
                     listener(.success(boards))
                 } catch {
-                    listener(.failure(error))
+                    print(error.localizedDescription)
                 }
             }
     }

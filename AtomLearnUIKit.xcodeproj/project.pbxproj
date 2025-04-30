@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		7D0397AD2DB86AFD00849CF1 /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D0397AC2DB86A8A00849CF1 /* SessionManager.swift */; };
-		7D1192162DAD00830013025E /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D4F3E512DACAD5B00B35A20 /* AuthService.swift */; };
 		7D16015A2DBB5025003FEC43 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 7D1601592DBB5025003FEC43 /* RxCocoa */; };
 		7D16015C2DBB5025003FEC43 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 7D16015B2DBB5025003FEC43 /* RxSwift */; };
 		7D16015F2DBB5080003FEC43 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 7D16015E2DBB5080003FEC43 /* GoogleSignIn */; };
@@ -23,6 +22,7 @@
 		7DB0F0CD2DA518B500F91601 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7DB0F0C32DA518B500F91601 /* Assets.xcassets */; };
 		7DB0F0CF2DA518B500F91601 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7DB0F0C62DA518B500F91601 /* LaunchScreen.storyboard */; };
 		7DB46F3B2DB773DF0040DE1C /* UIButtonExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DB46F3A2DB763680040DE1C /* UIButtonExtensions.swift */; };
+		7DDEE69C2DC08D7200F33839 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 7DDEE69B2DC08D7200F33839 /* Supabase */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,7 +61,6 @@
 		7D1B67562DA4C5CF00C9764D /* AtomLearnUIKit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AtomLearnUIKit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7D1B676F2DA4C5D000C9764D /* AtomLearnUIKitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AtomLearnUIKitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7D1B67792DA4C5D000C9764D /* AtomLearnUIKitUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AtomLearnUIKitUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		7D4F3E512DACAD5B00B35A20 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
 		7D6E85CF2DB5DBBC007A2BFE /* Pasajero.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Pasajero.otf; sourceTree = "<group>"; };
 		7DA8957A2DBF1A4200FA6D88 /* UIViewControllerPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewControllerPreview.swift; sourceTree = "<group>"; };
 		7DB0F0C32DA518B500F91601 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -81,13 +80,6 @@
 			);
 			target = 7D1B67552DA4C5CF00C9764D /* AtomLearnUIKit */;
 		};
-		7D3169912DB1083F00028C10 /* Exceptions for "Models" folder in "AtomLearnUIKit" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				AppUser.swift,
-			);
-			target = 7D1B67552DA4C5CF00C9764D /* AtomLearnUIKit */;
-		};
 		7D6E85D62DB5EEDD007A2BFE /* Exceptions for "Firestore" folder in "AtomLearnUIKit" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -100,19 +92,6 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				IconFactory.swift,
-			);
-			target = 7D1B67552DA4C5CF00C9764D /* AtomLearnUIKit */;
-		};
-		7D9ED82A2DB3756500A1618D /* Exceptions for "Auth" folder in "AtomLearnUIKit" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Apple/AppleAuthHandler.swift,
-				Firebase/FirebaseAuthService.swift,
-				Firebase/FirebaseUserService.swift,
-				Google/GoogleAuthError.swift,
-				Google/GoogleAuthHandler.swift,
-				Protocols/AuthServiceProtocol.swift,
-				Protocols/UserServiceProtocol.swift,
 			);
 			target = 7D1B67552DA4C5CF00C9764D /* AtomLearnUIKit */;
 		};
@@ -173,14 +152,6 @@
 			path = Helpers;
 			sourceTree = "<group>";
 		};
-		7D9ED8282DB3755D00A1618D /* Auth */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				7D9ED82A2DB3756500A1618D /* Exceptions for "Auth" folder in "AtomLearnUIKit" target */,
-			);
-			path = Auth;
-			sourceTree = "<group>";
-		};
 		7DB0F0E22DA7B09D00F91601 /* Features */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Features;
@@ -196,14 +167,6 @@
 			path = "Persistence ";
 			sourceTree = "<group>";
 		};
-		7DD549162DAF9E88002559B6 /* Models */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				7D3169912DB1083F00028C10 /* Exceptions for "Models" folder in "AtomLearnUIKit" target */,
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -211,6 +174,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7DDEE69C2DC08D7200F33839 /* Supabase in Frameworks */,
 				7D1601662DBB513B003FEC43 /* RealmSwift in Frameworks */,
 				7D16015C2DBB5025003FEC43 /* RxSwift in Frameworks */,
 				7D16015A2DBB5025003FEC43 /* RxCocoa in Frameworks */,
@@ -261,6 +225,7 @@
 			children = (
 				7DDEE61F2DBF20A900F33839 /* IOS */,
 				7DB0F0E32DA7B0A700F91601 /* Resources */,
+				7DDEE69A2DC08D7200F33839 /* Frameworks */,
 				7D1B67572DA4C5CF00C9764D /* Products */,
 			);
 			sourceTree = "<group>";
@@ -273,14 +238,6 @@
 				7D1B67792DA4C5D000C9764D /* AtomLearnUIKitUITests.xctest */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		7D4F3E502DACAD5600B35A20 /* Service */ = {
-			isa = PBXGroup;
-			children = (
-				7D4F3E512DACAD5B00B35A20 /* AuthService.swift */,
-			);
-			path = Service;
 			sourceTree = "<group>";
 		};
 		7D6E85E32DB63286007A2BFE /* Sources */ = {
@@ -320,9 +277,6 @@
 			isa = PBXGroup;
 			children = (
 				7D6E85D12DB5E679007A2BFE /* Firestore */,
-				7D9ED8282DB3755D00A1618D /* Auth */,
-				7DD549162DAF9E88002559B6 /* Models */,
-				7D4F3E502DACAD5600B35A20 /* Service */,
 				7DB0F0EA2DA7B40900F91601 /* Persistence  */,
 			);
 			path = Core;
@@ -380,6 +334,13 @@
 			path = IOS;
 			sourceTree = "<group>";
 		};
+		7DDEE69A2DC08D7200F33839 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -412,6 +373,7 @@
 				7D16016A2DBB5197003FEC43 /* FirebaseDatabase */,
 				7D16016C2DBB5197003FEC43 /* FirebaseFirestore */,
 				7D16016E2DBB5197003FEC43 /* FirebaseStorage */,
+				7DDEE69B2DC08D7200F33839 /* Supabase */,
 			);
 			productName = AtomLearnUIKit;
 			productReference = 7D1B67562DA4C5CF00C9764D /* AtomLearnUIKit.app */;
@@ -502,6 +464,7 @@
 				7D16015D2DBB5080003FEC43 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 				7D1601622DBB513B003FEC43 /* XCRemoteSwiftPackageReference "realm-swift" */,
 				7D1601672DBB5197003FEC43 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				7DDEE6992DC08D6300F33839 /* XCRemoteSwiftPackageReference "supabase-swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 7D1B67572DA4C5CF00C9764D /* Products */;
@@ -548,7 +511,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				7D0397AD2DB86AFD00849CF1 /* SessionManager.swift in Sources */,
-				7D1192162DAD00830013025E /* AuthService.swift in Sources */,
 				7DB46F3B2DB773DF0040DE1C /* UIButtonExtensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -919,6 +881,14 @@
 				minimumVersion = 11.12.0;
 			};
 		};
+		7DDEE6992DC08D6300F33839 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -966,6 +936,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 7D1601672DBB5197003FEC43 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseStorage;
+		};
+		7DDEE69B2DC08D7200F33839 /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7DDEE6992DC08D6300F33839 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

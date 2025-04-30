@@ -7,7 +7,13 @@ import RealmSwift
 protocol BoardDetailServiceProtocol {
     func createCard(for boardID: String) -> Single<Void>
     func deleteCards(for boardID: String) -> Completable
-    func fetchCards(for boardID: String, limit: Int?) -> Single<[Card]>
+    
+    func fetchCards(
+        for boardID: String,
+        limit: Int?,
+        startAfter: DocumentSnapshot?
+    ) -> Single<([Card], DocumentSnapshot?)>
+    
     func listenerCards(for boardID: String, listener: @escaping (Result<[Card], Error>) -> Void) -> ListenerRegistration
 }
 
@@ -30,32 +36,32 @@ final class BoardDetailService: BoardDetailServiceProtocol {
                     let cards = try documents.map { try $0.data(as: Card.self) }
                     listener(.success(cards))
                 } catch {
-                    listener(.failure(error))
-                }
+                    print(error.localizedDescription)                }
             }
     }
     
-    func fetchCards(for boardID: String, limit: Int?) -> Single<[Card]> {
+    func fetchCards(
+        for boardID: String,
+        limit: Int?               = nil,
+        startAfter: DocumentSnapshot? = nil
+    ) -> Single<([Card], DocumentSnapshot?)> {
+
         Single.create { single in
             var query: FirebaseFirestore.Query = FirestorePaths.cardsCollection(forBoard: boardID)
+            if let limit = limit      { query = query.limit(to: limit) }
+            if let after = startAfter { query = query.start(afterDocument: after) }
 
-            if let limit = limit {
-                query = query.limit(to: limit)
-            }
+            query.getDocuments { snap, error in
+                if let error = error { single(.failure(error)); return }
 
-            query.getDocuments { snapshot, error in
-                if let error = error {
+                let docs   = snap?.documents ?? []
+                do {
+                    let cards = try docs.map { try $0.data(as: Card.self) }
+                    single(.success((cards, docs.last)))      // ← tuple
+                } catch {
                     single(.failure(error))
-                } else {
-                    do {
-                        let cards = try snapshot?.documents.map { try $0.data(as: Card.self) } ?? []
-                        single(.success(cards))
-                    } catch {
-                        single(.failure(error))
-                    }
                 }
             }
-
             return Disposables.create()
         }
     }
