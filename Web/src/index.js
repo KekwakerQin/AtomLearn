@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './mainView.css';
 import reportWebVitals from './reportWebVitals.js';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import AuthSwitch from './components/auth/authPresenter.jsx';
+import {AuthSwitch} from './components/auth/authPresenter.jsx';
 import Dashboard from './components/dashboard.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 

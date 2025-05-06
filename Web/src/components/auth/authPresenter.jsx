@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { translateFirebaseError } from '../../firebaseErrors';
 import { onAuthStateChanged } from 'firebase/auth';
-import { createUserWithEmail, loginWithEmail, authWithGoogle, sendUserData, auth } from './authService';
-import './authCss.css';
+import { auth } from '../../firebase';
+import { updateUserData, createUser, loginUser, googleAuth} from './authInteractor';
+import './authStyles.css';
 
 // authSwitch
 export const AuthSwitch = () => {
@@ -14,7 +16,8 @@ export const AuthSwitch = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-				await sendUserData();
+				navigate('/dashboard');
+				await updateUserData(user);
       } else {
         setIsCheckingAuth(false);
       }
@@ -60,7 +63,7 @@ export const AuthSwitch = () => {
 };
 
 // Signup
-export const Signup = ({ switchToLogin }) => {
+const Signup = ({ switchToLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -79,20 +82,19 @@ export const Signup = ({ switchToLogin }) => {
     setLoading(true);
     setError('');
     
-    try {
-      await createUserWithEmail(email, password);
-    } catch (err) {
-      setError(translateFirebaseError(err.code))
-      setLoading(false);
-    }
+		const isUserCreated = await createUser(email, password);
+		
+		if(isUserCreated.status === false){
+			setError(translateFirebaseError(isUserCreated.errorMessage))
+			setLoading(false);
+		}
   };
 
   const handleGoogleSignup = async () => {
-    try {
-			await authWithGoogle()
-    } catch (err) {
-      setError(err.message);
-    }
+		const isGoogleSigned = await googleAuth()
+		if(isGoogleSigned.status === false){
+			setError(isGoogleSigned.errorMessage)
+		}
   };
 
   return (
@@ -178,7 +180,7 @@ export const Signup = ({ switchToLogin }) => {
 };
 
 // Login
-export const Login = ({ switchToSignup }) => {
+const Login = ({ switchToSignup }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -190,20 +192,19 @@ export const Login = ({ switchToSignup }) => {
     setLoading(true);
     setError('');
     
-    try {
-      await loginWithEmail(email, password);
-    } catch (err) {
-      setError(translateFirebaseError(err.code))
-      setLoading(false);
-    }
+		const isUserLogined = await loginUser(email, password);
+		
+		if(isUserLogined.status === false){
+			setError(translateFirebaseError(isUserLogined.errorMessage))
+			setLoading(false);
+		}
   };
 
-  const handleGoogleLogin = async () => {
-    try {
-      await authWithGoogle();
-    } catch (err) {
-      setError(err.message);
-    }
+  const handleGoogleLogin= async () => {
+		const isGoogleSigned = await googleAuth()
+		if(isGoogleSigned.status === false){
+			setError(isGoogleSigned.errorMessage)
+		}
   };
 
   return (
