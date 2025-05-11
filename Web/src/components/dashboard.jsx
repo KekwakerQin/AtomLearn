@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { auth, onIdTokenChanged, db } from '../firebase';
 import { doc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
+import { Button } from './UIComponents/UIButton';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -38,7 +39,9 @@ const Dashboard = () => {
   return (
     <div className="dashboard">
       <h1>Добро пожаловать, {userEmail}!</h1>
-      <button onClick={handleLogout}>Выйти</button>
+			<Button className="logout-button" type="button" disabled="false" onClick={handleLogout}>
+				Выйти
+			</Button>
     </div>
   );
 };

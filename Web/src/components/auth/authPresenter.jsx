@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
 import React from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { translateFirebaseError } from '../../firebaseErrors';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../../firebase';
 import { updateUserData, createUser, loginUser, googleAuth} from './authInteractor';
+import { Button } from '../UIComponents/UIButton'
 import './authStyles.css';
 
 // authSwitch
@@ -151,13 +152,9 @@ const Signup = ({ switchToLogin }) => {
             />
           </div>
           
-          <button 
-            type="submit" 
-            className="auth-button"
-            disabled={loading}
-          >
+          <Button className = 'auth-button' type="submit" disable={loading}>
             {loading ? "Регистрация..." : "Зарегистрироваться"}
-          </button>
+					</Button>
         </form>
         
         <div className="auth-footer">
@@ -249,13 +246,9 @@ const Login = ({ switchToSignup }) => {
             </div>
           </div>
           
-          <button 
-            type="submit" 
-            className="auth-button"
-            disabled={loading}
-          >
-            {loading ? "Вход..." : "Войти"}
-          </button>
+          <Button className = 'auth-button' type="submit" disable={loading}>
+						{loading ? "Вход..." : "Войти"}
+					</Button>
         </form>
         
         <div className="auth-footer">
