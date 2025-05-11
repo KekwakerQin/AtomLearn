@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { auth, onIdTokenChanged, db } from '../firebase';
 import { doc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { Button } from './UIComponents/UIButton';
+import { Button } from './UI/UIButton';
 
 const Dashboard = () => {
   const navigate = useNavigate();

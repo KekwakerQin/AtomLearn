@@ -5,14 +5,18 @@ import { translateFirebaseError } from '../../firebaseErrors';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../../firebase';
 import { updateUserData, createUser, loginUser, googleAuth} from './authInteractor';
-import { Button } from '../UIComponents/UIButton'
+import { Button } from '../UI/UIButton'
 import './authStyles.css';
+import { useLanguage } from '../switchLanguage/languageContext';
+import { translation } from '../switchLanguage/locales';
 
 // authSwitch
 export const AuthSwitch = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const navigate = useNavigate();
+	const {language, toggleLanguage} = useLanguage();
+	const text = translation[language];
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -33,7 +37,7 @@ export const AuthSwitch = () => {
         <div className="auth-card">
           <div className="auth-loading">
             <div className="auth-spinner"></div>
-            <p>Checking authentication...</p>
+            <p>{text.authSwith}</p>
           </div>
         </div>
       </div>
@@ -42,6 +46,9 @@ export const AuthSwitch = () => {
 
   return (
     <div className={`auth-switch-container ${isLogin ? 'login-view' : 'signup-view'}`}>
+			<Button className = 'language-switch-button' type="submit" onClick={toggleLanguage}>
+				{language === 'ru'? 'ENG' : 'RU'}
+			</Button>
       {isLogin ? (
         <Login 
           switchToSignup={() => {
@@ -71,12 +78,14 @@ const Signup = ({ switchToLogin }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+	const {language, toggleLanguage} = useLanguage();
+	const text = translation[language];
 
   const handleSignup = async (e) => {
     e.preventDefault();
     
     if (password !== confirmPassword) {
-      setError("Пароли не совпадают");
+      setError(text.signupPasswordError);
       return;
     }
     
@@ -101,14 +110,14 @@ const Signup = ({ switchToLogin }) => {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h1 className="auth-title">Создать аккаунт</h1>
-        <p className="auth-subtitle">Заполните форму для регистрации</p>
+        <h1 className="auth-title">{text.authSignup.signupTitle}</h1>
+        <p className="auth-subtitle">{text.authSignup.signupSubtitle}</p>
         
         <form className="auth-form" onSubmit={handleSignup}>
           {error && <div className="error-message">{error}</div>}
           
           <div className="input-group">
-            <label htmlFor="email" className="input-label">Email</label>
+            <label htmlFor="email" className="input-label">{text.authSignup.signupEmail}</label>
             <input
               id="email"
               type="email"
@@ -120,7 +129,7 @@ const Signup = ({ switchToLogin }) => {
           </div>
           
           <div className="input-group">
-            <label htmlFor="password" className="input-label">Пароль</label>
+            <label htmlFor="password" className="input-label">{text.authSignup.signupPassword}</label>
             <div className="password-input-container">
               <input
                 id="password"
@@ -141,7 +150,7 @@ const Signup = ({ switchToLogin }) => {
           </div>
           
           <div className="input-group">
-            <label htmlFor="confirmPassword" className="input-label">Подтвердите пароль</label>
+            <label htmlFor="confirmPassword" className="input-label">{text.authSignup.signupConfirmPassword}</label>
             <input
               id="confirmPassword"
               type={showPassword ? "text" : "password"}
@@ -153,18 +162,18 @@ const Signup = ({ switchToLogin }) => {
           </div>
           
           <Button className = 'auth-button' type="submit" disable={loading}>
-            {loading ? "Регистрация..." : "Зарегистрироваться"}
+            {loading ? text.authSignup.signupButtonloading : text.authSignup.signupButton}
 					</Button>
         </form>
         
         <div className="auth-footer">
-          Уже есть аккаунт?{' '}
+				{text.authSignup.signupFooterQuestion}
           <span className="auth-link" onClick={switchToLogin}>
-            Войти
+					{text.authSignup.signupFooterLoginSwitch}
           </span>
         </div>
         
-        <div className="divider">или</div>
+        <div className="divider">{text.authSignup.signupFooterOr}</div>
         
         <div className="social-buttons">
           <button className="social-button" onClick={handleGoogleSignup}>
@@ -183,6 +192,9 @@ const Login = ({ switchToSignup }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+	const {language, toggleLanguage} = useLanguage();
+	const text = translation[language];
+	console.log(text)
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -207,14 +219,14 @@ const Login = ({ switchToSignup }) => {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h1 className="auth-title">Вход в аккаунт</h1>
-        <p className="auth-subtitle">Введите свои данные для входа</p>
+        <h1 className="auth-title">{text.authLogin.loginTitle}</h1>
+        <p className="auth-subtitle">{text.authLogin.loginSubtitle}</p>
         
         <form className="auth-form" onSubmit={handleLogin}>
           {error && <div className="error-message">{error}</div>}
           
           <div className="input-group">
-            <label htmlFor="email" className="input-label">Email</label>
+            <label htmlFor="email" className="input-label">{text.authLogin.loginEmail}v</label>
             <input
               id="email"
               type="email"
@@ -226,7 +238,7 @@ const Login = ({ switchToSignup }) => {
           </div>
           
           <div className="input-group">
-            <label htmlFor="password" className="input-label">Пароль</label>
+            <label htmlFor="password" className="input-label">{text.authLogin.loginPassword}</label>
             <div className="password-input-container">
               <input
                 id="password"
@@ -247,18 +259,18 @@ const Login = ({ switchToSignup }) => {
           </div>
           
           <Button className = 'auth-button' type="submit" disable={loading}>
-						{loading ? "Вход..." : "Войти"}
+						{loading ? text.authLogin.loginButtonLoading : text.authLogin.loginButton}
 					</Button>
         </form>
         
         <div className="auth-footer">
-          Нет аккаунта?{' '}
+				{text.authLogin.loginFooterQuestion} 
           <span className="auth-link" onClick={switchToSignup}>
-            Зарегистрироваться
+					{text.authLogin.loginFooterSignupSwitch}
           </span>
         </div>
         
-        <div className="divider">или</div>
+        <div className="divider">{text.authLogin.loginFooterOr}</div>
         
         <div className="social-buttons">
           <button className="social-button" onClick={handleGoogleLogin}>

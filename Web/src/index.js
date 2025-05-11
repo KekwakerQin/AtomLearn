@@ -6,23 +6,26 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import {AuthSwitch} from './components/auth/authPresenter.jsx';
 import Dashboard from './components/dashboard.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
+import { LanguageProvider } from './components/switchLanguage/languageContext.jsx';
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/auth/*" element={<AuthSwitch />} />
-        <Route 
-          path="/dashboard" 
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          } 
-        />
-        <Route path="/" element={<Navigate to="/auth" replace />} />
-      </Routes>
-    </BrowserRouter>
+		<LanguageProvider>
+			<BrowserRouter>
+				<Routes>
+					<Route path="/auth/*" element={<AuthSwitch />} />
+					<Route 
+						path="/dashboard" 
+						element={
+							<ProtectedRoute>
+								<Dashboard />
+							</ProtectedRoute>
+						} 
+					/>
+					<Route path="/" element={<Navigate to="/auth" replace />} />
+				</Routes>
+			</BrowserRouter>
+		</LanguageProvider>
   );
 }
 
