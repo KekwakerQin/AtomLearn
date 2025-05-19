@@ -9,6 +9,7 @@ import { Button } from '../UI/UIButton'
 import './authStyles.css';
 import { useLanguage } from '../switchLanguage/languageContext';
 import { translation } from '../switchLanguage/locales';
+import { createUserData } from './authService';
 
 // authSwitch
 export const AuthSwitch = () => {
@@ -93,6 +94,7 @@ const Signup = ({ switchToLogin }) => {
     setError('');
     
 		const isUserCreated = await createUser(email, password);
+		await createUserData(auth.currentUser);
 		
 		if(isUserCreated.status === false){
 			setError(translateFirebaseError(isUserCreated.errorMessage))
@@ -162,7 +164,7 @@ const Signup = ({ switchToLogin }) => {
           </div>
           
           <Button className = 'auth-button' type="submit" disable={loading}>
-            {loading ? text.authSignup.signupButtonloading : text.authSignup.signupButton}
+            {loading ? text.authSignup.signupButtonLoading : text.authSignup.signupButton}
 					</Button>
         </form>
         
@@ -194,7 +196,6 @@ const Login = ({ switchToSignup }) => {
   const [showPassword, setShowPassword] = useState(false);
 	const {language, toggleLanguage} = useLanguage();
 	const text = translation[language];
-	console.log(text)
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -226,7 +227,7 @@ const Login = ({ switchToSignup }) => {
           {error && <div className="error-message">{error}</div>}
           
           <div className="input-group">
-            <label htmlFor="email" className="input-label">{text.authLogin.loginEmail}v</label>
+            <label htmlFor="email" className="input-label">{text.authLogin.loginEmail}</label>
             <input
               id="email"
               type="email"
