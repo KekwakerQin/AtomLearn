@@ -1,11 +1,11 @@
+// serviceWorkerRegistration.register();
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import reportWebVitals from './reportWebVitals.js';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import {AuthSwitch} from './components/auth/authPresenter.jsx';
-import MainPage from './components/mainPage/mainPage.jsx';
-import ProtectedRoute from './components/mainPage/ProtectedRoute.jsx';
+import {MainSite} from './components/mainPage/mainPage.jsx';
 import { LanguageProvider } from './components/switchLanguage/languageContext.jsx';
 
 function App() {
@@ -14,14 +14,7 @@ function App() {
 			<BrowserRouter>
 				<Routes>
 					<Route path="/auth/*" element={<AuthSwitch />} />
-					<Route 
-						path="/mainPage" 
-						element={
-							<ProtectedRoute>
-								<MainPage />
-							</ProtectedRoute>
-						} 
-					/>
+					<Route path="/mainPage" element={<MainSite />} />
 					<Route path="/" element={<Navigate to="/auth" replace />} />
 				</Routes>
 			</BrowserRouter>

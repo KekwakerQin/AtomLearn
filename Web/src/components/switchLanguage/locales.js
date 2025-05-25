@@ -27,7 +27,7 @@ export const translation = {
 			signupFooterOr: 'или',
 		},
 		mainPage: {
-			mainPagelogo: 'ATOM LEARN',
+			mainPageLogo: 'ATOM LEARN',
 			mainPageTitle: 'Прокачай свой словарный запас с умом!',
 			mainPageSubtitle: 'Atom Learn использует алгоритм интервального повторения (Spaced Repetition), чтобы помочь вам запоминать слова и фразы навсегда. Создавайте персонализированные наборы карточек или выбирайте из готовых коллекций. Наша система сама определяет, когда нужно повторить материал для максимального запоминания.',
 			mainPageStartButton: 'Начать изучение',
@@ -61,6 +61,15 @@ export const translation = {
 			signupFooterLoginSwitch: 'Log in',
 			signupPasswordError: "Passwords don't match",
 			signupFooterOr: 'or',
+		},
+		mainPage: {
+			mainPageLogo: 'ATOM LEARN',
+			mainPageTitle: 'Boost your vocabulary intelligently!',
+			mainPageSubtitle: 'Atom Learn uses the Spaced Repetition algorithm to help you memorize words and phrases permanently. Create personalized card sets or choose from ready-made collections. Our system automatically determines when to review material for optimal retention.',
+			mainPageStartButton: 'Start Learning',
+			mainPageBoardButton: 'Boards',
+			mainPageFriendsButton: 'Friends',
+			mainPageDashboardButton: 'Statistics'
 		}
 	}
 }
