@@ -22,7 +22,7 @@ export const AuthSwitch = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-				navigate('/dashboard');
+				navigate('/mainPage');
 				await updateUserData(user);
       } else {
         setIsCheckingAuth(false);

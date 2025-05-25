@@ -3,13 +3,12 @@ import React, {createContext, useContext, useState} from 'react'
 const LanguageContext = createContext();
 
 export const LanguageProvider = ({children}) => {
-	const [language, setLanguage] = useState(localStorage.getItem('appLanguage') || 'en') // язык по умолчанию 'ru' 
+	const [language, setLanguage] = useState(localStorage.getItem('appLanguage') || 'ru') // язык по умолчанию 'ru' 
 
 	const toggleLanguage = () => {
 		const newLanguage = language === 'ru' ? 'en' : 'ru';
 		setLanguage(newLanguage);
 		localStorage.setItem('appLanguage', newLanguage);
-		console.log(newLanguage)
 	}
 	return (
 		<LanguageContext.Provider value={{language, toggleLanguage}}>

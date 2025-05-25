@@ -25,6 +25,15 @@ export const translation = {
 			signupFooterLoginSwitch: 'Войти',
 			signupPasswordError: 'Пароли не совпадают',
 			signupFooterOr: 'или',
+		},
+		mainPage: {
+			mainPagelogo: 'ATOM LEARN',
+			mainPageTitle: 'Прокачай свой словарный запас с умом!',
+			mainPageSubtitle: 'Atom Learn использует алгоритм интервального повторения (Spaced Repetition), чтобы помочь вам запоминать слова и фразы навсегда. Создавайте персонализированные наборы карточек или выбирайте из готовых коллекций. Наша система сама определяет, когда нужно повторить материал для максимального запоминания.',
+			mainPageStartButton: 'Начать изучение',
+			mainPageBoardButton: 'Доски',
+			mainPageFriendsButton: 'Друзья',
+			mainPageDashboardButton: 'Статистика'
 		}
 	},
 	en: {

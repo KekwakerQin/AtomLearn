@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './mainView.css';
+import './index.css';
 import reportWebVitals from './reportWebVitals.js';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import {AuthSwitch} from './components/auth/authPresenter.jsx';
-import Dashboard from './components/dashboard.jsx';
-import ProtectedRoute from './components/ProtectedRoute.jsx';
+import MainPage from './components/mainPage/mainPage.jsx';
+import ProtectedRoute from './components/mainPage/ProtectedRoute.jsx';
 import { LanguageProvider } from './components/switchLanguage/languageContext.jsx';
 
 function App() {
@@ -15,10 +15,10 @@ function App() {
 				<Routes>
 					<Route path="/auth/*" element={<AuthSwitch />} />
 					<Route 
-						path="/dashboard" 
+						path="/mainPage" 
 						element={
 							<ProtectedRoute>
-								<Dashboard />
+								<MainPage />
 							</ProtectedRoute>
 						} 
 					/>

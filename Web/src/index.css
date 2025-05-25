@@ -1,0 +1,26 @@
+@font-face {
+	font-family: 'Pasajero';
+	font-style: normal;
+	font-weight: normal;
+	src: url('./fonts/Pasajero.otf');
+}
+
+body {
+  margin: 0;
+  font-family: 'Pasajero', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+
