@@ -24,52 +24,75 @@ body{
 	/* align-items: center; */
 }
 .mainpage-text{
-	margin-top: 110px;
-	margin-left: 30px;
+	margin-top: 70px;
+	margin-left: 50px;
 	align-items: center;
 	height: 330px;
 }
 .mainpage-title{
-	font-size: 40px;
+	font-size: 30px;
 	font-weight: 200;
 	margin-bottom: 40px;
 }
 .mainpage-subtitle{
 	display: block;
-	font-size: 20px;
+	font-size: 15px;
 	width: 600px;
 	line-height: 35px;
 }
 .mainpage-img{
+	margin-top: 10px;
 	position: absolute;
-	right: 0;
+	right: -30px;
 	width: auto;
 	height: 610px;
 }
-.mainpage-footer{
+.footer{
+	/* text-align: center; */
+	position: fixed;
+	left: 34%;
+	bottom: 0;
   display: grid;
   place-items: center;
-	margin-top: 90px;
+	/* margin-top: 150px; */
 }
 .footer-navbar-container{
 	background-color: white;
 	display: flex;
 	justify-content: space-around;
 	width: 500px;
-	height: 100px;
+	height: 70px;
 	border-radius: 30px 30px 0 0;
 	z-index: 1;
 	align-items: center;
 }
-.mainpage-footer-button{
+.footer-button{
 	background-color: white;
 	border: none;
 	cursor: pointer;
 	/* height: 45px; */
 }
-.mainpage-footer-button svg{
-	fill: gray;
+.footer-button:hover{
+	background-color: rgb(193, 193, 193);
+	transition: all ease 0.5s;
 }
 .active{
 	background-color: rgb(227, 227, 227);
+}
+.start-button{
+	margin-top: 20px;
+	width: 245px;
+	height: 45px;
+	border-radius: 40px;
+	background-color: black;
+	border: 1px solid white;
+	color: white;
+	font-size: 30px;
+	font-weight: 200;
+	  font-family: 'Pasajero', sans-serif;
+		cursor: pointer;
+}
+.start-button:hover{
+	background-color: rgb(51, 51, 51);
+	transition: all ease 0.5s;
 }

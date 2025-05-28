@@ -66,7 +66,7 @@ export const translation = {
 			mainPageLogo: 'ATOM LEARN',
 			mainPageTitle: 'Boost your vocabulary intelligently!',
 			mainPageSubtitle: 'Atom Learn uses the Spaced Repetition algorithm to help you memorize words and phrases permanently. Create personalized card sets or choose from ready-made collections. Our system automatically determines when to review material for optimal retention.',
-			mainPageStartButton: 'Start Learning',
+			mainPageStartButton: 'Get start',
 			mainPageBoardButton: 'Boards',
 			mainPageFriendsButton: 'Friends',
 			mainPageDashboardButton: 'Statistics'

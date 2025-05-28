@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import {AuthSwitch} from './components/auth/authPresenter.jsx';
 import {MainSite} from './components/mainPage/mainPage.jsx';
 import { LanguageProvider } from './components/switchLanguage/languageContext.jsx';
+import { Boards } from './components/boards/boards.jsx';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
 					<Route path="/auth/*" element={<AuthSwitch />} />
 					<Route path="/mainPage" element={<MainSite />} />
 					<Route path="/" element={<Navigate to="/auth" replace />} />
+					<Route path='/boards' element={<Boards/>} />
 				</Routes>
 			</BrowserRouter>
 		</LanguageProvider>
