@@ -70,6 +70,14 @@ export const translation = {
 			mainPageBoardButton: 'Boards',
 			mainPageFriendsButton: 'Friends',
 			mainPageDashboardButton: 'Statistics'
+		},
+		boards: {
+			boardsFilterName: "My boards",
+			boardsFilter: "Filter",
+			boardsFilterProcess: "Process",
+			boardsFilterLearn: "Learn",
+			boardsFilterAll: "All",
+			boardsCreateButton: "Create board"
 		}
 	}
 }

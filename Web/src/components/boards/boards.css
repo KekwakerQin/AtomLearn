@@ -48,3 +48,54 @@
 	background-color: rgb(193, 193, 193);
 	transition: all ease 0.5s;
 }
+
+.boards-list-container{
+	display: grid;
+	justify-items: center;
+	margin-top: 50px;
+	font-size: 20px;
+}
+.boards-filter{
+	display: flex;
+	justify-content: space-between;
+	width: 800px;
+	margin-bottom: 30px;
+}
+.boards-filter-my-boards{
+	/* width: 200px; */
+}
+.boards-filter-all{
+	margin-right: 40px;
+}
+.board{
+	display: flex;
+	align-items: center;
+	background-color: #242424;
+	width: 820px;
+	border-radius: 40px;
+	height: auto;
+	min-height: 40px;
+	margin-bottom: 15px;
+}
+.board-name-container{
+	margin-left: 10px;
+	display: flex;
+	align-items: center;
+}
+.board-name{
+	width: 320px;
+	margin-left: 40px;
+}
+.board-process{
+	width: 190px;
+}
+.board-learn{
+	width: 150px;
+}
+.create-board-button{
+	position: fixed;
+	left: 45%;
+	bottom: 100px;
+	font-size: 20px;
+	padding: 10px 15px;
+}

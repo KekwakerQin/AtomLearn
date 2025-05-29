@@ -7,7 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import {AuthSwitch} from './components/auth/authPresenter.jsx';
 import {MainSite} from './components/mainPage/mainPage.jsx';
 import { LanguageProvider } from './components/switchLanguage/languageContext.jsx';
-import { Boards } from './components/boards/boards.jsx';
+import { Boards } from './components/boards/boardsPresenter.jsx';
 
 function App() {
   return (

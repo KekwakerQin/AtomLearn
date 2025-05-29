@@ -1,0 +1,15 @@
+.standart-button{
+	width: auto;
+	height: 45px;
+	border-radius: 40px;
+	background-color: black;
+	border: 1px solid white;
+	color: white;
+	font-weight: 200;
+	  font-family: 'Pasajero', sans-serif;
+		cursor: pointer;
+}
+.standart-button:hover{
+	background-color: rgb(51, 51, 51);
+	transition: all ease 0.5s;
+}

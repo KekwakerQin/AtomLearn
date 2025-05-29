@@ -11,6 +11,24 @@ export const Boards = () => {
 	const {language, toggleLanguage} = useLanguage();
 	const text = translation[language];
 
+	function random() {
+  return Math.floor(Math.random() * 1000);
+}
+
+	function NewBoard () {
+		return (
+									<div className="board">
+							<div className="board-name-container">
+								<img src="../../images/default-user-img.png" alt="default-user-img" className="default-user-img" />
+								<span className="board-name">board1</span>
+							</div>
+							<span className="board-process">{random()}</span>
+							<span className="board-learn">{random()}</span>
+							<span className="board-all">{random()}</span>
+						</div>
+		)
+	}
+
 	return(
 		<div className="boards">
 			<header className="boards-header">
@@ -19,10 +37,31 @@ export const Boards = () => {
 						{text.mainPage.mainPageLogo}
 					</span>
 				</div>
-				<Button className = 'language-switch-button' type="submit" onClick={toggleLanguage}>
+				<Button className = 'language-switch-button standart-button' type="submit" onClick={toggleLanguage}>
 					{language === 'ru'? 'ENG' : 'RU'}
 				</Button>
 			</header>
+			<section className="boards-container">
+				<div className="boards-list-container">
+					<div className="boards-filter">
+						<span className="boards-filter-my-boards">{text.boards.boardsFilterName}</span>
+						<span className="boards-filter-filter">{text.boards.boardsFilter}</span>
+						<span className="boards-filter-process">{text.boards.boardsFilterProcess}</span>
+						<span className="boards-filter-learn">{text.boards.boardsFilterLearn}</span>
+						<span className="boards-filter-all">{text.boards.boardsFilterAll}</span>
+					</div>
+					<div className="boards-list">
+						<NewBoard></NewBoard>
+						<NewBoard></NewBoard>
+						<NewBoard></NewBoard>
+						<NewBoard></NewBoard>
+						<NewBoard></NewBoard>
+					</div>
+				</div>
+				<Button className="create-board-button standart-button" type="button">
+					{text.boards.boardsCreateButton}
+				</Button>
+			</section>
 			<footer className="footer">
 				<div className="footer-navbar-container">
 					<Button className = 'footer-button boards-button' type="button" onClick={toggleLanguage}>

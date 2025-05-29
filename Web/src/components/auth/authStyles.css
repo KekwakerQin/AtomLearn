@@ -219,9 +219,6 @@
   to { opacity: 1; transform: translateY(0); }
 }
 .language-switch-button{
-  background-color: #6C63FF;
-  color: white;
-  border: none;
   border-radius: 8px;
   padding: 10px 16px; /* Увеличил горизонтальный padding для текста */
   font-size: 16px;
@@ -232,17 +229,6 @@
 	margin-left: 10px;
   width: auto; /* Ширина по содержимому */
   min-width: 60px; /* Минимальная ширина */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Тень для объема */
   position: relative;
   overflow: hidden; /* Для эффекта нажатия */
-}
-.language-switch-button:hover {
-  background-color: #5a52e0; /* Темнее на 10% */
-  transform: translateY(-1px); /* Легкий подъем */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-.language-switch-button:active {
-  background-color: #4a43c7; /* Еще темнее */
-  transform: translateY(1px); /* "Утопление" */
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
