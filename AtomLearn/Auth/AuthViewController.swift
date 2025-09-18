@@ -1,9 +1,11 @@
 import UIKit
 
-class AuthViewController: UIViewController {
+class RegisterViewController: UIViewController {
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        view.backgroundColor = .red
     }
 }
