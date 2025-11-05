@@ -1,15 +1,24 @@
 import UIKit
 import FirebaseFirestore
 
+// Экран карточек выбранного борда
 final class CardsViewController: UIViewController {
+    // MARK: - Properties
+    // Текущий борд
     private let board: Board
+    // Список карточек
     private var cards: [Card] = []
+    // База Firestore
     private let db = Firestore.firestore()
+    // Подписка на обновления
     private var listener: ListenerRegistration?
+    // Пользователь
     private let user: AppUser
 
+    // Коллекция карточек
     private let collection = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
 
+    // Инициализация с пользователем и бордом
     init(user: AppUser, board: Board) {
         self.user = user
         self.board = board
@@ -19,6 +28,8 @@ final class CardsViewController: UIViewController {
     @available(*, unavailable)
     required init?(coder: NSCoder) { fatalError("init(coder:) not implemented") }
 
+    // MARK: - Lifecycle
+    // Настройка интерфейса и запуск наблюдения
     override func viewDidLoad() {
         super.viewDidLoad()
         title = board.title
@@ -30,7 +41,10 @@ final class CardsViewController: UIViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addCard))
     }
 
+    // MARK: - UI
+    // Настройка коллекции карточек
     private func setupCollection() {
+        // Конфигурация layout для карточек
         let layout = UICollectionViewFlowLayout()
         layout.itemSize = CGSize(width: view.frame.width - 40, height: 80)
         layout.minimumLineSpacing = 16
@@ -44,6 +58,8 @@ final class CardsViewController: UIViewController {
         view.addSubview(collection)
     }
 
+    // MARK: - Data
+    // Подписка на изменения карточек в Firestore
     private func observeCards() {
         let cardsCol = db.collection("boards").document(board.id).collection("cards")
 
@@ -53,7 +69,7 @@ final class CardsViewController: UIViewController {
                 guard let self else { return }
 
                 if let error = error {
-                    print("Listener error:", error)
+                    print("[LOG:ERROR] Ошибка слушателя: \(error.localizedDescription)")
                     return
                 }
 
@@ -67,14 +83,17 @@ final class CardsViewController: UIViewController {
                     self.collection.reloadData()
                 }
 
-                print("[CardsVC] synced cards = \(self.cards.count)")
+                print("[LOG:INFO] CardsVC синхронизировал карточки: \(self.cards.count)")
             }
     }
     
+    // Отписка от слушателя при деинициализации
     deinit {
         listener?.remove()
     }
 
+    // MARK: - Actions
+    // Добавление новой карточки в текущий борд
     @objc private func addCard() {
         print("BOARD: \(board.id) | UID: \(user.uid)")
         let data = Card.basic(for: board.id, ownerId: user.uid)
@@ -82,14 +101,15 @@ final class CardsViewController: UIViewController {
             .collection("cards")
             .addDocument(data: data) { error in
                 if let error = error {
-                    print("Error adding card:", error)
+                    print("[LOG:ERROR] Ошибка при добавлении карточки: \(error.localizedDescription)")
                 } else {
-                    print("Card added successfully by \(self.user.uid)")
+                    print("[LOG:INFO] Карточка успешно добавлена пользователем \(self.user.uid)")
                 }
             }
     }
 }
 
+// MARK: - UICollectionViewDataSource & UICollectionViewDelegate
 extension CardsViewController: UICollectionViewDataSource, UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         cards.count

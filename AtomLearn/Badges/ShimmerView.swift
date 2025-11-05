@@ -2,47 +2,52 @@ import UIKit
 
 final class ShimmerView: UIView {
     private let gradient = CAGradientLayer()
-    private var animating = false
+    private var isAnimating = false
 
     override init(frame: CGRect) {
         super.init(frame: frame)
         isUserInteractionEnabled = false
-        backgroundColor = UIColor.secondarySystemFill
-        gradient.colors = [
-            UIColor.secondarySystemFill.cgColor,
-            UIColor.tertiarySystemFill.cgColor,
-            UIColor.secondarySystemFill.cgColor
-        ]
-        gradient.startPoint = CGPoint(x: 0, y: 0.5)
-        gradient.endPoint = CGPoint(x: 1, y: 0.5)
-        gradient.locations = [0, 0.5, 1]
-        layer.addSublayer(gradient)
         layer.masksToBounds = true
         layer.cornerRadius = 8
+
+        // более контрастные цвета (видно и в light, и в dark)
+        let base = UIColor.systemGray5.cgColor
+        let highlight = UIColor.systemGray4.cgColor
+
+        gradient.colors = [base, highlight, base]
+        gradient.locations = [0, 0.5, 1]
+        gradient.startPoint = CGPoint(x: 0, y: 0.5)
+        gradient.endPoint   = CGPoint(x: 1, y: 0.5)
+        layer.addSublayer(gradient)
     }
 
     required init?(coder: NSCoder) { fatalError() }
 
     override func layoutSubviews() {
         super.layoutSubviews()
-        gradient.frame = bounds.insetBy(dx: -bounds.width, dy: 0) // запас для анимации
+        // Делаем слой шире, чтобы «блик» мог уехать за границы
+        gradient.frame = bounds.insetBy(dx: -bounds.width, dy: 0)
     }
 
     func start() {
-        guard !animating else { return }
-        animating = true
-        let animation = CABasicAnimation(keyPath: "locations")
-        animation.fromValue = [-1, -0.5, 0]
-        animation.toValue = [1, 1.5, 2]
-        animation.duration = 1.25
-        animation.repeatCount = .infinity
-        gradient.add(animation, forKey: "shimmer")
+        guard !isAnimating else { return }
+        isAnimating = true
         isHidden = false
+
+        // Анимация «блика» через сдвиг locations
+        let anim = CABasicAnimation(keyPath: "locations")
+        anim.fromValue = [-1, -0.5, 0]
+        anim.toValue   = [1, 1.5, 2]
+        anim.duration = 1.2
+        anim.repeatCount = .infinity
+        anim.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+
+        gradient.add(anim, forKey: "shimmer.locations")
     }
 
     func stop() {
-        animating = false
-        gradient.removeAnimation(forKey: "shimmer")
+        isAnimating = false
+        gradient.removeAnimation(forKey: "shimmer.locations")
         isHidden = true
     }
 }
