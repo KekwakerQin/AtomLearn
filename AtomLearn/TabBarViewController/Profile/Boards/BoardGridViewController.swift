@@ -98,10 +98,8 @@ final class BoardsGridViewController: UIViewController, UICollectionViewDelegate
         navigationItem.rightBarButtonItems = [add, sort]
     }
 
-    private func sortButtonTitle() -> String {
-        order == .createdAtDesc ? "Новые ↑" : "Старые ↑"
-    }
-
+    private func sortButtonTitle() -> String { order.title }
+    
     // MARK: - Actions
     @objc private func addTapped() {
         let vc = AddBoardViewController { [weak self] title, desc in
@@ -122,31 +120,32 @@ final class BoardsGridViewController: UIViewController, UICollectionViewDelegate
 
     // Переключаем порядок сортировки и прокручиваем к началу
     @objc private func toggleSort() {
-        order = (order == .createdAtDesc) ? .createdAtAsc : .createdAtDesc
+        order = order.toggled()
         if let items = navigationItem.rightBarButtonItems, items.count > 1 {
-            items[1].title = sortButtonTitle()
+            items[1].title = order.title
         }
-
-        // Скроллим к началу
+            
+        // Скролл к началу
         let top = CGPoint(x: 0, y: -collection.adjustedContentInset.top)
         collection.setContentOffset(top, animated: false)
-
         resortAndApply(animated: true)
     }
-
+    
     // MARK: - Автосмена сортировки (каждую секунду)
     private func startSortTimer() {
         timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+        let t = Timer(timeInterval: 1.0, repeats: true) { [weak self] _ in
             guard let self else { return }
-            self.order = (self.order == .createdAtDesc) ? .createdAtAsc : .createdAtDesc
+            self.order = self.order.toggled()
             if let items = self.navigationItem.rightBarButtonItems, items.count > 1 {
-                items[1].title = self.sortButtonTitle()
+                items[1].title = self.order.title
             }
             self.resortAndApply(animated: true)
         }
+        timer = t
+        RunLoop.main.add(t, forMode: .common)
     }
-
+    
     // MARK: - Firestore Listener
     private func startObserving() {
         listener?.remove()
@@ -169,15 +168,22 @@ final class BoardsGridViewController: UIViewController, UICollectionViewDelegate
 
     // Применяем новую сортировку и обновляем снапшот
     private func resortAndApply(animated: Bool) {
-        // сортируем по createdAtClient (Date)
+        let isDesc: Bool = {
+            switch order {
+            case .createdAtDesc: return true
+            case .createdAtAsc:  return false
+            }
+        }()
+
+        // Сортировка по дате
         boards.sort {
-            order == .createdAtDesc
-                ? ($0.createdAtClient > $1.createdAtClient)
-                : ($0.createdAtClient < $1.createdAtClient)
+            let d0 = $0.createdAtClient
+            let d1 = $1.createdAtClient
+            return isDesc ? (d0 > d1) : (d0 < d1)
         }
         applySnapshot(animated: animated)
     }
-
+    
     // Пересобираем снапшот для diffable data source
     private func applySnapshot(animated: Bool = true) {
         boardsById = Dictionary(uniqueKeysWithValues: boards.map { ($0.id, $0) })

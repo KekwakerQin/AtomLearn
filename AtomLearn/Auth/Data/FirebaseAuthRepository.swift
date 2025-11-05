@@ -33,7 +33,7 @@ final class FirebaseAuthRepository {
             try Auth.auth().signOut()
             
             // Чистим Google SignIn, чтобы при следующем входе не подхватывалась старая сессия
-            if let rootVC = UIApplication.shared.connectedScenes
+            if let _ = UIApplication.shared.connectedScenes
                 .compactMap({ ($0 as? UIWindowScene)?.keyWindow?.rootViewController })
                 .first {
                 GIDSignIn.sharedInstance.signOut()

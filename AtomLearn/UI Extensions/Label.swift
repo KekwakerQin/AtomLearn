@@ -17,7 +17,7 @@ enum FontSize: CGFloat {
 }
 
 extension UILabel {
-    static func make(text text: String, _ size: FontSize = .standart, _ weight: FontWeight = .regular) -> UILabel {
+    static func make(text: String, _ size: FontSize = .standart, _ weight: FontWeight = .regular) -> UILabel {
         let label = UILabel()
         label.text = text
         label.textColor = UIColor(named: "TextColor")

@@ -70,7 +70,7 @@ extension TableViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        var nextView = CellViewController()
+        let nextView = CellViewController()
         self.navigationController?.pushViewController(nextView, animated: true)
         DispatchQueue.global(qos: .background).async {
             DispatchQueue.main.asyncAfter(deadline: .now() + 5) {

@@ -6,6 +6,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     // Главное окно приложения
     var window: UIWindow?
+    
+    // Handle for Firebase Auth state listener to remove it when no longer needed
+    private var authStateDidChangeHandle: AuthStateDidChangeListenerHandle?
+    
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
 
@@ -31,7 +35,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         }
 
         // Следим за сменой состояния авторизации
-        Auth.auth().addStateDidChangeListener { [weak self] _, user in
+        authStateDidChangeHandle = Auth.auth().addStateDidChangeListener { [weak self] _, user in
             guard let self = self else { return }
 
             if let user {
@@ -55,6 +59,19 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneDidEnterBackground(_ scene: UIScene) {
         // Сохраняем данные при уходе в фон
         (UIApplication.shared.delegate as? AppDelegate)?.saveContext()
+    }
+
+    func sceneDidDisconnect(_ scene: UIScene) {
+        if let handle = authStateDidChangeHandle {
+            Auth.auth().removeStateDidChangeListener(handle)
+            authStateDidChangeHandle = nil
+        }
+    }
+
+    deinit {
+        if let handle = authStateDidChangeHandle {
+            Auth.auth().removeStateDidChangeListener(handle)
+        }
     }
 
 
@@ -83,3 +100,4 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         return UINavigationController(rootViewController: authVC)
     }
 }
+
