@@ -1,13 +1,22 @@
 // BoardGridCell.swift
 import UIKit
 
+// Ячейка доски в сетке
 final class BoardGridCell: UICollectionViewCell {
+    // MARK: - Properties
+
+    // Идентификатор для переиспользования
     static let reuseID = "BoardGridCell"
 
+    // Заголовок доски
     private let title = UILabel()
+    // Подзаголовок или описание
     private let subtitle = UILabel()
+    // Контейнер-карточка
     private let card = UIView()
 
+    // MARK: - Init
+    // Настройка внешнего вида и иерархии
     override init(frame: CGRect) {
         super.init(frame: frame)
 
@@ -43,6 +52,8 @@ final class BoardGridCell: UICollectionViewCell {
     }
     required init?(coder: NSCoder) { fatalError() }
 
+    // MARK: - Configuration
+    // Настройка содержимого ячейки данными борда
     func configure(_ board: Board) {
         title.text = board.title
         subtitle.text = board.description.isEmpty

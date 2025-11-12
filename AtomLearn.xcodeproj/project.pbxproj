@@ -6,6 +6,21 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		7D0986092E9354A400F19213 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 7D0986082E9354A400F19213 /* GoogleSignIn */; };
+		7D498C462E9F6C0100D2529E /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 7DA0E9EA2E9F616F00DD8E9D /* .gitignore */; };
+		7D9D54992E7C0BD4001A88BB /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 7D9D54982E7C0BD4001A88BB /* FirebaseAnalytics */; };
+		7D9D549B2E7C0BD4001A88BB /* FirebaseAnalyticsCore in Frameworks */ = {isa = PBXBuildFile; productRef = 7D9D549A2E7C0BD4001A88BB /* FirebaseAnalyticsCore */; };
+		7D9D549D2E7C0BD4001A88BB /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 7D9D549C2E7C0BD4001A88BB /* FirebaseAuth */; };
+		7D9D549F2E7C0BD4001A88BB /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 7D9D549E2E7C0BD4001A88BB /* FirebaseCore */; };
+		7D9D54A12E7C0BD4001A88BB /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 7D9D54A02E7C0BD4001A88BB /* FirebaseDatabase */; };
+		7D9D54A32E7C0BD4001A88BB /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 7D9D54A22E7C0BD4001A88BB /* FirebaseFirestore */; };
+		7D9D54A52E7C0BD4001A88BB /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 7D9D54A42E7C0BD4001A88BB /* FirebaseMessaging */; };
+		7D9D54A72E7C0BD4001A88BB /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 7D9D54A62E7C0BD4001A88BB /* FirebaseStorage */; };
+		7DA0E9E32E9F5DE100DD8E9D /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 7DA0E9E22E9F5DE100DD8E9D /* Storage */; };
+		7DA0E9ED2E9F63FA00DD8E9D /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 7DA0E9EC2E9F63FA00DD8E9D /* Supabase */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		7D9D545A2E7BCEC8001A88BB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,30 +42,47 @@
 		7D9D54402E7BCEC6001A88BB /* AtomLearn.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AtomLearn.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7D9D54592E7BCEC8001A88BB /* AtomLearnTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AtomLearnTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7D9D54632E7BCEC8001A88BB /* AtomLearnUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AtomLearnUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		7DA0E9EA2E9F616F00DD8E9D /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		7D9D546B2E7BCEC8001A88BB /* Exceptions for "AtomLearn" folder in "AtomLearn" target */ = {
+		7D9D54822E7BF2B5001A88BB /* Exceptions for "AtomLearn" folder in "AtomLearnTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				AtomLearnTests/AtomLearnTests.swift,
+			);
+			target = 7D9D54582E7BCEC8001A88BB /* AtomLearnTests */;
+		};
+		7D9D54912E7BF696001A88BB /* Exceptions for "AtomLearn" folder in "AtomLearn" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Config.xcconfig,
 				Info.plist,
+				Trash/AuthViewController.swift,
 			);
 			target = 7D9D543F2E7BCEC6001A88BB /* AtomLearn */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		7D498C452E9F6A1700D2529E /* Exceptions for "AtomLearn" folder in "Compile Sources" phase from "AtomLearn" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = 7D9D543C2E7BCEC6001A88BB /* Sources */;
+			membershipExceptions = (
+				Config.xcconfig,
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		7D9D54422E7BCEC6001A88BB /* AtomLearn */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				7D9D546B2E7BCEC8001A88BB /* Exceptions for "AtomLearn" folder in "AtomLearn" target */,
+				7D9D54912E7BF696001A88BB /* Exceptions for "AtomLearn" folder in "AtomLearn" target */,
+				7D498C452E9F6A1700D2529E /* Exceptions for "AtomLearn" folder in "Compile Sources" phase from "AtomLearn" target */,
+				7D9D54822E7BF2B5001A88BB /* Exceptions for "AtomLearn" folder in "AtomLearnTests" target */,
 			);
 			path = AtomLearn;
-			sourceTree = "<group>";
-		};
-		7D9D545C2E7BCEC8001A88BB /* AtomLearnTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = AtomLearnTests;
 			sourceTree = "<group>";
 		};
 		7D9D54662E7BCEC8001A88BB /* AtomLearnUITests */ = {
@@ -65,6 +97,17 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7DA0E9ED2E9F63FA00DD8E9D /* Supabase in Frameworks */,
+				7D9D54A12E7C0BD4001A88BB /* FirebaseDatabase in Frameworks */,
+				7D9D54992E7C0BD4001A88BB /* FirebaseAnalytics in Frameworks */,
+				7D9D54A52E7C0BD4001A88BB /* FirebaseMessaging in Frameworks */,
+				7D9D549D2E7C0BD4001A88BB /* FirebaseAuth in Frameworks */,
+				7D9D549F2E7C0BD4001A88BB /* FirebaseCore in Frameworks */,
+				7D9D54A72E7C0BD4001A88BB /* FirebaseStorage in Frameworks */,
+				7D9D549B2E7C0BD4001A88BB /* FirebaseAnalyticsCore in Frameworks */,
+				7D9D54A32E7C0BD4001A88BB /* FirebaseFirestore in Frameworks */,
+				7DA0E9E32E9F5DE100DD8E9D /* Storage in Frameworks */,
+				7D0986092E9354A400F19213 /* GoogleSignIn in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -88,9 +131,10 @@
 		7D9D54372E7BCEC6001A88BB = {
 			isa = PBXGroup;
 			children = (
+				7DA0E9EA2E9F616F00DD8E9D /* .gitignore */,
 				7D9D54422E7BCEC6001A88BB /* AtomLearn */,
-				7D9D545C2E7BCEC8001A88BB /* AtomLearnTests */,
 				7D9D54662E7BCEC8001A88BB /* AtomLearnUITests */,
+				7D9D54972E7C0BD4001A88BB /* Frameworks */,
 				7D9D54412E7BCEC6001A88BB /* Products */,
 			);
 			sourceTree = "<group>";
@@ -103,6 +147,13 @@
 				7D9D54632E7BCEC8001A88BB /* AtomLearnUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		7D9D54972E7C0BD4001A88BB /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -125,6 +176,17 @@
 			);
 			name = AtomLearn;
 			packageProductDependencies = (
+				7D9D54982E7C0BD4001A88BB /* FirebaseAnalytics */,
+				7D9D549A2E7C0BD4001A88BB /* FirebaseAnalyticsCore */,
+				7D9D549C2E7C0BD4001A88BB /* FirebaseAuth */,
+				7D9D549E2E7C0BD4001A88BB /* FirebaseCore */,
+				7D9D54A02E7C0BD4001A88BB /* FirebaseDatabase */,
+				7D9D54A22E7C0BD4001A88BB /* FirebaseFirestore */,
+				7D9D54A42E7C0BD4001A88BB /* FirebaseMessaging */,
+				7D9D54A62E7C0BD4001A88BB /* FirebaseStorage */,
+				7D0986082E9354A400F19213 /* GoogleSignIn */,
+				7DA0E9E22E9F5DE100DD8E9D /* Storage */,
+				7DA0E9EC2E9F63FA00DD8E9D /* Supabase */,
 			);
 			productName = AtomLearn;
 			productReference = 7D9D54402E7BCEC6001A88BB /* AtomLearn.app */;
@@ -142,9 +204,6 @@
 			);
 			dependencies = (
 				7D9D545B2E7BCEC8001A88BB /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				7D9D545C2E7BCEC8001A88BB /* AtomLearnTests */,
 			);
 			name = AtomLearnTests;
 			packageProductDependencies = (
@@ -210,6 +269,8 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				7D9D547E2E7BEA8C001A88BB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				7D0986072E9354A400F19213 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				7DA0E9E12E9F5DE100DD8E9D /* XCRemoteSwiftPackageReference "supabase-swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 7D9D54412E7BCEC6001A88BB /* Products */;
@@ -228,6 +289,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7D498C462E9F6C0100D2529E /* .gitignore in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -287,12 +349,15 @@
 /* Begin XCBuildConfiguration section */
 		7D9D546D2E7BCEC8001A88BB /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 7D9D54422E7BCEC6001A88BB /* AtomLearn */;
+			baseConfigurationReferenceRelativePath = Config.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = FM5UA69R37;
+				ENABLE_TESTABILITY = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AtomLearn/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
@@ -300,7 +365,7 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -320,12 +385,15 @@
 		};
 		7D9D546E2E7BCEC8001A88BB /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 7D9D54422E7BCEC6001A88BB /* AtomLearn */;
+			baseConfigurationReferenceRelativePath = Config.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = FM5UA69R37;
+				ENABLE_TESTABILITY = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AtomLearn/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
@@ -333,7 +401,7 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -598,6 +666,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		7D0986072E9354A400F19213 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.0.0;
+			};
+		};
 		7D9D547E2E7BEA8C001A88BB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
@@ -606,7 +682,73 @@
 				minimumVersion = 12.3.0;
 			};
 		};
+		7DA0E9E12E9F5DE100DD8E9D /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		7D0986082E9354A400F19213 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7D0986072E9354A400F19213 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		7D9D54982E7C0BD4001A88BB /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7D9D547E2E7BEA8C001A88BB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		7D9D549A2E7C0BD4001A88BB /* FirebaseAnalyticsCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7D9D547E2E7BEA8C001A88BB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalyticsCore;
+		};
+		7D9D549C2E7C0BD4001A88BB /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7D9D547E2E7BEA8C001A88BB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		7D9D549E2E7C0BD4001A88BB /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7D9D547E2E7BEA8C001A88BB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		7D9D54A02E7C0BD4001A88BB /* FirebaseDatabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7D9D547E2E7BEA8C001A88BB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseDatabase;
+		};
+		7D9D54A22E7C0BD4001A88BB /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7D9D547E2E7BEA8C001A88BB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		7D9D54A42E7C0BD4001A88BB /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7D9D547E2E7BEA8C001A88BB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
+		};
+		7D9D54A62E7C0BD4001A88BB /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7D9D547E2E7BEA8C001A88BB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
+		};
+		7DA0E9E22E9F5DE100DD8E9D /* Storage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7DA0E9E12E9F5DE100DD8E9D /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Storage;
+		};
+		7DA0E9EC2E9F63FA00DD8E9D /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7DA0E9E12E9F5DE100DD8E9D /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 7D9D54382E7BCEC6001A88BB /* Project object */;
 }

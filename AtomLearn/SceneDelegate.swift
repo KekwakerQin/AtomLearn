@@ -1,59 +1,103 @@
-//
-//  SceneDelegate.swift
-//  AtomLearn
-//
-//  Created by Qin Chingis on 9/18/25.
-//
-
 import UIKit
+import FirebaseAuth
 
+// Делегат сцены — точка входа UI
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
-
+    
+    // Главное окно приложения
     var window: UIWindow?
-
-
+    
+    // Handle for Firebase Auth state listener to remove it when no longer needed
+    private var authStateDidChangeHandle: AuthStateDidChangeListenerHandle?
+    
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
-        // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
-        // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         guard let windowScene = (scene as? UIWindowScene) else { return }
+
+        // Создаём окно и показываем стартовый экран
         let window = UIWindow(windowScene: windowScene)
         self.window = window
-        window.rootViewController = AuthViewController()
-        window.makeKeyAndVisible()
-    }
 
-    func sceneDidDisconnect(_ scene: UIScene) {
-        // Called as the scene is being released by the system.
-        // This occurs shortly after the scene enters the background, or when its session is discarded.
-        // Release any resources associated with this scene that can be re-created the next time the scene connects.
-        // The scene may re-connect later, as its session was not necessarily discarded (see `application:didDiscardSceneSessions` instead).
-    }
+        if let fbUser = Auth.auth().currentUser {
+            // Создаём модель текущего пользователя
+            let user = AppUser(
+                uid: fbUser.uid,
+                name: fbUser.displayName ?? "",
+                email: fbUser.email,
+                displayName: fbUser.displayName
+            )
+            // Главный экран с таббаром
+            let main = makeMain(for: user)
+            setRoot(main, animated: false)
+        } else {
+            // Экран авторизации
+            let auth = makeAuth()
+            setRoot(auth, animated: false)
+        }
 
-    func sceneDidBecomeActive(_ scene: UIScene) {
-        // Called when the scene has moved from an inactive state to an active state.
-        // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
-    }
+        // Следим за сменой состояния авторизации
+        authStateDidChangeHandle = Auth.auth().addStateDidChangeListener { [weak self] _, user in
+            guard let self = self else { return }
 
-    func sceneWillResignActive(_ scene: UIScene) {
-        // Called when the scene will move from an active state to an inactive state.
-        // This may occur due to temporary interruptions (ex. an incoming phone call).
-    }
-
-    func sceneWillEnterForeground(_ scene: UIScene) {
-        // Called as the scene transitions from the background to the foreground.
-        // Use this method to undo the changes made on entering the background.
+            if let user {
+                // Пользователь вошёл — переходим на главный экран
+                let appUser = AppUser(
+                    uid: user.uid,
+                    name: user.displayName ?? "",
+                    email: user.email,
+                    displayName: user.displayName
+                )
+                let main = self.makeMain(for: appUser)
+                self.setRoot(main, animated: true)
+            } else {
+                // Пользователь вышел — показываем авторизацию
+                let auth = self.makeAuth()
+                self.setRoot(auth, animated: true)
+            }
+        }
     }
 
     func sceneDidEnterBackground(_ scene: UIScene) {
-        // Called as the scene transitions from the foreground to the background.
-        // Use this method to save data, release shared resources, and store enough scene-specific state information
-        // to restore the scene back to its current state.
-
-        // Save changes in the application's managed object context when the application transitions to the background.
+        // Сохраняем данные при уходе в фон
         (UIApplication.shared.delegate as? AppDelegate)?.saveContext()
     }
 
+    func sceneDidDisconnect(_ scene: UIScene) {
+        if let handle = authStateDidChangeHandle {
+            Auth.auth().removeStateDidChangeListener(handle)
+            authStateDidChangeHandle = nil
+        }
+    }
 
+    deinit {
+        if let handle = authStateDidChangeHandle {
+            Auth.auth().removeStateDidChangeListener(handle)
+        }
+    }
+
+
+    // Обёртка для установки корневого контроллера
+    private func setRoot(_ vc: UIViewController, animated: Bool) {
+        guard let window = self.window else { return }
+        if animated {
+            let transition = CATransition()
+            transition.type = .fade
+            transition.duration = 0.25
+            window.layer.add(transition, forKey: kCATransition)
+        }
+        window.rootViewController = vc
+        window.makeKeyAndVisible()
+    }
+
+    // Создать главный экран приложения
+    private func makeMain(for user: AppUser) -> UIViewController {
+        let main = MainTabBarController(user: user)
+        return UINavigationController(rootViewController: main)
+    }
+
+    // Создать экран авторизации
+    private func makeAuth() -> UIViewController {
+        let authVC = AuthViewController()
+        return UINavigationController(rootViewController: authVC)
+    }
 }
 
