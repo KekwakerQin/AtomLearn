@@ -21,6 +21,9 @@
       "@app/*": ["app/*"],
       "@app": ["app/index.ts"],
 
+      "@pages/*": ["pages/*"],
+      "@pages": ["pages/index.ts"],
+
       "@widgets/*": ["widgets/*"],
       "@widgets": ["widgets/index.ts"],
 

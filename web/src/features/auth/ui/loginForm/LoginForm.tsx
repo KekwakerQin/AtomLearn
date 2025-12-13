@@ -1,5 +1,6 @@
-import React from "react";
+import { registerUser } from "@features";
+import { useState } from "react";
 
 export const LoginForm = () => {
-  return <div>LoginForm</div>;
+  return <div>Login form</div>;
 };
