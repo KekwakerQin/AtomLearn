@@ -21,7 +21,7 @@ export const LoginForm = () => {
       return;
     }
 
-    navigate("/");
+    navigate("/profile");
   }
 
   return (
