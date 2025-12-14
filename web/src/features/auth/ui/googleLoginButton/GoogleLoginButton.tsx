@@ -9,7 +9,7 @@ export function GoogleLoginButton() {
     const res = await signInWithGoogle();
 
     if (res.ok) {
-      navigate("/");
+      navigate("/profile");
     } else {
       alert(res.message);
     }
