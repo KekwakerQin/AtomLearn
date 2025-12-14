@@ -28,6 +28,7 @@ export async function registerUser(input: RegisterUserInput) {
       name,
       email,
       displayName,
+      password,
       username: generateUsername(displayName),
 
       avatarURL: null,
