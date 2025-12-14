@@ -30,7 +30,7 @@ export const RegisterForm = () => {
       return;
     }
 
-    navigate("/");
+    navigate("/profile");
   }
 
   return (
