@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import { Layout } from "@app";
+
 import { LoginPage, RegisterPage } from "@pages";
-import { Layout } from "@app/layout/Layout";
 
 export const RouterProvider = () => {
   return (

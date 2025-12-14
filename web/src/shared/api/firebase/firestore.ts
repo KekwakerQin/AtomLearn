@@ -1,5 +1,6 @@
-import { db } from "./config";
 import { doc, setDoc, getDoc } from "firebase/firestore";
+
+import { db } from "@shared";
 
 export const firebaseFirestoreApi = {
   set: <T extends object>(collection: string, id: string, data: T) =>
