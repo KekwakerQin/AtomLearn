@@ -25,28 +25,29 @@ export const LoginForm = () => {
   }
 
   return (
-    <form onSubmit={handleLogin}>
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-      />
+    <>
+      <form onSubmit={handleLogin}>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
 
-      <input
-        type="password"
-        placeholder="Пароль"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-      />
+        <input
+          type="password"
+          placeholder="Пароль"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
 
-      <button type="submit">Войти</button>
+        <button type="submit">Войти</button>
 
-      {error && <div style={{ color: "red" }}>{error}</div>}
-
+        {error && <div style={{ color: "red" }}>{error}</div>}
+      </form>
       <GoogleLoginButton />
-    </form>
+    </>
   );
 };

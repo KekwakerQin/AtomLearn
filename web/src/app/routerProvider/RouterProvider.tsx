@@ -12,6 +12,7 @@ export const RouterProvider = () => {
           <Route path="login" element={<LoginPage />} />
           <Route path="register" element={<RegisterPage />} />
           <Route path="profile" element={<ProfilePage />} />
+          {/* <Route path="card" element={<Card />} /> */}
         </Route>
       </Routes>
     </BrowserRouter>
