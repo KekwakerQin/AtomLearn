@@ -1,3 +1,5 @@
+export * from "./board/model/types";
+
 export * from "./card/model/types";
 
 export * from "./user/model/api";
