@@ -34,44 +34,45 @@ export const RegisterForm = () => {
   }
 
   return (
-    <form onSubmit={handleRegister}>
-      <input
-        type="text"
-        placeholder="фио"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        required
-      />
+    <>
+      <form onSubmit={handleRegister}>
+        <input
+          type="text"
+          placeholder="фио"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
 
-      <input
-        type="email"
-        placeholder="емеил"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-      />
+        <input
+          type="email"
+          placeholder="емеил"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
 
-      <input
-        type="text"
-        placeholder="дисплей нейм"
-        value={displayName}
-        onChange={(e) => setDisplayName(e.target.value)}
-        required
-      />
+        <input
+          type="text"
+          placeholder="дисплей нейм"
+          value={displayName}
+          onChange={(e) => setDisplayName(e.target.value)}
+          required
+        />
 
-      <input
-        type="password"
-        placeholder="пароль"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-      />
+        <input
+          type="password"
+          placeholder="пароль"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
 
-      <button type="submit">зарегистрироваться</button>
+        <button type="submit">зарегистрироваться</button>
 
-      {error && <div style={{ color: "red" }}>{error}</div>}
-
+        {error && <div style={{ color: "red" }}>{error}</div>}
+      </form>
       <GoogleLoginButton />
-    </form>
+    </>
   );
 };
