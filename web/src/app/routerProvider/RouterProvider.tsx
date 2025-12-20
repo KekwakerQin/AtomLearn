@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import { Layout } from "@app";
+import { IndexRedirect, Layout, RequireAuth, RequireGuest } from "@app";
 
 import { LoginPage, ProfilePage, RegisterPage } from "@pages";
 
@@ -9,10 +9,18 @@ export const RouterProvider = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route path="login" element={<LoginPage />} />
-          <Route path="register" element={<RegisterPage />} />
-          <Route path="profile" element={<ProfilePage />} />
-          {/* <Route path="card" element={<Card />} /> */}
+          <Route index element={<IndexRedirect />} />
+
+          <Route element={<RequireGuest />}>
+            <Route path="login" element={<LoginPage />} />
+            <Route path="register" element={<RegisterPage />} />
+          </Route>
+
+          <Route element={<RequireAuth />}>
+            <Route path="profile" element={<ProfilePage />} />
+            {/* <Route path="boards/:boardId" element={<BoardPage />} />
+            <Route path="cards/:cardId" element={<CardPage />} /> */}
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>
