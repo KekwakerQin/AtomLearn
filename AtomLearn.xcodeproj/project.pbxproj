@@ -45,43 +45,9 @@
 		7DA0E9EA2E9F616F00DD8E9D /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		7D9D54822E7BF2B5001A88BB /* Exceptions for "AtomLearn" folder in "AtomLearnTests" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				AtomLearnTests/AtomLearnTests.swift,
-			);
-			target = 7D9D54582E7BCEC8001A88BB /* AtomLearnTests */;
-		};
-		7D9D54912E7BF696001A88BB /* Exceptions for "AtomLearn" folder in "AtomLearn" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Config.xcconfig,
-				Info.plist,
-				Trash/AuthViewController.swift,
-			);
-			target = 7D9D543F2E7BCEC6001A88BB /* AtomLearn */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
-/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-		7D498C452E9F6A1700D2529E /* Exceptions for "AtomLearn" folder in "Compile Sources" phase from "AtomLearn" target */ = {
-			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
-			buildPhase = 7D9D543C2E7BCEC6001A88BB /* Sources */;
-			membershipExceptions = (
-				Config.xcconfig,
-			);
-		};
-/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		7D9D54422E7BCEC6001A88BB /* AtomLearn */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				7D9D54912E7BF696001A88BB /* Exceptions for "AtomLearn" folder in "AtomLearn" target */,
-				7D498C452E9F6A1700D2529E /* Exceptions for "AtomLearn" folder in "Compile Sources" phase from "AtomLearn" target */,
-				7D9D54822E7BF2B5001A88BB /* Exceptions for "AtomLearn" folder in "AtomLearnTests" target */,
-			);
 			path = AtomLearn;
 			sourceTree = "<group>";
 		};
