@@ -16,6 +16,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Создаём окно и показываем стартовый экран
         let window = UIWindow(windowScene: windowScene)
         self.window = window
+        window.backgroundColor = .systemBackground
 
         if let fbUser = Auth.auth().currentUser {
             // Создаём модель текущего пользователя
@@ -78,20 +79,23 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     // Обёртка для установки корневого контроллера
     private func setRoot(_ vc: UIViewController, animated: Bool) {
         guard let window = self.window else { return }
+
         if animated {
             let transition = CATransition()
             transition.type = .fade
             transition.duration = 0.25
+            transition.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
             window.layer.add(transition, forKey: kCATransition)
         }
+
         window.rootViewController = vc
         window.makeKeyAndVisible()
+        window.layoutIfNeeded()
     }
 
     // Создать главный экран приложения
     private func makeMain(for user: AppUser) -> UIViewController {
-        let main = MainTabBarController(user: user)
-        return UINavigationController(rootViewController: main)
+        MainTabBarController(user: user)
     }
 
     // Создать экран авторизации
@@ -100,4 +104,5 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         return UINavigationController(rootViewController: authVC)
     }
 }
+
 

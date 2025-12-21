@@ -8,7 +8,7 @@ struct AnatomyStudyScreen: View {
         
         ZStack {
             Color(.systemGroupedBackground)
-//                .ignoresSafeArea(edges: .top)
+                .ignoresSafeArea()
             VStack {
                 // MARK: - Header
                 header
