@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		7D0986092E9354A400F19213 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 7D0986082E9354A400F19213 /* GoogleSignIn */; };
-		7D498C462E9F6C0100D2529E /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 7DA0E9EA2E9F616F00DD8E9D /* .gitignore */; };
 		7D9D54992E7C0BD4001A88BB /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 7D9D54982E7C0BD4001A88BB /* FirebaseAnalytics */; };
 		7D9D549B2E7C0BD4001A88BB /* FirebaseAnalyticsCore in Frameworks */ = {isa = PBXBuildFile; productRef = 7D9D549A2E7C0BD4001A88BB /* FirebaseAnalyticsCore */; };
 		7D9D549D2E7C0BD4001A88BB /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 7D9D549C2E7C0BD4001A88BB /* FirebaseAuth */; };
@@ -45,9 +44,24 @@
 		7DA0E9EA2E9F616F00DD8E9D /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		7D0498042EF7F33900BDCFEC /* Exceptions for "AtomLearn" folder in "AtomLearn" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Config.xcconfig,
+				Info.plist,
+				Trash/AuthViewController.swift,
+			);
+			target = 7D9D543F2E7BCEC6001A88BB /* AtomLearn */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		7D9D54422E7BCEC6001A88BB /* AtomLearn */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				7D0498042EF7F33900BDCFEC /* Exceptions for "AtomLearn" folder in "AtomLearn" target */,
+			);
 			path = AtomLearn;
 			sourceTree = "<group>";
 		};
@@ -255,7 +269,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7D498C462E9F6C0100D2529E /* .gitignore in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -324,7 +337,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = FM5UA69R37;
 				ENABLE_TESTABILITY = YES;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = AtomLearn/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -337,7 +350,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = Kekwaker.AtomLearn;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kekwaker.atomlearn;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -360,7 +373,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = FM5UA69R37;
 				ENABLE_TESTABILITY = NO;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = AtomLearn/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -373,7 +386,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = Kekwaker.AtomLearn;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kekwaker.atomlearn;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
