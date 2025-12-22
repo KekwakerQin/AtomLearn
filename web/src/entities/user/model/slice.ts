@@ -5,12 +5,14 @@ import type { User } from "@entities";
 interface UserState {
   data: User | null;
   loading: boolean;
+  initialized: boolean;
   error?: string;
 }
 
 const initialState: UserState = {
   data: null,
   loading: false,
+  initialized: false,
 };
 
 const userSlice = createSlice({
@@ -31,11 +33,20 @@ const userSlice = createSlice({
     },
     userCleared(state) {
       state.data = null;
+      state.loading = false;
+    },
+    userInitialized(state) {
+      state.initialized = true;
     },
   },
 });
 
-export const { userRequested, userReceived, userRequestFailed, userCleared } =
-  userSlice.actions;
+export const {
+  userRequested,
+  userReceived,
+  userRequestFailed,
+  userCleared,
+  userInitialized,
+} = userSlice.actions;
 
 export default userSlice.reducer;

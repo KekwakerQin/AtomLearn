@@ -30,7 +30,7 @@ export async function signInWithGoogle() {
       const user: User = {
         uid: fbUser.uid,
 
-        name: fbUser.displayName, // ФИО из Google
+        name: fbUser.displayName,
         email: fbUser.email,
         displayName,
         username: generateUsername(displayName),
