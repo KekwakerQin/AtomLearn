@@ -15,6 +15,7 @@ export const Layout = () => {
           <>
             <span>Привет, {user.displayName}</span>
             <LogoutButton />
+            <Link to="/boards/">boards</Link>
           </>
         ) : (
           <>

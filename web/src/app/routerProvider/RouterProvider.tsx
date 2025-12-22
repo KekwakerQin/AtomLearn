@@ -2,7 +2,13 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import { IndexRedirect, Layout, RequireAuth, RequireGuest } from "@app";
 
-import { LoginPage, ProfilePage, RegisterPage } from "@pages";
+import {
+  BoardPage,
+  BoardsPage,
+  LoginPage,
+  ProfilePage,
+  RegisterPage,
+} from "@pages";
 
 export const RouterProvider = () => {
   return (
@@ -19,8 +25,9 @@ export const RouterProvider = () => {
           <Route element={<RequireAuth />}>
             <Route path="profile" element={<ProfilePage />} />
             <Route path="profile/:profileId" element={<ProfilePage />} />
-            {/* <Route path="boards/:boardId" element={<BoardPage />} />
-            <Route path="cards/:cardId" element={<CardPage />} /> */}
+            <Route path="boards" element={<BoardsPage />} />
+            <Route path="boards/:boardsId" element={<BoardPage />} />
+            {/*  <Route path="cards/:cardId" element={<CardPage />} /> */}
           </Route>
         </Route>
       </Routes>
