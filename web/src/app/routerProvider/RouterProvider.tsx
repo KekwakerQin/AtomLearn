@@ -18,6 +18,7 @@ export const RouterProvider = () => {
 
           <Route element={<RequireAuth />}>
             <Route path="profile" element={<ProfilePage />} />
+            <Route path="profile/:profileId" element={<ProfilePage />} />
             {/* <Route path="boards/:boardId" element={<BoardPage />} />
             <Route path="cards/:cardId" element={<CardPage />} /> */}
           </Route>

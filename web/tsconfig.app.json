@@ -38,9 +38,6 @@
 
       "@assets/*": ["shared/assets/*"],
       "@assets": ["shared/assets/index.ts"]
-
-      // "@types/*": ["shared/types/*"],
-      // "@styles/*": ["shared/styles/*"]
     },
     "ignoreDeprecations": "6.0",
 
