@@ -1,12 +1,11 @@
 import UIKit
-import FirebaseFirestore
 
 // Экран с досками пользователя (сетка)
-final class BoardsGridViewController: UIViewController, UICollectionViewDelegateFlowLayout {
-    // MARK: - Properties
+final class BoardsViewController: UIViewController, UICollectionViewDelegateFlowLayout {
+    // MARK: - Dependencies
     private let service: BoardsService // Сервис работы с бордами
     private let user: AppUser // Текущий пользователь
-    private var listener: ListenerRegistration? // Слушатель Firestore
+    private let viewModel: BoardsViewModel
     private var boards: [Board] = [] // Текущий список досок
     private var boardsById: [String: Board] = [:] // Быстрый доступ по id
 
@@ -17,9 +16,11 @@ final class BoardsGridViewController: UIViewController, UICollectionViewDelegate
     private var dataSource: UICollectionViewDiffableDataSource<Int, String>! // Diffable-источник данных
 
     // MARK: - Init
-    init(user: AppUser, service: BoardsService) {
+    /// Инициализация экрана досок.
+    init(user: AppUser, service: BoardsService, viewModel: BoardsViewModel? = nil) {
         self.user = user
         self.service = service
+        self.viewModel = viewModel ?? BoardsViewModel(service: service, ownerUID: user.uid)
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -27,7 +28,6 @@ final class BoardsGridViewController: UIViewController, UICollectionViewDelegate
     required init?(coder: NSCoder) { fatalError("init(coder:) not implemented") }
 
     deinit {
-        listener?.remove()
         timer?.invalidate()
     }
 
@@ -39,11 +39,12 @@ final class BoardsGridViewController: UIViewController, UICollectionViewDelegate
         setupCollection()
         setupDataSource()
         setupTopBar()
-        startObserving()
+        bindViewModel()
+        viewModel.onViewDidLoad()
         startSortTimer() // Автоматическая смена сортировки каждые 1 с
     }
 
-    // MARK: - UI Setup
+    // MARK: - UI
     // Настройка коллекции и layout
     private func setupCollection() {
         let layout = UICollectionViewFlowLayout()
@@ -146,23 +147,18 @@ final class BoardsGridViewController: UIViewController, UICollectionViewDelegate
         RunLoop.main.add(t, forMode: .common)
     }
     
-    // MARK: - Firestore Listener
-    private func startObserving() {
-        listener?.remove()
-
-        listener = service.observeBoards(ownerUID: user.uid, order: .createdAtDesc) { [weak self] result in
+    private func bindViewModel() {
+        viewModel.onUpdate = { [weak self] list in
             guard let self else { return }
-            switch result {
-            case .success(let list):
-                DispatchQueue.main.async {
-                    self.boards = list
-                    self.resortAndApply(animated: true)
-                    self.collection.collectionViewLayout.invalidateLayout()
-                    self.collection.layoutIfNeeded()
-                }
-            case .failure(let error):
-                self.showError(error)
+            DispatchQueue.main.async {
+                self.boards = list
+                self.resortAndApply(animated: true)
+                self.collection.collectionViewLayout.invalidateLayout()
+                self.collection.layoutIfNeeded()
             }
+        }
+        viewModel.onError = { [weak self] error in
+            self?.showError(error)
         }
     }
 

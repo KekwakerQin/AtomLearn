@@ -3,14 +3,20 @@ import FirebaseAuth
 
 // Экран профиля пользователя
 final class ProfileViewController: UIViewController {
-    // MARK: - Properties
+    // MARK: - Dependencies
+    private let viewModel: ProfileViewModel
 
     // Вкладки: профиль, доски, учёба
     enum Tab { case profile, boards, study }
 
     // Текущий пользователь
     private let user: AppUser
-    init(user: AppUser) { self.user = user; super.init(nibName: nil, bundle: nil) }
+    /// Создаёт экран профиля.
+    init(user: AppUser, viewModel: ProfileViewModel = ProfileViewModel(service: ProfileRepository())) {
+        self.user = user
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError() }
 
     // MARK: - UI
@@ -34,7 +40,7 @@ final class ProfileViewController: UIViewController {
     // Экран информации профиля
     private lazy var infoVC   = ProfileInfoViewController(user: user)
     // Экран списка досок
-    private lazy var boardsVC = BoardsGridViewController(user: user, service: FirebaseBoardsService())
+    private lazy var boardsVC = BoardsViewController(user: user, service: BoardsRepository())
     // Экран обучения
     private lazy var studyVC  = StudyViewController()
 
@@ -50,6 +56,7 @@ final class ProfileViewController: UIViewController {
         setupHeader()
         setupContainer()
         switchTo(.boards)
+        viewModel.onViewDidLoad()
     }
     
     // Скрываем навбар на экране профиля

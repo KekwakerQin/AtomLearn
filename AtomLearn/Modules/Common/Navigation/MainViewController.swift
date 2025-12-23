@@ -16,7 +16,7 @@ final class MainTabBarController: UITabBarController, UITabBarControllerDelegate
     )
     private let profileVC: UINavigationController
 
-    init(user: AppUser, boardsService: BoardsService = FirebaseBoardsService()) {
+    init(user: AppUser, boardsService: BoardsService = BoardsRepository()) {
         self.user = user
         self.boardsService = boardsService
         self.profileVC = UINavigationController(rootViewController: ProfileViewController(user: user))
@@ -70,7 +70,7 @@ final class MainTabBarController: UITabBarController, UITabBarControllerDelegate
     }
 
     private func presentAddBoardSheet() {
-        let vc = AddEntityViewController(service: FirebaseBoardsService()) {
+        let vc = AddEntityViewController(service: BoardsRepository()) {
             print(" Создано, обнови UI если нужно")
         }
 
@@ -82,4 +82,3 @@ final class MainTabBarController: UITabBarController, UITabBarControllerDelegate
         present(vc, animated: true)
     }
 }
-

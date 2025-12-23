@@ -2,11 +2,24 @@
 import UIKit
 
 final class SearchViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchResultsUpdating {
-    // MARK: - Properties
+    // MARK: - Dependencies
+    private let viewModel: SearchViewModel
+
+    // MARK: - UI
     private let table = UITableView() // Таблица с результатами
     private let all: [String] = ["Алгебра", "Английский", "География", "История", "Информатика", "Физика", "Химия", "Биология"] // Все предметы
     private var filtered: [String] = [] // Отфильтрованные результаты
     private let searchController = UISearchController(searchResultsController: nil) // Контроллер поиска
+
+    // MARK: - Init
+    /// Создаёт экран поиска.
+    init(viewModel: SearchViewModel = SearchViewModel(service: SearchRepository())) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) { fatalError() }
 
     // MARK: - Lifecycle
     // Настройка экрана и контроллера поиска
@@ -26,6 +39,8 @@ final class SearchViewController: UIViewController, UITableViewDataSource, UITab
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchResultsUpdater = self
         definesPresentationContext = true
+
+        viewModel.onViewDidLoad()
     }
 
     // MARK: - Search

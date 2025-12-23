@@ -4,8 +4,8 @@ import Supabase
 /// Экран со списком бейджей.
 final class BadgesViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
     // MARK: - Dependencies
+    private let viewModel: BadgesViewModel
     private var items: [Badge] = []
-    private let repo = BadgeRepository()
 
     // MARK: - UI
     private lazy var supabaseClient = SupabaseClient(
@@ -29,6 +29,16 @@ final class BadgesViewController: UIViewController, UICollectionViewDataSource, 
         return cv
     }()
 
+    // MARK: - Init
+    /// Создаёт экран со списком бейджей.
+    init(viewModel: BadgesViewModel = BadgesViewModel(service: BadgesRepository())) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) { fatalError() }
+
     // MARK: - Lifecycle
     /// Настройка экрана и старт загрузки.
     override func viewDidLoad() {
@@ -44,7 +54,8 @@ final class BadgesViewController: UIViewController, UICollectionViewDataSource, 
             collection.trailingAnchor.constraint(equalTo: view.trailingAnchor),
         ])
 
-        Task { await load() }
+        bindViewModel()
+        viewModel.onViewDidLoad()
     }
 
     /// Перезапуск шиммера при возврате.
@@ -157,13 +168,15 @@ final class BadgesViewController: UIViewController, UICollectionViewDataSource, 
     }
 
     // MARK: - Private helpers
-    /// Загружаем список бейджей из Firestore.
-    private func load() async {
-        do {
-            let badges = try await repo.fetchAll()
+    private func bindViewModel() {
+        viewModel.onBadgesUpdated = { [weak self] badges in
+            guard let self else { return }
             self.items = badges
-            await MainActor.run { self.collection.reloadData() }
-        } catch {
+            DispatchQueue.main.async {
+                self.collection.reloadData()
+            }
+        }
+        viewModel.onError = { error in
             print("[LOG:WARN] Ошибка загрузки Firestore: \(error.localizedDescription)")
         }
     }

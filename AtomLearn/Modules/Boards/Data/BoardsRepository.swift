@@ -1,10 +1,13 @@
 import Foundation
 import FirebaseFirestore
 
-final class FirebaseBoardsService: BoardsService {
+/// Репозиторий для работы с досками в Firestore.
+final class BoardsRepository: BoardsService {
+    // MARK: - Dependencies
     private let db = Firestore.firestore()
 
-    // MARK: - Live updates
+    // MARK: - Public API
+    /// Подписывается на изменения списка досок.
     @discardableResult
     func observeBoards(ownerUID: String,
                        order: BoardsOrder,
@@ -33,7 +36,7 @@ final class FirebaseBoardsService: BoardsService {
         return listener
     }
 
-    // MARK: - One-time fetch
+    /// Загружает список досок один раз.
     func fetchBoardsOnce(ownerUID: String, order: BoardsOrder) async throws -> [Board] {
         let query = db.collection("boards")
             .whereField("ownerUID", isEqualTo: ownerUID)
@@ -43,7 +46,7 @@ final class FirebaseBoardsService: BoardsService {
         return snapshot.documents.compactMap { Board(id: $0.documentID, data: $0.data()) }
     }
 
-    // MARK: - Create new board
+    /// Создаёт новую доску.
     func createBoard(ownerUID: String, title: String, description: String) async throws {
         let now = Timestamp(date: Date())
 
@@ -51,8 +54,8 @@ final class FirebaseBoardsService: BoardsService {
             "title": title,
             "description": description,
             "ownerUID": ownerUID,
-            "createdAt": FieldValue.serverTimestamp(), // серверное время
-            "createdAtClient": now                     // локальное время для сортировки
+            "createdAt": FieldValue.serverTimestamp(),
+            "createdAtClient": now
         ]
 
         try await db.collection("boards").addDocument(data: data)
