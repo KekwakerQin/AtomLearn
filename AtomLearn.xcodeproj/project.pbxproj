@@ -48,8 +48,9 @@
 		7D0498042EF7F33900BDCFEC /* Exceptions for "AtomLearn" folder in "AtomLearn" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Modules/Core/Config/Config.xcconfig,
 				Info.plist,
+				Modules/AddEntity/Domain/AddEntityModels.swift,
+				Modules/Core/Config/Config.xcconfig,
 			);
 			target = 7D9D543F2E7BCEC6001A88BB /* AtomLearn */;
 		};

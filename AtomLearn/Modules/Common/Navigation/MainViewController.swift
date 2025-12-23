@@ -70,15 +70,11 @@ final class MainTabBarController: UITabBarController, UITabBarControllerDelegate
     }
 
     private func presentAddBoardSheet() {
-        let vc = AddEntityViewController(service: BoardsRepository()) {
-            print(" Создано, обнови UI если нужно")
-        }
-
-        vc.modalPresentationStyle = .pageSheet
-        if let sheet = vc.presentationController as? UISheetPresentationController {
-            sheet.detents = [.medium(), .large()]
-            sheet.prefersGrabberVisible = true
-        }
-        present(vc, animated: true)
+        let coordinator = AddEntityCoordinator(
+            presenter: self,
+            user: user,
+            boardsService: boardsService
+        )
+        coordinator.start()
     }
 }

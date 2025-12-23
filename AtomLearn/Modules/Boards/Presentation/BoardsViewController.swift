@@ -10,7 +10,6 @@ final class BoardsViewController: UIViewController, UICollectionViewDelegateFlow
     private var boardsById: [String: Board] = [:] // Быстрый доступ по id
 
     private var order: BoardsOrder = .createdAtDesc // Порядок сортировки
-    private var timer: Timer? // Таймер автосмены сортировки
 
     private var collection: UICollectionView! // Коллекция с сеткой
     private var dataSource: UICollectionViewDiffableDataSource<Int, String>! // Diffable-источник данных
@@ -28,7 +27,7 @@ final class BoardsViewController: UIViewController, UICollectionViewDelegateFlow
     required init?(coder: NSCoder) { fatalError("init(coder:) not implemented") }
 
     deinit {
-        timer?.invalidate()
+
     }
 
     // MARK: - Lifecycle
@@ -41,7 +40,6 @@ final class BoardsViewController: UIViewController, UICollectionViewDelegateFlow
         setupTopBar()
         bindViewModel()
         viewModel.onViewDidLoad()
-        startSortTimer() // Автоматическая смена сортировки каждые 1 с
     }
 
     // MARK: - UI
@@ -131,22 +129,7 @@ final class BoardsViewController: UIViewController, UICollectionViewDelegateFlow
         collection.setContentOffset(top, animated: false)
         resortAndApply(animated: true)
     }
-    
-    // MARK: - Автосмена сортировки (каждую секунду)
-    private func startSortTimer() {
-        timer?.invalidate()
-        let t = Timer(timeInterval: 1.0, repeats: true) { [weak self] _ in
-            guard let self else { return }
-            self.order = self.order.toggled()
-            if let items = self.navigationItem.rightBarButtonItems, items.count > 1 {
-                items[1].title = self.order.title
-            }
-            self.resortAndApply(animated: true)
-        }
-        timer = t
-        RunLoop.main.add(t, forMode: .common)
-    }
-    
+        
     private func bindViewModel() {
         viewModel.onUpdate = { [weak self] list in
             guard let self else { return }
