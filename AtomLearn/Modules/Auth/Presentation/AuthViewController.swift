@@ -2,17 +2,20 @@ import UIKit
 
 /// ViewController, отвечающий только за UI, биндинг и отображение экрана авторизации.
 final class AuthViewController: UIViewController {
+    // MARK: - Dependencies
     private let viewModel: AuthViewModel
     private let labelAnimator = AuthLabelAnimator()
 
-    // Элементы интерфейса
+    // MARK: - UI
     private let spinner = UIActivityIndicatorView(style: .large)
     private let label = UILabel.make(text: "")
     private let stack = UIStackView()
     private let container = UIView()
     
-    let button = UIButton(type: .system) // No in stack
+    private let button = UIButton(type: .system) // No in stack
 
+    // MARK: - Init
+    /// Создаёт экран авторизации с зависимым view model.
     init(viewModel: AuthViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -20,25 +23,13 @@ final class AuthViewController: UIViewController {
     }
 
     @available(*, unavailable)
+    /// Инициализатор из storyboard недоступен.
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // Добавляем элементы в стек
-    func addToStack() {
-        [label].forEach {
-            stack.addArrangedSubview($0)
-        }
-    }
-    
-    // Отключаем автогенерацию Auto Layout (TAMIC)
-    func removeTAMIC() {
-        [container, button, stack, label, spinner].forEach {
-            $0.translatesAutoresizingMaskIntoConstraints = false
-        }
-    }
-
-    // Настройка экрана при загрузке
+    // MARK: - Lifecycle
+    /// Настройка экрана при загрузке.
     override func viewDidLoad() {
         super.viewDidLoad()
         addViews()
@@ -48,7 +39,7 @@ final class AuthViewController: UIViewController {
         view.backgroundColor = .black
     }
     
-    // Запуск анимации текста при появлении
+    /// Запуск анимации текста при появлении.
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         label.alpha = 0
@@ -56,16 +47,27 @@ final class AuthViewController: UIViewController {
         viewModel.onViewDidAppear()
     }
 
-    // MARK: - UI SETUP
-    
-    // Настройка внешнего вида кнопки, стека и меток
+    /// Остановка анимации при уходе с экрана.
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        labelAnimator.stopAnimating()
+    }
+
+    // MARK: - Actions
+    /// Обработчик нажатия на кнопку входа.
+    @objc private func handleSignInTap() {
+        viewModel.onSignInTap()
+    }
+
+    // MARK: - Private helpers
+    /// Настройка внешнего вида кнопки, стека и меток.
     private func setupUI() {
         // BUTTONS
         button.setTitle("Нажми", for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.backgroundColor = .systemBlue
         button.layer.cornerRadius = 12
-        button.addTarget(self, action: #selector(tap), for: .touchUpInside)
+        button.addTarget(self, action: #selector(handleSignInTap), for: .touchUpInside)
         
         // STACK
         stack.axis = .vertical
@@ -122,30 +124,32 @@ final class AuthViewController: UIViewController {
             self.labelAnimator.startAnimating(label: self.label)
         }
     }
-    
-    //MARK: - TARGETS
-    
-    // Обработчик нажатия на кнопку входа
-    @objc private func tap() {
-        viewModel.onSignInTap()
+
+    /// Добавляем элементы в стек.
+    private func addToStack() {
+        [label].forEach {
+            stack.addArrangedSubview($0)
+        }
     }
-    
-    // Состояние загрузки — блокировка кнопки и спиннер
+
+    /// Отключаем автогенерацию Auto Layout (TAMIC).
+    private func removeTAMIC() {
+        [container, button, stack, label, spinner].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+        }
+    }
+
+    /// Состояние загрузки — блокировка кнопки и спиннер.
     private func setLoading(_ loading: Bool) {
         button.isEnabled = !loading
         loading ? spinner.startAnimating() : spinner.stopAnimating()
         button.alpha = loading ? 0.3 : 1.0
     }
 
-    // Отображение ошибок авторизации
+    /// Отображение ошибок авторизации.
     private func showError(_ message: String) {
         let alert = UIAlertController(title: "Ошибка входа", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Ок", style: .default))
         present(alert, animated: true)
-    }
-
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        labelAnimator.stopAnimating()
     }
 }
