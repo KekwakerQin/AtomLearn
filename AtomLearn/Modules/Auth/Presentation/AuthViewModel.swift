@@ -1,9 +1,11 @@
 import UIKit
 
+/// Coordinator API for Auth flow navigation.
 protocol AuthCoordinating: AnyObject {
     func showMain(for user: AppUser, animated: Bool)
 }
 
+/// ViewModel экрана авторизации: состояние, бизнес-логика, обработка ошибок и вызовы сервисов.
 final class AuthViewModel {
     private let authService: AuthService
     private let signInPresenter: GoogleSignInPresenting

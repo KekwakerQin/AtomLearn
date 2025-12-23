@@ -2,12 +2,13 @@ import FirebaseCore
 import GoogleSignIn
 import UIKit
 
+/// UI-протокол для запуска Google Sign-In и получения токенов.
 protocol GoogleSignInPresenting {
     @MainActor
     func signIn(from presenting: UIViewController) async throws -> GoogleTokens
 }
 
-// Провайдер входа через Google в UI-слое
+/// UI-провайдер Google Sign-In, отвечает только за показ нативного экрана.
 final class GoogleSignInPresenter: GoogleSignInPresenting {
     @MainActor
     func signIn(from presenting: UIViewController) async throws -> GoogleTokens {

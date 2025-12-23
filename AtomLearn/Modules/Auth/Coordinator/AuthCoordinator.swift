@@ -1,5 +1,6 @@
 import UIKit
 
+/// Coordinator авторизации: создаёт экран и управляет навигацией Auth flow.
 final class AuthCoordinator: AuthCoordinating {
     private weak var window: UIWindow?
 

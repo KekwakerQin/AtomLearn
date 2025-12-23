@@ -25,3 +25,10 @@ Modules/
 - **Shared UI** belongs in `Modules/Common`, especially reusable views, modifiers, and helpers.
 - **Infrastructure and integrations** (networking stacks, SDK wrappers, persistence) belong in `Modules/Core`.
 - Avoid placing new code at the repo root; instead, create or reuse an appropriate module folder.
+
+## Roles
+
+- **ViewController**: only UI setup, binding, and rendering (no business logic).
+- **ViewModel**: state, business logic, error handling, and service calls.
+- **Coordinator**: navigation, screen creation, and flow management.
+- **Services**: networking/DB/SDK work without UIKit dependencies.
