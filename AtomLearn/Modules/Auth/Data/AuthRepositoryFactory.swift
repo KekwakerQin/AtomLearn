@@ -22,24 +22,24 @@ struct AuthRepositoryFactory: ServiceProtocol {
     }
 }
 
-/// Заготовка репозитория под Supabase.
+/// Заготовка репозитория под Supabase (stub).
 final class SupabaseAuthRepository: AuthRepositoryProtocol {
     func signInWithGoogle(tokens: GoogleTokens) async throws -> AppUser {
         throw AuthError.unknown
     }
 
     func signOut() async throws {
-        // TODO: реализовать выход через Supabase.
+        // TODO(Auth): реализовать выход через Supabase.
     }
 }
 
-/// Заготовка локального репозитория (например, для офлайн/моков).
+/// Заготовка локального репозитория (stub, например, для офлайн/моков).
 final class LocalAuthRepository: AuthRepositoryProtocol {
     func signInWithGoogle(tokens: GoogleTokens) async throws -> AppUser {
         throw AuthError.unknown
     }
 
     func signOut() async throws {
-        // TODO: реализовать локальный выход.
+        // TODO(Auth): реализовать локальный выход.
     }
 }
