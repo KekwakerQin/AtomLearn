@@ -44,4 +44,9 @@ final class MessagesViewController: UIViewController, UITableViewDataSource, UIT
         cell.accessoryType = .disclosureIndicator
         return cell
     }
+    
+    deinit {
+        print("DEINIT \(self)")
+    }
+    
 }

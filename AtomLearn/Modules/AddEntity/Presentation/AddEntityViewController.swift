@@ -22,7 +22,11 @@ final class AddEntityViewController: UIViewController, UISearchBarDelegate {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
-
+    
+    deinit {
+        print("DEINIT \(self)")
+    }
+    
     @available(*, unavailable)
     required init?(coder: NSCoder) { fatalError() }
 
@@ -43,13 +47,6 @@ final class AddEntityViewController: UIViewController, UISearchBarDelegate {
             style: .plain,
             target: self,
             action: #selector(close)
-        )
-
-        navigationItem.rightBarButtonItem = UIBarButtonItem(
-            title: "Создать карточки",
-            style: .done,
-            target: self,
-            action: #selector(createCards)
         )
 
         searchBar.delegate = self
@@ -90,20 +87,16 @@ final class AddEntityViewController: UIViewController, UISearchBarDelegate {
     
     // MARK: - Actions
     @objc private func close() {
-        dismiss(animated: true)
-    }
-
-    @objc private func createCards() {
-        // дальше координатор
+        viewModel.didTapClose()
     }
 }
 
 extension AddEntityViewController: UITableViewDataSource, UITableViewDelegate {
 
     func numberOfSections(in tableView: UITableView) -> Int {
-        Section.boardsOffset + viewModel.state.sortedKeys.count
+        return 1 + viewModel.state.sortedKeys.count
     }
-
+    
     func tableView(_ tableView: UITableView,
                    numberOfRowsInSection section: Int) -> Int {
         if section == Section.actions {
@@ -113,7 +106,39 @@ extension AddEntityViewController: UITableViewDataSource, UITableViewDelegate {
         let key = viewModel.state.sortedKeys[section - Section.boardsOffset]
         return viewModel.state.groupedBoards[key]?.count ?? 0
     }
+    
+    func tableView(_ tableView: UITableView,
+                   didSelectRowAt indexPath: IndexPath) {
 
+        tableView.deselectRow(at: indexPath, animated: true)
+
+        if indexPath.section == Section.actions {
+            switch indexPath.row {
+            case 0:
+                // ➕ Добавить доску
+                viewModel.didTapCreateBoard()
+            case 1:
+                // 📰 Добавить новость (пока заглушка)
+                break
+            case 2:
+                // 📣 Добавить канал (пока заглушка)
+                break
+            default:
+                break
+            }
+            return
+        }
+
+        let key = viewModel.state.sortedKeys[indexPath.section - Section.boardsOffset]
+        guard
+            let boards = viewModel.state.groupedBoards[key],
+            indexPath.row < boards.count
+        else { return }
+
+        let board = boards[indexPath.row]
+        viewModel.didSelectBoard(board)
+    }
+    
     func tableView(_ tableView: UITableView,
                    cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 

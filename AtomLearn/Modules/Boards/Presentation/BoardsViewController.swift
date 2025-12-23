@@ -22,13 +22,14 @@ final class BoardsViewController: UIViewController, UICollectionViewDelegateFlow
         self.viewModel = viewModel ?? BoardsViewModel(service: service, ownerUID: user.uid)
         super.init(nibName: nil, bundle: nil)
     }
-
+    
+    deinit {
+        print("DEINIT \(self)")
+    }
+    
     @available(*, unavailable)
     required init?(coder: NSCoder) { fatalError("init(coder:) not implemented") }
 
-    deinit {
-
-    }
 
     // MARK: - Lifecycle
     override func viewDidLoad() {

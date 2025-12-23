@@ -22,6 +22,11 @@ final class BadgeSheetViewController: UIViewController {
         self.images = images
         super.init(nibName: nil, bundle: nil)
     }
+    
+    deinit {
+        print("DEINIT \(self)")
+    }
+    
     required init?(coder: NSCoder) { fatalError() }
 
     // Настройка UI и запуск загрузки

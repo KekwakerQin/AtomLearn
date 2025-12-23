@@ -205,6 +205,7 @@ struct AnatomyStudyScreen: View {
             .foregroundStyle(.secondary)
             .padding()
     }
+    
 }
 
 // MARK: - Card shell (одинаковая “рамка”)

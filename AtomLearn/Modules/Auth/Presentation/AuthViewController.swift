@@ -21,7 +21,11 @@ final class AuthViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
         self.viewModel.presentingViewController = self
     }
-
+    
+    deinit {
+        print("DEINIT \(self)")
+    }
+    
     @available(*, unavailable)
     /// Инициализатор из storyboard недоступен.
     required init?(coder: NSCoder) {

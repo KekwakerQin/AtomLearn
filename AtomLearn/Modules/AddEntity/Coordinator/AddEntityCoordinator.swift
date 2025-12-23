@@ -1,21 +1,31 @@
 import UIKit
 
 final class AddEntityCoordinator {
-
+    
     // MARK: - Dependencies
-    private weak var presenter: UIViewController?
+    private let navigationController: UINavigationController
     private let user: AppUser
     private let boardsService: BoardsService
-
+    private var childCoordinators: [AnyObject] = []
+    
     // MARK: - Init
-    init(presenter: UIViewController,
+    init(navigationController: UINavigationController,
          user: AppUser,
          boardsService: BoardsService) {
-        self.presenter = presenter
+        self.navigationController = navigationController
         self.user = user
         self.boardsService = boardsService
     }
-
+    
+    deinit {
+        print("AddEntityCoordinator deinit")
+    }
+    
+    // MARK: - Output
+    var onFinish: (() -> Void)?
+    var onCreateBoard: (() -> Void)?
+    var onSelectBoard: ((Board) -> Void)?
+    
     // MARK: - Public API
     func start() {
         let viewModel = AddEntityViewModel(
@@ -23,14 +33,30 @@ final class AddEntityCoordinator {
             boardsService: boardsService
         )
 
-        let vc = AddEntityViewController(viewModel: viewModel)
-        vc.modalPresentationStyle = .pageSheet
-
-        if let sheet = vc.presentationController as? UISheetPresentationController {
-            sheet.detents = [.large()]
-            sheet.prefersGrabberVisible = true
+        viewModel.onCreateBoard = { [weak self] in
+            self?.onCreateBoard?()
         }
 
-        presenter?.present(vc, animated: true)
+        viewModel.onSelectBoard = { [weak self] board in
+            self?.onSelectBoard?(board)
+        }
+
+        viewModel.onClose = { [weak self] in
+            self?.onFinish?()
+        }
+
+        let vc = AddEntityViewController(viewModel: viewModel)
+        vc.title = "Добавить"
+        navigationController.pushViewController(vc, animated: true)
     }
+    
+    // MARK: - Finish
+    private func finish() {
+        onFinish?()
+    }
+}
+
+// MARK: - Navigation
+private extension AddEntityCoordinator {
+    
 }

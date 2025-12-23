@@ -28,7 +28,12 @@ final class CardsViewController: UIViewController {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
-
+    
+    deinit {
+        print("DEINIT \(self)")
+        listener?.remove()
+    }
+    
     @available(*, unavailable)
     required init?(coder: NSCoder) { fatalError("init(coder:) not implemented") }
 
@@ -91,12 +96,6 @@ final class CardsViewController: UIViewController {
                 print("[LOG:INFO] CardsVC синхронизировал карточки: \(self.cards.count)")
             }
     }
-    
-    // Отписка от слушателя при деинициализации
-    deinit {
-        listener?.remove()
-    }
-
     // MARK: - Actions
     // Добавление новой карточки в текущий борд
     @objc private func addCard() {

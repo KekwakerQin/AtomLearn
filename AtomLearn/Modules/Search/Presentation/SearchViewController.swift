@@ -17,7 +17,11 @@ final class SearchViewController: UIViewController, UITableViewDataSource, UITab
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
-
+    
+    deinit {
+        print("DEINIT \(self)")
+    }
+    
     @available(*, unavailable)
     required init?(coder: NSCoder) { fatalError() }
 

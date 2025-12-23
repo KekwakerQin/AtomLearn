@@ -5,4 +5,8 @@ final class ProfileCustomizationViewController: UIViewController {
         title = "Кастомизация профиля"
         view.backgroundColor = .systemBackground
     }
+    
+    deinit {
+        print("DEINIT \(self)")
+    }
 }

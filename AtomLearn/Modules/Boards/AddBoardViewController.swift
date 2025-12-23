@@ -12,6 +12,11 @@ final class AddBoardViewController: UIViewController, UITextFieldDelegate, UITex
         self.onCreate = onCreate
         super.init(nibName: nil, bundle: nil)
     }
+    
+    deinit {
+        print("DEINIT \(self)")
+    }
+    
     required init?(coder: NSCoder) { fatalError("init(coder:) not implemented") }
 
     // Поле ввода названия доски

@@ -19,6 +19,10 @@ final class AddEntityViewModel {
     var onError: ((Error) -> Void)?
 
     private(set) var state = State()
+    
+    // MARK: - Navigation
+    var onCreateBoard: (() -> Void)?
+    var onSelectBoard: ((Board) -> Void)?
 
     // MARK: - Init
     init(user: AppUser,
@@ -112,5 +116,25 @@ final class AddEntityViewModel {
 
         groupBoardsAlphabetically(filtered)
         onStateChange?(state)
+    }
+    
+    // MARK: - Navigation
+    var onClose: (() -> Void)?
+
+    /// Пользователь нажал "Отмена"
+    func didTapClose() {
+        onClose?()
+    }
+
+    // MARK: - Пользовательские события
+    
+    /// Пользователь нажал "Добавить доску"
+    func didTapCreateBoard() {
+        onCreateBoard?()
+    }
+
+    /// Пользователь выбрал существующую доску
+    func didSelectBoard(_ board: Board) {
+        onSelectBoard?(board)
     }
 }
