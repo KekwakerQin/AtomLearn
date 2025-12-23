@@ -48,9 +48,8 @@
 		7D0498042EF7F33900BDCFEC /* Exceptions for "AtomLearn" folder in "AtomLearn" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Config.xcconfig,
+				Modules/Core/Config/Config.xcconfig,
 				Info.plist,
-				Trash/AuthViewController.swift,
 			);
 			target = 7D9D543F2E7BCEC6001A88BB /* AtomLearn */;
 		};
@@ -329,7 +328,7 @@
 		7D9D546D2E7BCEC8001A88BB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 7D9D54422E7BCEC6001A88BB /* AtomLearn */;
-			baseConfigurationReferenceRelativePath = Config.xcconfig;
+			baseConfigurationReferenceRelativePath = Modules/Core/Config/Config.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -365,7 +364,7 @@
 		7D9D546E2E7BCEC8001A88BB /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 7D9D54422E7BCEC6001A88BB /* AtomLearn */;
-			baseConfigurationReferenceRelativePath = Config.xcconfig;
+			baseConfigurationReferenceRelativePath = Modules/Core/Config/Config.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
