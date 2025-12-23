@@ -6,6 +6,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     // Главное окно приложения
     var window: UIWindow?
+    private var authCoordinator: AuthCoordinator?
     
     // Handle for Firebase Auth state listener to remove it when no longer needed
     private var authStateDidChangeHandle: AuthStateDidChangeListenerHandle?
@@ -17,6 +18,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let window = UIWindow(windowScene: windowScene)
         self.window = window
         window.backgroundColor = .systemBackground
+        let coordinator = AuthCoordinator(window: window)
+        self.authCoordinator = coordinator
 
         if let fbUser = Auth.auth().currentUser {
             // Создаём модель текущего пользователя
@@ -27,12 +30,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 displayName: fbUser.displayName
             )
             // Главный экран с таббаром
-            let main = makeMain(for: user)
-            setRoot(main, animated: false)
+            coordinator.showMain(for: user, animated: false)
         } else {
             // Экран авторизации
-            let auth = makeAuth()
-            setRoot(auth, animated: false)
+            coordinator.showAuth(animated: false)
         }
 
         // Следим за сменой состояния авторизации
@@ -47,12 +48,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                     email: user.email,
                     displayName: user.displayName
                 )
-                let main = self.makeMain(for: appUser)
-                self.setRoot(main, animated: true)
+                coordinator.showMain(for: appUser, animated: true)
             } else {
                 // Пользователь вышел — показываем авторизацию
-                let auth = self.makeAuth()
-                self.setRoot(auth, animated: true)
+                coordinator.showAuth(animated: true)
             }
         }
     }
@@ -76,33 +75,5 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
 
-    // Обёртка для установки корневого контроллера
-    private func setRoot(_ vc: UIViewController, animated: Bool) {
-        guard let window = self.window else { return }
-
-        if animated {
-            let transition = CATransition()
-            transition.type = .fade
-            transition.duration = 0.25
-            transition.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-            window.layer.add(transition, forKey: kCATransition)
-        }
-
-        window.rootViewController = vc
-        window.makeKeyAndVisible()
-        window.layoutIfNeeded()
-    }
-
-    // Создать главный экран приложения
-    private func makeMain(for user: AppUser) -> UIViewController {
-        MainTabBarController(user: user)
-    }
-
-    // Создать экран авторизации
-    private func makeAuth() -> UIViewController {
-        let authVC = AuthViewController()
-        return UINavigationController(rootViewController: authVC)
-    }
 }
-
 

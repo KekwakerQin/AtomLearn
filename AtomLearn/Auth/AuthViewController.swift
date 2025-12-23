@@ -1,9 +1,9 @@
 import UIKit
 
 // Экран авторизации через Google
-class AuthViewController: UIViewController {
-    // Сервис авторизации
-    private let auth: AuthService = AuthServiceImpl()
+final class AuthViewController: UIViewController {
+    private let viewModel: AuthViewModel
+    private let labelAnimator = AuthLabelAnimator()
 
     // Элементы интерфейса
     private let spinner = UIActivityIndicatorView(style: .large)
@@ -12,6 +12,17 @@ class AuthViewController: UIViewController {
     private let container = UIView()
     
     let button = UIButton(type: .system) // No in stack
+
+    init(viewModel: AuthViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+        self.viewModel.presentingViewController = self
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // Добавляем элементы в стек
     func addToStack() {
@@ -33,39 +44,19 @@ class AuthViewController: UIViewController {
         addViews()
         setupUI()
         setupConstraints()
+        bindViewModel()
         view.backgroundColor = .black
     }
     
     // Запуск анимации текста при появлении
-    override func viewDidAppear(_ animate: Bool) {
-        super.viewDidAppear(true)
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         label.alpha = 0
-        
-        animateLabel()
+
+        viewModel.onViewDidAppear()
     }
-    
+
     // MARK: - UI SETUP
-    
-    // Анимация цикличного появления текста
-    private func animateLabel(index: Int = 0) {
-        guard index < StorageOfLabels.russian.count else { return }
-        
-        label.alpha = 0
-        label.text = StorageOfLabels.russian[index]
-        
-        UIView.animate(withDuration: 0.65) {
-            self.label.alpha = 1
-        } completion: { _ in
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                UIView.animate(withDuration: 0.3) {
-                    self.label.alpha = 0
-                } completion: { _ in
-                    let next = (index + 1) % StorageOfLabels.russian.count
-                    self.animateLabel(index: next)
-                }
-            }
-        }
-    }
     
     // Настройка внешнего вида кнопки, стека и меток
     private func setupUI() {
@@ -118,28 +109,25 @@ class AuthViewController: UIViewController {
             
             ])
     }
+
+    private func bindViewModel() {
+        viewModel.onLoadingChange = { [weak self] isLoading in
+            self?.setLoading(isLoading)
+        }
+        viewModel.onError = { [weak self] message in
+            self?.showError(message)
+        }
+        viewModel.onLabelAnimationStart = { [weak self] in
+            guard let self else { return }
+            self.labelAnimator.startAnimating(label: self.label)
+        }
+    }
     
     //MARK: - TARGETS
     
     // Обработчик нажатия на кнопку входа
     @objc private func tap() {
-        // Асинхронно выполняем вход
-        setLoading(true)
-        Task { [weak self] in
-            guard let self else { return }
-            do {
-                let user = try await auth.signInWithGoogle(from: self)
-                await MainActor.run {
-                    self.setLoading(false)
-                    self.routeToMain(user: user)
-                }
-            } catch {
-                await MainActor.run {
-                    self.setLoading(false)
-                    self.showError(error)
-                }
-            }
-        }
+        viewModel.onSignInTap()
     }
     
     // Состояние загрузки — блокировка кнопки и спиннер
@@ -150,36 +138,14 @@ class AuthViewController: UIViewController {
     }
 
     // Отображение ошибок авторизации
-    private func showError(_ error: Error) {
-        let message: String
-        if let e = error as? AuthError {
-            switch e {
-            case .configurationMissing: message = "Нет конфигурации Firebase."
-            case .userCancelled:        message = "Вход отменён."
-            case .providerError(let u): message = "Ошибка Google: \(u.localizedDescription)"
-            case .firebaseError(let u): message = "Ошибка Firebase: \(u.localizedDescription)"
-            case .unknown:              message = "Неизвестная ошибка."
-            }
-        } else {
-            message = error.localizedDescription
-        }
+    private func showError(_ message: String) {
         let alert = UIAlertController(title: "Ошибка входа", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Ок", style: .default))
         present(alert, animated: true)
     }
-    
-    // Переход на главный экран после успешного входа
-    private func routeToMain(user: AppUser) {
-        let tab = MainTabBarController(user: user)
 
-        if let nav = navigationController {
-            // Полностью заменяем стек на таб-бар
-            nav.setViewControllers([tab], animated: true)
-        } else {
-            // если AuthVC не в навигации — меняем root
-            let nav = UINavigationController(rootViewController: tab)
-            view.window?.rootViewController = nav
-            view.window?.makeKeyAndVisible()
-        }
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        labelAnimator.stopAnimating()
     }
 }

@@ -1,5 +1,6 @@
 import FirebaseAuth
 import GoogleSignIn
+import UIKit
 
 // Репозиторий для авторизации через Firebase
 final class FirebaseAuthRepository {
