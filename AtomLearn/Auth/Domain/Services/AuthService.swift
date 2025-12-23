@@ -1,35 +1,27 @@
-import UIKit
 import FirebaseAuth
 
 // Протокол сервиса авторизации
 protocol AuthService {
-    func signInWithGoogle(from presenting: UIViewController) async throws -> AppUser
+    func signInWithGoogle(tokens: GoogleTokens) async throws -> AppUser
     func signOut() async throws
     func currentUser() -> AppUser? // Геттер текущего пользователя
 }
 
 // Реализация сервиса авторизации через Firebase + Google
 final class AuthServiceImpl: AuthService {
-    private let provider: GoogleAuthProvider
     private let repo: FirebaseAuthRepository
 
     // Внедрение зависимостей (провайдер и репозиторий)
     init(
-        provider: GoogleAuthProvider = .init(),
         repo: FirebaseAuthRepository = .init()
     ) {
-        self.provider = provider
         self.repo = repo
     }
 
     // MARK: - Sign In
 
     // Вход через Google (двойной шаг: Google SDK → Firebase)
-    @MainActor
-    func signInWithGoogle(from presenting: UIViewController) async throws -> AppUser {
-        // Авторизация через Google
-        let tokens = try await provider.signIn(from: presenting)
-
+    func signInWithGoogle(tokens: GoogleTokens) async throws -> AppUser {
         // Авторизация через Firebase
         let user = try await repo.signInWithGoogle(tokens: tokens)
 

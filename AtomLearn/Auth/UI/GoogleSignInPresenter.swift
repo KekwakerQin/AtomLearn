@@ -1,9 +1,14 @@
-import UIKit
 import FirebaseCore
 import GoogleSignIn
+import UIKit
 
-// Провайдер входа через Google
-final class GoogleAuthProvider {
+protocol GoogleSignInPresenting {
+    @MainActor
+    func signIn(from presenting: UIViewController) async throws -> GoogleTokens
+}
+
+// Провайдер входа через Google в UI-слое
+final class GoogleSignInPresenter: GoogleSignInPresenting {
     @MainActor
     func signIn(from presenting: UIViewController) async throws -> GoogleTokens {
         // Берём clientID из Firebase-конфигурации
