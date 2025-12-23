@@ -13,6 +13,7 @@ Modules/
   Boards/
   Cards/
   Common/
+    Services/
     UI Extensions/
   Core/
     Networking/
@@ -32,6 +33,37 @@ Modules/
 - **ViewModel**: state, business logic, error handling, and service calls.
 - **Coordinator**: navigation, screen creation, and flow management.
 - **Services**: networking/DB/SDK work without UIKit dependencies.
+
+## Adding a new screen
+
+1. **Create Presentation layer**
+   - `Modules/<Feature>/Presentation/<Screen>ViewController.swift`
+   - `Modules/<Feature>/Presentation/<Screen>ViewModel.swift`
+   - If there are UI helpers: `Modules/<Feature>/Presentation/UI/`.
+2. **Create Domain layer**
+   - `Modules/<Feature>/Domain/Entities/` for models.
+   - `Modules/<Feature>/Domain/Services/` for service protocols/business logic.
+3. **Create Data layer**
+   - `Modules/<Feature>/Data/` for repositories, mappers, and storage.
+   - Implement repository protocols defined in Domain (no UIKit dependencies).
+4. **Create Coordinator**
+   - `Modules/<Feature>/Coordinator/<Feature>Coordinator.swift` for navigation and screen assembly.
+   - Coordinator creates VC/VM and injects dependencies (services/repositories).
+5. **Wire dependencies**
+   - Use factories from `Modules/Common/Services` to select source (Firestore/Supabase/Local).
+   - Pass concrete services into ViewModel via initializer.
+
+## Adding new data sources
+
+- **Data layer integration**
+  - For each service, define a `...RepositoryProtocol` (or service protocol) in `Domain/Services`.
+  - Implement concrete repositories in `Data/` for each source (Firestore/Supabase/Local).
+- **Factory connection**
+  - Add a `...Factory` conforming to `ServiceProtocol` in the feature module.
+  - Use `ServiceFactory.make(..., source:)` to select implementation at runtime.
+- **Where it lives**
+  - Base factory/types: `Modules/Common/Services/ServiceFactory.swift`.
+  - Feature-specific factories/repositories: `Modules/<Feature>/Data/` and `Modules/<Feature>/Domain/Services/`.
 
 ## Style guide
 

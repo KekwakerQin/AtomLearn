@@ -3,7 +3,7 @@ import GoogleSignIn
 import UIKit
 
 /// Репозиторий данных авторизации: низкоуровневые вызовы Firebase/Google SDK.
-final class FirebaseAuthRepository {
+final class FirebaseAuthRepository: AuthRepositoryProtocol {
     // Вход через Google — создаёт Firebase-пользователя
     func signInWithGoogle(tokens: GoogleTokens) async throws -> AppUser {
         // Формируем credential из токенов Google
