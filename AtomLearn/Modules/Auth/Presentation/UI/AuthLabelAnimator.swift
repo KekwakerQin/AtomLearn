@@ -1,5 +1,6 @@
 import UIKit
 
+/// UI-утилита для анимации текста на экране авторизации.
 final class AuthLabelAnimator {
     private let labels: [String]
     private let fadeInDuration: TimeInterval

@@ -1,6 +1,6 @@
 import UIKit
 
-// Экран авторизации через Google
+/// ViewController, отвечающий только за UI, биндинг и отображение экрана авторизации.
 final class AuthViewController: UIViewController {
     private let viewModel: AuthViewModel
     private let labelAnimator = AuthLabelAnimator()

@@ -1,13 +1,13 @@
 import FirebaseAuth
 
-// Протокол сервиса авторизации
+/// Service API для работы с авторизацией без зависимостей на UIKit.
 protocol AuthService {
     func signInWithGoogle(tokens: GoogleTokens) async throws -> AppUser
     func signOut() async throws
     func currentUser() -> AppUser? // Геттер текущего пользователя
 }
 
-// Реализация сервиса авторизации через Firebase + Google
+/// Реализация сервиса авторизации: бизнес-логика Auth и вызовы репозитория.
 final class AuthServiceImpl: AuthService {
     private let repo: FirebaseAuthRepository
 
