@@ -3,18 +3,32 @@ import UIKit
 import Supabase
 
 final class HomeViewController: UIViewController {
-    // MARK: - Properties
+    // MARK: - Dependencies
+    private let viewModel: HomeViewModel
+
+    // MARK: - UI
 
     // Превью изображения (результат загрузки)
     private let imageView = UIImageView()
     // Статус/лог загрузки
     private let status = UILabel()
 
+    // MARK: - Init
+    /// Создаёт домашний экран.
+    init(viewModel: HomeViewModel = HomeViewModel(service: HomeRepository())) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) { fatalError() }
+
     // MARK: - Lifecycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        viewModel.onViewDidLoad()
         testSupabase()
     }
 

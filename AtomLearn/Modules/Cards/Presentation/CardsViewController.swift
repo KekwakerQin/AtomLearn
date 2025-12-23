@@ -3,7 +3,10 @@ import FirebaseFirestore
 
 // Экран карточек выбранного борда
 final class CardsViewController: UIViewController {
-    // MARK: - Properties
+    // MARK: - Dependencies
+    private let viewModel: CardsViewModel
+
+    // MARK: - UI
     // Текущий борд
     private let board: Board
     // Список карточек
@@ -18,10 +21,11 @@ final class CardsViewController: UIViewController {
     // Коллекция карточек
     private let collection = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
 
-    // Инициализация с пользователем и бордом
-    init(user: AppUser, board: Board) {
+    /// Инициализация с пользователем и бордом.
+    init(user: AppUser, board: Board, viewModel: CardsViewModel = CardsViewModel(service: CardsRepository())) {
         self.user = user
         self.board = board
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -37,6 +41,7 @@ final class CardsViewController: UIViewController {
 
         setupCollection()
         observeCards()
+        viewModel.onViewDidLoad()
 
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addCard))
     }
