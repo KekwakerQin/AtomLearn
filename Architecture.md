@@ -32,3 +32,16 @@ Modules/
 - **ViewModel**: state, business logic, error handling, and service calls.
 - **Coordinator**: navigation, screen creation, and flow management.
 - **Services**: networking/DB/SDK work without UIKit dependencies.
+
+## Style guide
+
+- **MARK order**:
+  1. Dependencies
+  2. UI
+  3. Init
+  4. Lifecycle
+  5. Actions
+  6. Public API
+  7. Private helpers
+- **Doc-comments**: add `///` documentation for every non-`private` method/property exposed outside the type.
+- **Naming**: use plural names for list screens and match file/class names (e.g., `BadgesViewController` in `BadgesViewController.swift`).

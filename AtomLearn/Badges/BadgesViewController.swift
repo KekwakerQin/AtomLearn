@@ -1,26 +1,24 @@
 import UIKit
 import Supabase
 
-// Экран со списком бейджей
+/// Экран со списком бейджей.
 final class BadgesViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
-    // MARK: - Properties
-    private var items: [Badge] = []           // Данные для коллекции
-    private let repo = BadgeRepository()      // Репозиторий бейджей (Firestore)
+    // MARK: - Dependencies
+    private var items: [Badge] = []
+    private let repo = BadgeRepository()
 
-    // Клиент Supabase
+    // MARK: - UI
     private lazy var supabaseClient = SupabaseClient(
         supabaseURL: SupabaseConfig.url,
         supabaseKey: SupabaseConfig.anonKey
     )
 
-    // Провайдер изображений (Supabase Storage)
     private lazy var images = SupabaseImages(
         client: supabaseClient,
         bucket: SupabaseConfig.bucket,
         baseURL: SupabaseConfig.url
     )
 
-    // Коллекция с компоновкой 3 в ряд
     private lazy var collection: UICollectionView = {
         let layout = BadgesViewController.makeLayout()
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -32,7 +30,7 @@ final class BadgesViewController: UIViewController, UICollectionViewDataSource, 
     }()
 
     // MARK: - Lifecycle
-    // Настройка экрана и старт загрузки
+    /// Настройка экрана и старт загрузки.
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
@@ -49,7 +47,7 @@ final class BadgesViewController: UIViewController, UICollectionViewDataSource, 
         Task { await load() }
     }
 
-    // Перезапуск шиммера при возврате
+    /// Перезапуск шиммера при возврате.
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         // Перезапускаем шимер на видимых ячейках при возврате на экран/вкладку
@@ -58,21 +56,11 @@ final class BadgesViewController: UIViewController, UICollectionViewDataSource, 
         }
     }
 
-    // MARK: - Data
-    // Загружаем список бейджей из Firestore
-    private func load() async {
-        do {
-            let badges = try await repo.fetchAll()
-            self.items = badges
-            await MainActor.run { self.collection.reloadData() }
-        } catch {
-            print("[LOG:WARN] Ошибка загрузки Firestore: \(error.localizedDescription)")
-        }
-    }
-
-    // MARK: - UICollectionViewDataSource
+    // MARK: - Public API
+    /// Возвращает число элементов в секции.
     func collectionView(_ cv: UICollectionView, numberOfItemsInSection section: Int) -> Int { items.count }
 
+    /// Конфигурирует ячейку для элемента.
     func collectionView(_ cv: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = cv.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! BadgeGridCell
         let badge = items[indexPath.item]
@@ -134,7 +122,7 @@ final class BadgesViewController: UIViewController, UICollectionViewDataSource, 
         return cell
     }
 
-    // MARK: - UICollectionViewDelegate
+    /// Обрабатывает нажатие на ячейку.
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let badge = items[indexPath.item]
         let vc = BadgeSheetViewController(badge: badge, images: images)
@@ -147,8 +135,7 @@ final class BadgesViewController: UIViewController, UICollectionViewDataSource, 
         present(vc, animated: true)
     }
 
-    // MARK: - Layout
-    // 3 колонки
+    /// Создаёт компоновку с 3 колонками.
     static func makeLayout() -> UICollectionViewCompositionalLayout {
         let spacing: CGFloat = 12
 
@@ -168,16 +155,29 @@ final class BadgesViewController: UIViewController, UICollectionViewDataSource, 
 
         return UICollectionViewCompositionalLayout(section: section)
     }
+
+    // MARK: - Private helpers
+    /// Загружаем список бейджей из Firestore.
+    private func load() async {
+        do {
+            let badges = try await repo.fetchAll()
+            self.items = badges
+            await MainActor.run { self.collection.reloadData() }
+        } catch {
+            print("[LOG:WARN] Ошибка загрузки Firestore: \(error.localizedDescription)")
+        }
+    }
 }
 
-// Ячейка грида бейджа
+/// Ячейка грида бейджа.
 final class BadgeGridCell: UICollectionViewCell {
-    // MARK: - Subviews
+    // MARK: - UI
     private let imageView = UIImageView()
     private let titleLabel = UILabel()
     private let shimmer = ShimmerView()
 
     // MARK: - Init
+    /// Создаёт ячейку бейджа.
     override init(frame: CGRect) {
         super.init(frame: frame)
 
@@ -229,25 +229,30 @@ final class BadgeGridCell: UICollectionViewCell {
         shimmer.isHidden = true
     }
     
+    /// Инициализатор из storyboard недоступен.
     required init?(coder: NSCoder) { fatalError() }
 
-    // MARK: - Reuse
+    // MARK: - Lifecycle
+    /// Готовит ячейку к переиспользованию.
     override func prepareForReuse() {
         super.prepareForReuse()
         imageView.image = nil
         startShimmerIfNeeded()
     }
 
-    // MARK: - API
+    // MARK: - Public API
+    /// Устанавливает заголовок для ячейки.
     func configure(title: String) {
         titleLabel.text = title
     }
 
+    /// Устанавливает изображение и состояние шиммера.
     func setImage(_ img: UIImage?) {
         imageView.image = img
         if img != nil { shimmer.stop() } else { shimmer.start() }
     }
 
+    /// Запускает шиммер, если изображения ещё нет.
     func startShimmerIfNeeded() {
         if imageView.image == nil { shimmer.start() }
     }
