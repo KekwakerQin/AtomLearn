@@ -22,7 +22,20 @@ final class CreateBoardViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        title = "Новая доска"
+        title = nil
         viewModel.onViewDidLoad()
+        
+        navigationItem.leftBarButtonItem = UIBarButtonItem(
+            title: "Отмена",
+            style: .plain,
+            target: self,
+            action: #selector(cancelTapped)
+        )
+    }
+    
+    // MARK: - Actions
+    
+    @objc private func cancelTapped() {
+        viewModel.cancel()
     }
 }

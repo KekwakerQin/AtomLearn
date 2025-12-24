@@ -10,4 +10,12 @@ final class AddCardsViewModel {
 
     /// Экран загрузился
     func onViewDidLoad() {}
+    
+    // MARK: - Outputting
+    
+    var onCancel: (() -> Void)?
+
+    func cancel() {
+        onCancel?()
+    }
 }

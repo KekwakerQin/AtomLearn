@@ -10,4 +10,12 @@ final class CreateBoardViewModel {
 
     /// Экран загрузился
     func onViewDidLoad() {}
+    
+    // MARK: - Outputting
+    
+    var onCancel: (() -> Void)?
+
+    func cancel() {
+        onCancel?()
+    }
 }

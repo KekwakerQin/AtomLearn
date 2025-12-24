@@ -22,10 +22,10 @@ final class AddCardsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        title = viewModel.board.title
+        title = nil
         viewModel.onViewDidLoad()
         
-        navigationItem.rightBarButtonItem = UIBarButtonItem(
+        navigationItem.leftBarButtonItem = UIBarButtonItem(
             title: "Отмена",
             style: .plain,
             target: self,
