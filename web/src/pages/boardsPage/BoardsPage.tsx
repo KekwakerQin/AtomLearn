@@ -1,5 +1,6 @@
-import { PopUp } from "@widgets/index";
 import { useState } from "react";
+
+import { PopUp } from "@widgets/index";
 
 export const BoardsPage = () => {
   const [isOpen, isOpenHandler] = useState(false);
