@@ -1,10 +1,10 @@
 import UIKit
 
 final class AddCardsViewController: UIViewController {
-
+    
     // MARK: - Dependencies
     private let viewModel: AddCardsViewModel
-
+    
     // MARK: - Init
     init(viewModel: AddCardsViewModel) {
         self.viewModel = viewModel
@@ -17,12 +17,25 @@ final class AddCardsViewController: UIViewController {
     
     @available(*, unavailable)
     required init?(coder: NSCoder) { fatalError() }
-
+    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         title = viewModel.board.title
         viewModel.onViewDidLoad()
+        
+        navigationItem.rightBarButtonItem = UIBarButtonItem(
+            title: "Отмена",
+            style: .plain,
+            target: self,
+            action: #selector(cancelTapped)
+        )
+    }
+
+    // MARK: - Actions
+    
+    @objc private func cancelTapped() {
+        viewModel.cancel()
     }
 }
