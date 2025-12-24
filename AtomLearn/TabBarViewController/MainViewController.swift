@@ -1,5 +1,6 @@
 import UIKit
 import FirebaseAuth
+import SwiftUI
 
 final class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
     private let user: AppUser
@@ -9,7 +10,10 @@ final class MainTabBarController: UITabBarController, UITabBarControllerDelegate
 //    private let homeVC = UINavigationController(rootViewController: HomeViewController())
     private let badgeVC = UINavigationController(rootViewController: BadgesViewController())
     private let searchVC = UINavigationController(rootViewController: SearchViewController())
-    private let messagesVC = UINavigationController(rootViewController: MessagesViewController())
+
+    private let messagesVC = UINavigationController(
+        rootViewController: UIHostingController(rootView: AnatomyStudyScreen())
+    )
     private let profileVC: UINavigationController
 
     init(user: AppUser, boardsService: BoardsService = FirebaseBoardsService()) {
