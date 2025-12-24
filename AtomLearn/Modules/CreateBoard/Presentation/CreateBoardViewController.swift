@@ -5,6 +5,9 @@ final class CreateBoardViewController: UIViewController {
     // MARK: - Dependencies
     private let viewModel: CreateBoardViewModel
 
+    // MARK: - UI
+    private let titleTextField = UITextField()
+
     // MARK: - Init
     init(viewModel: CreateBoardViewModel) {
         self.viewModel = viewModel
@@ -22,8 +25,27 @@ final class CreateBoardViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        title = nil
+
+        configureNavigation()
+        configureUI()
+        bind()
+
         viewModel.onViewDidLoad()
+    }
+
+    // MARK: - Actions
+    @objc private func cancelTapped() {
+        viewModel.cancel()
+    }
+
+    @objc private func createTapped() {
+        viewModel.createBoard(
+            title: titleTextField.text ?? ""
+        )
+    }
+
+    // MARK: - Private helpers
+    private func configureNavigation() {
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(
             title: "Отмена",
@@ -31,11 +53,49 @@ final class CreateBoardViewController: UIViewController {
             target: self,
             action: #selector(cancelTapped)
         )
+
+        navigationItem.rightBarButtonItem = UIBarButtonItem(
+            title: "Создать",
+            style: .done,
+            target: self,
+            action: #selector(createTapped)
+        )
     }
-    
-    // MARK: - Actions
-    
-    @objc private func cancelTapped() {
-        viewModel.cancel()
+
+    private func configureUI() {
+        titleTextField.placeholder = "Название доски"
+        titleTextField.borderStyle = .roundedRect
+        titleTextField.font = .systemFont(ofSize: 17)
+        titleTextField.returnKeyType = .done
+
+        view.addSubview(titleTextField)
+        titleTextField.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            titleTextField.topAnchor.constraint(
+                equalTo: view.safeAreaLayoutGuide.topAnchor,
+                constant: 24
+            ),
+            titleTextField.leadingAnchor.constraint(
+                equalTo: view.leadingAnchor,
+                constant: 16
+            ),
+            titleTextField.trailingAnchor.constraint(
+                equalTo: view.trailingAnchor,
+                constant: -16
+            )
+        ])
+    }
+
+    private func bind() {
+        viewModel.onError = { [weak self] message in
+            let alert = UIAlertController(
+                title: "Ошибка",
+                message: message,
+                preferredStyle: .alert
+            )
+            alert.addAction(.init(title: "OK", style: .default))
+            self?.present(alert, animated: true)
+        }
     }
 }
