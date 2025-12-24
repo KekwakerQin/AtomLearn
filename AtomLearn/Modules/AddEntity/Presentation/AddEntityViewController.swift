@@ -38,7 +38,52 @@ final class AddEntityViewController: UIViewController, UISearchBarDelegate {
         viewModel.onViewDidLoad()
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        prepareForAppearanceAnimation()
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        animateAppearance()
+    }
+
     // MARK: - UI
+
+    private func prepareForAppearanceAnimation() {
+        let offset: CGFloat = 20
+
+        searchBar.alpha = 0
+        searchBar.transform = CGAffineTransform(translationX: 0, y: -offset)
+
+        tableView.alpha = 0
+        tableView.transform = CGAffineTransform(translationX: 0, y: -offset / 2)
+    }
+
+    private func animateAppearance() {
+
+        // 1) SearchBar — появляется быстрее
+        UIView.animate(
+            withDuration: 0.25,
+            delay: 0,
+            options: [.curveEaseOut],
+            animations: {
+                self.searchBar.alpha = 1
+                self.searchBar.transform = .identity
+            }
+        )
+
+        // 2) TableView — плавнее и чуть позже
+        UIView.animate(
+            withDuration: 0.45,
+            delay: 0.08,
+            options: [.curveEaseOut],
+            animations: {
+                self.tableView.alpha = 1
+                self.tableView.transform = .identity
+            }
+        )
+    }
     private func setupUI() {
         view.backgroundColor = .systemBackground
 
@@ -56,6 +101,10 @@ final class AddEntityViewController: UIViewController, UISearchBarDelegate {
 
         view.addSubview(searchBar)
         view.addSubview(tableView)
+
+        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tap.cancelsTouchesInView = false
+        view.addGestureRecognizer(tap)
 
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -85,9 +134,17 @@ final class AddEntityViewController: UIViewController, UISearchBarDelegate {
         viewModel.updateSearch(text: searchText)
     }
     
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
+    }
+    
     // MARK: - Actions
     @objc private func close() {
         viewModel.didTapClose()
+    }
+    
+    @objc private func dismissKeyboard() {
+        view.endEditing(true)
     }
 }
 
