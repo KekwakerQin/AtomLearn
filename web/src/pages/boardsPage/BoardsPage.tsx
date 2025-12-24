@@ -12,6 +12,7 @@ export const BoardsPage = () => {
   return (
     <div>
       <button onClick={onClose}>создать</button>
+      <p>test</p>
       <PopUp onClose={onClose} isOpen={isOpen}>
         <h2>Создать</h2>
       </PopUp>
