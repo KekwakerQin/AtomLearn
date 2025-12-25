@@ -8,7 +8,6 @@ struct Board: Hashable {
     let description: String     // Описание доски
     let ownerUID: String        // UID владельца
     let createdAt: Date         // серверное время (serverTimestamp)
-    let createdAtClient: Date   // локальное время клиента (при создании)
 }
 
 // Расширение: инициализация модели из Firestore
@@ -37,14 +36,6 @@ extension Board {
         } else {
             self.createdAt = Date.distantPast
         }
-
-        // Локальное время клиента
-        if let tsClient = data["createdAtClient"] as? Timestamp {
-            self.createdAtClient = tsClient.dateValue()
-        } else {
-            // если поля нет (старые документы) — подстрахуемся серверным/текущим временем
-            self.createdAtClient = (data["createdAt"] as? Timestamp)?.dateValue() ?? Date()
-        }
     }
 
     // Инициализация из словаря (для локальных данных)
@@ -58,17 +49,13 @@ extension Board {
         }
 
         let createdAt = (data["createdAt"] as? Timestamp)?.dateValue() ?? Date.distantPast
-        let createdAtClient = (data["createdAtClient"] as? Timestamp)?.dateValue()
-            ?? (data["createdAt"] as? Timestamp)?.dateValue()
-            ?? Date()
 
         self.init(
             id: id,
             title: title,
             description: data["description"] as? String ?? "",
             ownerUID: ownerUID,
-            createdAt: createdAt,
-            createdAtClient: createdAtClient
+            createdAt: createdAt
         )
     }
 }

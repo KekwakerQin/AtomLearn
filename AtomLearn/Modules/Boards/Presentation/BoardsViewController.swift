@@ -154,11 +154,12 @@ final class BoardsViewController: UIViewController, UICollectionViewDelegateFlow
             case .createdAtAsc:  return false
             }
         }()
-
+        
+        print(boards)
         // Сортировка по дате
         boards.sort {
-            let d0 = $0.createdAtClient
-            let d1 = $1.createdAtClient
+            let d0 = $0.createdAt
+            let d1 = $1.createdAt
             return isDesc ? (d0 > d1) : (d0 < d1)
         }
         applySnapshot(animated: animated)
@@ -198,6 +199,7 @@ final class BoardsViewController: UIViewController, UICollectionViewDelegateFlow
                                   message: error.localizedDescription,
                                   preferredStyle: .alert)
         a.addAction(UIAlertAction(title: "OK", style: .default))
+        print(error.localizedDescription)
         present(a, animated: true)
     }
 }

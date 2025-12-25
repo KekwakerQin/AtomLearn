@@ -14,7 +14,7 @@ final class BoardsRepository: BoardsService {
                        onUpdate: @escaping (Result<[Board], Error>) -> Void) -> ListenerRegistration {
         let query = db.collection("boards")
             .whereField("ownerUID", isEqualTo: ownerUID)
-            .order(by: "createdAtClient", descending: order.descending)
+            .order(by: "createdAt", descending: order.descending)
 
         let listener = query.addSnapshotListener { snapshot, error in
             if let error = error {
@@ -40,7 +40,7 @@ final class BoardsRepository: BoardsService {
     func fetchBoardsOnce(ownerUID: String, order: BoardsOrder) async throws -> [Board] {
         let query = db.collection("boards")
             .whereField("ownerUID", isEqualTo: ownerUID)
-            .order(by: "createdAtClient", descending: order.descending)
+            .order(by: "createdAt", descending: order.descending)
 
         let snapshot = try await query.getDocuments()
         return snapshot.documents.compactMap { Board(id: $0.documentID, data: $0.data()) }
@@ -55,7 +55,6 @@ final class BoardsRepository: BoardsService {
             "description": description,
             "ownerUID": ownerUID,
             "createdAt": FieldValue.serverTimestamp(),
-            "createdAtClient": now
         ]
 
         try await db.collection("boards").addDocument(data: data)

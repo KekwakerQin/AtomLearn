@@ -7,6 +7,7 @@ final class CreateBoardViewController: UIViewController {
 
     // MARK: - UI
     private let titleTextField = UITextField()
+    private let loader = UIActivityIndicatorView(style: .large)
 
     // MARK: - Init
     init(viewModel: CreateBoardViewModel) {
@@ -85,6 +86,15 @@ final class CreateBoardViewController: UIViewController {
                 constant: -16
             )
         ])
+
+        loader.hidesWhenStopped = true
+        view.addSubview(loader)
+        loader.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            loader.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            loader.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
     }
 
     private func bind() {
@@ -97,5 +107,25 @@ final class CreateBoardViewController: UIViewController {
             alert.addAction(.init(title: "OK", style: .default))
             self?.present(alert, animated: true)
         }
+
+        viewModel.onLoadingChanged = { [weak self] isLoading in
+            self?.setLoading(isLoading)
+        }
+
+        viewModel.onFinish = { [weak self] in
+            self?.dismiss(animated: true)
+        }
+    }
+
+    private func setLoading(_ isLoading: Bool) {
+        if isLoading {
+            loader.startAnimating()
+        } else {
+            loader.stopAnimating()
+        }
+
+        navigationItem.leftBarButtonItem?.isEnabled = !isLoading
+        navigationItem.rightBarButtonItem?.isEnabled = !isLoading
+        titleTextField.isEnabled = !isLoading
     }
 }

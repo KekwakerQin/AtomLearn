@@ -10,6 +10,7 @@ final class CreateBoardViewModel {
     var onCancel: (() -> Void)?
     var onFinish: (() -> Void)?
     var onError: ((String) -> Void)?
+    var onLoadingChanged: ((Bool) -> Void)?
 
     // MARK: - Init
     init(
@@ -38,15 +39,27 @@ final class CreateBoardViewModel {
             return
         }
 
-        Task {
+        onLoadingChanged?(true)
+
+        Task { [weak self] in
+            guard let self else { return }
+
             do {
                 try await useCase.createBoard(
                     title: trimmed,
                     ownerUID: user.uid
                 )
-                onFinish?()
+
+                await MainActor.run {
+                    self.onLoadingChanged?(false)
+                    self.onFinish?()
+                    self.onCancel?()
+                }
             } catch {
-                onError?("Не удалось создать доску")
+                await MainActor.run {
+                    self.onLoadingChanged?(false)
+                    self.onError?("Не удалось создать доску")
+                }
             }
         }
     }
