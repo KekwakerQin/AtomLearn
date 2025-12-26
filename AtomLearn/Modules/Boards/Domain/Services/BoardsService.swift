@@ -5,15 +5,22 @@ import FirebaseFirestore
 protocol BoardsService {
     /// Живые обновления коллекции досок пользователя.
     @discardableResult
-    func observeBoards(ownerUID: String,
-                       order: BoardsOrder,
-                       onUpdate: @escaping (Result<[Board], Error>) -> Void) -> ListenerRegistration
-
+    func observeBoards(
+        ownerUID: String,
+        order: BoardsOrder,
+        onUpdate: @escaping (Result<[Board], Error>) -> Void) -> ListenerRegistration
+    
     /// Однократная загрузка (без listener).
-    func fetchBoardsOnce(ownerUID: String, order: BoardsOrder) async throws -> [Board]
-
+    func fetchBoardsOnce(
+        ownerUID: String,
+        order: BoardsOrder
+    ) async throws -> [Board]
+    
     /// Создание новой доски.
-    func createBoard(ownerUID: String, title: String, description: String) async throws
+    func createBoard(
+        ownerUID: String,
+        input: CreateBoardInput
+    ) async throws
 }
 
 extension BoardsService {

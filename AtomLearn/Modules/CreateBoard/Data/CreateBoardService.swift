@@ -25,7 +25,8 @@ final class CreateBoardService: CreateBoardServiceProtocol {
             "id": id,
             "title": title,
             "ownerUID": ownerUID,
-            "createdAt": Timestamp()
+            "createdAt": Timestamp(),
+            "lastActivityAt": Timestamp()
         ]
 
         try await db

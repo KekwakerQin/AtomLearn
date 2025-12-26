@@ -11,6 +11,9 @@ final class MainTabBarController: UITabBarController, UITabBarControllerDelegate
         case creatingBoard
         case addingCards(Board)
     }
+    
+    private weak var addEntitySheetNav: UINavigationController?
+    private weak var addEntitySheetCoordinator: AnyObject?
 
     private var addFlowState: AddFlowState = .idle
     private var addFlowNavigationController: UINavigationController?
@@ -103,29 +106,46 @@ final class MainTabBarController: UITabBarController, UITabBarControllerDelegate
             boardsService: boardsService
         )
 
-        coordinator.onFinish = { [weak self] in
-            self?.childCoordinators.removeAll { $0 === coordinator }
-            sheetNav.dismiss(animated: true)
+        // важно: чтобы поймать свайп вниз
+        sheetNav.presentationController?.delegate = self
+        addEntitySheetNav = sheetNav
+        addEntitySheetCoordinator = coordinator
+
+        coordinator.onFinish = { [weak self, weak coordinator, weak sheetNav] in
+            guard let self else { return }
+            if let coordinator {
+                self.childCoordinators.removeAll { $0 === coordinator }
+            }
+            self.addEntitySheetNav = nil
+            self.addEntitySheetCoordinator = nil
+            sheetNav?.dismiss(animated: true)
         }
 
-        coordinator.onCreateBoard = { [weak self] in
-            sheetNav.dismiss(animated: true) {
-                self?.startCreateBoardFlow()
+        coordinator.onCreateBoard = { [weak self, weak coordinator, weak sheetNav] in
+            guard let self else { return }
+            if let coordinator {
+                self.childCoordinators.removeAll { $0 === coordinator }
             }
+            self.addEntitySheetNav = nil
+            self.addEntitySheetCoordinator = nil
+            sheetNav?.dismiss(animated: true) { self.startCreateBoardFlow() }
         }
 
-        coordinator.onSelectBoard = { [weak self] board in
-            sheetNav.dismiss(animated: true) {
-                self?.startAddCardsFlow(board: board)
+        coordinator.onSelectBoard = { [weak self, weak coordinator, weak sheetNav] board in
+            guard let self else { return }
+            if let coordinator {
+                self.childCoordinators.removeAll { $0 === coordinator }
             }
+            self.addEntitySheetNav = nil
+            self.addEntitySheetCoordinator = nil
+            sheetNav?.dismiss(animated: true) { self.startAddCardsFlow(board: board) }
         }
 
         childCoordinators.append(coordinator)
         coordinator.start()
-
         present(sheetNav, animated: true)
     }
-
+    
     /// Starts the flow for creating a new board.
     private func startCreateBoardFlow() {
         resetAddFlowIfNeeded()
@@ -217,4 +237,18 @@ final class MainTabBarController: UITabBarController, UITabBarControllerDelegate
         addNavController.setViewControllers([], animated: false)
     }
 
+}
+
+extension MainTabBarController: UIAdaptivePresentationControllerDelegate {
+    func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+        // сюда попадает свайп вниз (или другое системное закрытие)
+        guard presentationController.presentedViewController === addEntitySheetNav else { return }
+
+        if let coordinator = addEntitySheetCoordinator {
+            childCoordinators.removeAll { $0 === coordinator }
+        }
+
+        addEntitySheetNav = nil
+        addEntitySheetCoordinator = nil
+    }
 }

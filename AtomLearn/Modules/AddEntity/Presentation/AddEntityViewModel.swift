@@ -13,6 +13,7 @@ final class AddEntityViewModel {
     private let user: AppUser
     private let boardsService: BoardsService
     private var allBoards: [Board] = []
+    private var loadTask: Task<Void, Never>?
 
     // MARK: - Output
     var onStateChange: ((State) -> Void)?
@@ -30,6 +31,11 @@ final class AddEntityViewModel {
         self.user = user
         self.boardsService = boardsService
     }
+    
+    deinit {
+        loadTask?.cancel()
+        print("AddEntityViewModel deinit")
+    }
 
     // MARK: - Public API
     func onViewDidLoad() {
@@ -43,21 +49,23 @@ final class AddEntityViewModel {
     
     // MARK: - Private helpers
     private func loadBoards() {
-        Task {
+        
+        loadTask = Task { [weak self] in
+            guard let self else { return }
+
             do {
                 let boards = try await boardsService.fetchBoardsOnce(
                     ownerUID: user.uid
                 )
 
                 self.allBoards = boards
-                applySearchAndGrouping()
+                self.applySearchAndGrouping()
 
             } catch {
-                onError?(error)
+                self.onError?(error)
             }
         }
     }
-    
     // MARK: - Private helpers
     private func groupBoardsAlphabetically(_ boards: [Board]) {
         var letterGroups: [String: [Board]] = [:]
