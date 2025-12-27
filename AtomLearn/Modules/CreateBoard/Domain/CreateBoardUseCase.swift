@@ -1,21 +1,22 @@
+import Foundation
+
 struct CreateBoardUseCase {
 
-    // MARK: - Dependencies
+    // MARK: Dependencies
     private let service: CreateBoardServiceProtocol
 
-    // MARK: - Init
+    // MARK: Init
     init(service: CreateBoardServiceProtocol) {
         self.service = service
     }
 
-    /// Создать борд
+    // MARK: Public API
+
+    /// Создать борд (атомарно: board + collaborators + userMeta + уникальный shareSlug)
     func createBoard(
-        title: String,
-        ownerUID: String
-    ) async throws {
-        try await service.createBoard(
-            title: title,
-            ownerUID: ownerUID
-        )
+        ownerUID: String,
+        input: CreateBoardInput
+    ) async throws -> String {
+        try await service.createBoard(ownerUID: ownerUID, input: input)
     }
 }

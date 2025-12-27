@@ -12,6 +12,7 @@ final class BoardsViewController: UIViewController, UICollectionViewDelegateFlow
     private var boards: [Board] = []
     private var boardsById: [String: Board] = [:]
     private var listener: ListenerRegistration?
+    private var createBoardCoordinator: CreateBoardCoordinator?
 
     // MARK: - UI
     private var collection: UICollectionView!
@@ -157,37 +158,30 @@ final class BoardsViewController: UIViewController, UICollectionViewDelegateFlow
 
     // MARK: - Actions
     @objc private func addTapped() {
-        let vc = AddBoardViewController { [weak self] title, desc in
-            guard let self else { return }
+        let nav = UINavigationController()
+        nav.modalPresentationStyle = UIModalPresentationStyle.pageSheet
 
-            let input = CreateBoardInput(
-                title: title,
-                description: desc,
-                subject: "general",
-                lang: "ru",
-                tags: [],
-                visibility: .private,
-                learningIntent: .study,
-                repetitionModel: .fsrs,
-                examDate: nil
-            )
+        let coordinator = CreateBoardCoordinator(
+            navigationController: nav,
+            ownerUID: user.uid
+        )
+        createBoardCoordinator = coordinator
 
-            Task {
-                do {
-                    try await self.service.createBoard(
-                        ownerUID: self.user.uid,
-                        input: input
-                    )
-                } catch {
-                    self.showError(error)
-                }
-            }
+        coordinator.onFinish = { [weak self] _ in
+            self?.dismiss(animated: true)
+            self?.createBoardCoordinator = nil
+            // observeBoards() и так подтянет изменения через listener
         }
 
-        vc.modalPresentationStyle = .pageSheet
-        present(vc, animated: true)
-    }
+        coordinator.onCancel = { [weak self] in
+            self?.dismiss(animated: true)
+            self?.createBoardCoordinator = nil
+        }
 
+        present(nav, animated: true)
+        coordinator.start()
+    }
+    
     // MARK: - Errors
     private func showError(_ error: Error) {
         let alert = UIAlertController(

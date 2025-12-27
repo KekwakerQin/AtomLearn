@@ -2,37 +2,35 @@ import UIKit
 
 final class CreateBoardCoordinator {
 
-    // MARK: - Dependencies
+    // MARK: Dependencies
     private let navigationController: UINavigationController
-    private let user: AppUser
+    private let ownerUID: String
 
-    // MARK: - Output
-    var onFinish: (() -> Void)?
+    // MARK: Output
+    var onFinish: ((String) -> Void)?
     var onCancel: (() -> Void)?
 
-    // MARK: - Init
+    // MARK: Init
     init(
         navigationController: UINavigationController,
-        user: AppUser
+        ownerUID: String
     ) {
         self.navigationController = navigationController
-        self.user = user
+        self.ownerUID = ownerUID
     }
 
-    // MARK: - Public API
+    // MARK: Public API
+
+    /// Открыть создание борда
     func start() {
         let service = CreateBoardService()
         let useCase = CreateBoardUseCase(service: service)
+        let viewModel = CreateBoardViewModel(ownerUID: ownerUID, useCase: useCase)
 
-        let viewModel = CreateBoardViewModel(
-            user: user,
-            useCase: useCase
-        )
-
-        viewModel.onFinish = { [weak self] in
-            self?.onFinish?()
+        viewModel.onFinish = { [weak self] boardId in
+            self?.onFinish?(boardId)
         }
-        
+
         viewModel.onCancel = { [weak self] in
             self?.onCancel?()
         }

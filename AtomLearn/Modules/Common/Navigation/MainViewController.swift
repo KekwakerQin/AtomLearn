@@ -32,6 +32,7 @@ final class MainTabBarController: UITabBarController, UITabBarControllerDelegate
     private let profileVC: UINavigationController
 
     private let addNavController = UINavigationController()
+    private let addPlaceholderVC = UIViewController()
 
     // MARK: Init
 
@@ -58,6 +59,9 @@ final class MainTabBarController: UITabBarController, UITabBarControllerDelegate
         badgeVC.tabBarItem = UITabBarItem(title: "", image: UIImage(systemName: "house"), tag: 0)
         searchVC.tabBarItem = UITabBarItem(title: "", image: UIImage(systemName: "magnifyingglass"), tag: 1)
 
+        addPlaceholderVC.view.backgroundColor = .systemBackground
+        addNavController.setViewControllers([addPlaceholderVC], animated: false)
+
         addNavController.view.backgroundColor = .clear
         addNavController.tabBarItem = UITabBarItem(
             title: nil,
@@ -65,10 +69,6 @@ final class MainTabBarController: UITabBarController, UITabBarControllerDelegate
             selectedImage: UIImage(systemName: "plus.circle")
         )
         addNavController.tabBarItem.tag = 2
-
-        let addPlaceholderVC = UIViewController()
-        addPlaceholderVC.view.backgroundColor = .systemBackground
-        addNavController.setViewControllers([addPlaceholderVC], animated: false)
 
         messagesVC.tabBarItem = UITabBarItem(title: "", image: UIImage(systemName: "bubble.left.and.bubble.right"), tag: 3)
         profileVC.tabBarItem = UITabBarItem(title: "", image: UIImage(systemName: "person.circle"), tag: 4)
@@ -153,13 +153,17 @@ final class MainTabBarController: UITabBarController, UITabBarControllerDelegate
         let nav = UINavigationController()
         let coordinator = CreateBoardCoordinator(
             navigationController: nav,
-            user: user
+            ownerUID: user.uid
         )
 
         coordinator.onCancel = { [weak self] in
             self?.cancelAddFlow()
         }
 
+        coordinator.onFinish = { [weak self] _ in
+            self?.cancelAddFlow()
+        }
+        
         addFlowState = .creatingBoard
         addFlowNavigationController = nav
         addFlowCoordinator = coordinator
@@ -234,7 +238,7 @@ final class MainTabBarController: UITabBarController, UITabBarControllerDelegate
         addFlowCoordinator = nil
         addFlowState = .idle
 
-        addNavController.setViewControllers([], animated: false)
+        addNavController.setViewControllers([addPlaceholderVC], animated: false)
     }
 
 }
