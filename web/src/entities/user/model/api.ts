@@ -1,8 +1,8 @@
 import { doc, getDoc } from "firebase/firestore";
 
-import { db } from "@shared";
-
 import type { User } from "@entities";
+
+import { db } from "@shared";
 
 export async function getUserById(uid: string): Promise<User> {
   const ref = doc(db, "users", uid);
