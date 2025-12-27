@@ -1,9 +1,10 @@
-import { auth } from "./config";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
+
+import { auth } from "@shared";
 
 export const firebaseAuthApi = {
   signup: (email: string, password: string) =>
