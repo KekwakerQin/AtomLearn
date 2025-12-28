@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-import React from "react";
-
-export const LoginForm = () => {
-  return <div>LoginForm</div>;
-=======
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -56,5 +50,4 @@ export const LoginForm = () => {
       <GoogleLoginButton />
     </>
   );
->>>>>>> dd77a964bfef0935b41c2a278ff11adf8af0484f
 };

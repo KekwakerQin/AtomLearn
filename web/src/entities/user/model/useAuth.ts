@@ -7,6 +7,7 @@ export const useAuth = () => {
   const initialized = useSelector(selectUserInitialized);
 
   return {
+    user,
     isAuth: Boolean(user),
     loading: !initialized,
   };
