@@ -11,14 +11,14 @@ final class CreateBoardViewController: UIViewController {
     
     private let titleView = FormTextFieldView(
         title: "Название",
-        placeholder: "Например: Swift основы",
-        helper: "Коротко и понятно. Можно потом поменять."
+        placeholder: "Например: Подготовка к контрольной",
+        helper: "Коротко опиши, для чего эта доска."
     )
     
     private let subjectView = FormTextFieldView(
-        title: "Subject",
-        placeholder: "Например: Swift / Biology",
-        helper: "Subject — узкая направленность общего тега. Например: tag=Programming, subject=Swift."
+        title: "Направление",
+        placeholder: "Например: Арифметика",
+        helper: "Узкая область знаний, к которой относится доска."
     )
     
     private let descriptionView = FormTextFieldView(
@@ -27,9 +27,9 @@ final class CreateBoardViewController: UIViewController {
         helper: "Помогает тебе и другим понять контекст."
     )
     
-    private let visibilityControl = UISegmentedControl(items: ["Public", "Private"])
-    private let intentControl = UISegmentedControl(items: ["Study", "Exam", "Work", "Personal"])
-    private let repetitionControl = UISegmentedControl(items: ["FSRS", "FSRS Exam", "SRS", "Everyday"])
+    private let visibilityControl = UISegmentedControl(items: ["Публичный", "Закрытый"])
+    private let intentControl = UISegmentedControl(items: ["Учёба", "Экзамен", "Работа", "Личное"])
+    private let repetitionControl = UISegmentedControl()
     
     private let examDatePicker = UIDatePicker()
     
@@ -105,14 +105,11 @@ final class CreateBoardViewController: UIViewController {
     }
     
     @objc private func repetitionChanged() {
-        let m: BoardRepetitionModel
-        switch repetitionControl.selectedSegmentIndex {
-        case 1: m = .fsrs_exam
-        case 2: m = .srs
-        case 3: m = .everyday
-        default: m = .fsrs
-        }
-        viewModel.selectRepetitionModel(m)
+        let models = viewModel.state.availableRepetitionModels
+        guard repetitionControl.selectedSegmentIndex < models.count else { return }
+
+        let model = models[repetitionControl.selectedSegmentIndex]
+        viewModel.selectRepetitionModel(model)
     }
     
     @objc private func examDateChanged() {
@@ -144,8 +141,8 @@ final class CreateBoardViewController: UIViewController {
     private func configureUI() {
         // Inputs
         titleView.textField.addTarget(self, action: #selector(titleChanged), for: .editingChanged)
-        subjectView.textField.addTarget(self, action: #selector(subjectChanged), for: .editingChanged)
         descriptionView.textField.addTarget(self, action: #selector(descriptionChanged), for: .editingChanged)
+        subjectView.textField.addTarget(self, action: #selector(subjectChanged), for: .editingChanged)
         
         visibilityControl.selectedSegmentIndex = 0 // public default
         visibilityControl.addTarget(self, action: #selector(visibilityChanged), for: .valueChanged)
@@ -153,7 +150,6 @@ final class CreateBoardViewController: UIViewController {
         intentControl.selectedSegmentIndex = 0 // study default
         intentControl.addTarget(self, action: #selector(intentChanged), for: .valueChanged)
         
-        repetitionControl.selectedSegmentIndex = 0 // fsrs default
         repetitionControl.addTarget(self, action: #selector(repetitionChanged), for: .valueChanged)
         
         examDatePicker.datePickerMode = .date
@@ -174,8 +170,8 @@ final class CreateBoardViewController: UIViewController {
         
         let main = FormSectionView(title: "Основное")
         main.addArranged(titleView)
-        main.addArranged(subjectView)
         main.addArranged(descriptionView)
+        main.addArranged(subjectView)
         
         let access = FormSectionView(title: "Доступ")
         access.addArranged(visibilityControl)
@@ -229,12 +225,18 @@ final class CreateBoardViewController: UIViewController {
             case .personal: self.intentControl.selectedSegmentIndex = 3
             }
             
-            switch state.repetitionModel {
-            case .fsrs: self.repetitionControl.selectedSegmentIndex = 0
-            case .fsrs_exam: self.repetitionControl.selectedSegmentIndex = 1
-            case .srs: self.repetitionControl.selectedSegmentIndex = 2
-            case .everyday: self.repetitionControl.selectedSegmentIndex = 3
-            default: self.repetitionControl.selectedSegmentIndex = 0
+            self.repetitionControl.removeAllSegments()
+
+            for (index, model) in state.availableRepetitionModels.enumerated() {
+                self.repetitionControl.insertSegment(
+                    withTitle: model.displayTitle,
+                    at: index,
+                    animated: false
+                )
+            }
+
+            if let selectedIndex = state.availableRepetitionModels.firstIndex(of: state.repetitionModel) {
+                self.repetitionControl.selectedSegmentIndex = selectedIndex
             }
             
             self.examDatePicker.isHidden = !state.isExamDateVisible

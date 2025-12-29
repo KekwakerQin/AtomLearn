@@ -19,3 +19,20 @@ struct BoardCollaboratorDraft: Equatable {
     let uid: String
     let role: BoardCollaboratorRole
 }
+
+extension BoardRepetitionModel {
+
+    /// Строковое значение для хранения в Firestore
+    var firestoreValue: String {
+        switch self {
+        case .fsrs:
+            return "fsrs"
+        case .srs:
+            return "srs"
+        case .fsrs_exam:
+            return "fsrs_exam"
+        case .simple:
+            return "simple"
+        }
+    }
+}

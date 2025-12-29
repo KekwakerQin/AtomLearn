@@ -12,7 +12,7 @@ extension CreateBoardInput {
             "visibility": visibility.rawValue,
             "ownerUID": ownerUID,
             "learningIntent": learningIntent.rawValue,
-            "repetitionModel": repetitionModel.rawValue,
+            "repetitionModel": repetitionModel.firestoreValue,
             "createdAt": FieldValue.serverTimestamp(),
             "lastActivityAt": FieldValue.serverTimestamp()
         ]

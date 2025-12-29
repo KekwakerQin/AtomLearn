@@ -100,7 +100,7 @@ final class CreateBoardService: CreateBoardServiceProtocol {
 
                     "learning": [
                         "intent": input.learningIntent.rawValue,
-                        "repetitionModel": input.repetitionModel.rawValue
+                        "repetitionModel": input.repetitionModel.firestoreValue
                     ],
 
                     "counts": [
