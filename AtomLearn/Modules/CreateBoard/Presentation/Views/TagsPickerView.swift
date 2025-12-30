@@ -60,11 +60,25 @@ final class TagsPickerView: UIView {
         addButton.setTitle("Добавить", for: .normal)
         addButton.addTarget(self, action: #selector(addTapped), for: .touchUpInside)
 
-        let row = UIStackView(arrangedSubviews: [inputField, addButton])
+        // контейнер для кнопки
+        let buttonContainer = UIView()
+        buttonContainer.translatesAutoresizingMaskIntoConstraints = false
+
+        buttonContainer.addSubview(addButton)
+        addButton.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            buttonContainer.widthAnchor.constraint(equalToConstant: 88),
+            addButton.centerXAnchor.constraint(equalTo: buttonContainer.centerXAnchor),
+            addButton.centerYAnchor.constraint(equalTo: buttonContainer.centerYAnchor)
+        ])
+
+        // строка ввода
+        let row = UIStackView(arrangedSubviews: [inputField, buttonContainer])
         row.axis = .horizontal
         row.spacing = 10
-        addButton.setContentHuggingPriority(.required, for: .horizontal)
-
+        row.distribution = .fill
+        
         selectedLabel.font = .systemFont(ofSize: 13, weight: .semibold)
         selectedLabel.textColor = .secondaryLabel
 
@@ -75,12 +89,12 @@ final class TagsPickerView: UIView {
         selectedStack.axis = .horizontal
         selectedStack.spacing = 8
         selectedStack.alignment = .leading
-        selectedStack.distribution = .fillProportionally
+        selectedStack.distribution = .fill
 
         suggestedStack.axis = .horizontal
         suggestedStack.spacing = 8
         suggestedStack.alignment = .leading
-        suggestedStack.distribution = .fillProportionally
+        suggestedStack.distribution = .fill
 
         let selectedScroll = horizontalScroll(with: selectedStack)
         let suggestedScroll = horizontalScroll(with: suggestedStack)
@@ -135,6 +149,11 @@ final class TagsPickerView: UIView {
         let b = UIButton(configuration: config)
         b.configuration?.baseForegroundColor = (style == .selected) ? .systemBackground : .label
         b.configuration?.baseBackgroundColor = (style == .selected) ? .systemBlue : .tertiarySystemFill
+
+        // Prevent stretching to the width of the longest tag
+        b.setContentHuggingPriority(.required, for: .horizontal)
+        b.setContentCompressionResistancePriority(.required, for: .horizontal)
+
         return b
     }
 }

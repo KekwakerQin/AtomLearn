@@ -190,6 +190,7 @@ final class BoardsViewController: UIViewController, UICollectionViewDelegateFlow
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "OK", style: .default))
+        print(error.localizedDescription)
         present(alert, animated: true)
     }
 }

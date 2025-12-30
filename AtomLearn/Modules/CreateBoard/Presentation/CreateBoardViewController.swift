@@ -12,7 +12,7 @@ final class CreateBoardViewController: UIViewController {
     private let titleView = FormTextFieldView(
         title: "Название",
         placeholder: "Например: Подготовка к контрольной",
-        helper: "Коротко опиши, для чего эта доска."
+        helper: "Основная тема  ."
     )
     
     private let subjectView = FormTextFieldView(

@@ -81,6 +81,8 @@ final class CreateBoardService: CreateBoardServiceProtocol {
                 ], forDocument: slugRef)
 
                 // 2) board doc
+                let collaboratorUIDs = input.extraCollaborators.map { $0.uid }
+
                 var boardData: [String: Any] = [
                     "id": boardId,
                     "shareSlug": shareSlug,
@@ -92,6 +94,7 @@ final class CreateBoardService: CreateBoardServiceProtocol {
                     "tags": input.tags,
 
                     "ownerUID": ownerUID,
+                    "collaboratorUIDs": collaboratorUIDs,
                     "visibility": input.visibility.rawValue,
 
                     "isArchived": false,
@@ -157,7 +160,7 @@ final class CreateBoardService: CreateBoardServiceProtocol {
                         "addedAt": FieldValue.serverTimestamp()
                     ], forDocument: ref)
                 }
-
+                
                 // 4) userMeta
                 transaction.setData([
                     "pinned": false,

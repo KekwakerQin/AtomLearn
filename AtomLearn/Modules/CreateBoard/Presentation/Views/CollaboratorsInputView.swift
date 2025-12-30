@@ -52,10 +52,27 @@ final class CollaboratorsInputView: UIView {
         addButton.setTitle("Добавить", for: .normal)
         addButton.addTarget(self, action: #selector(addTapped), for: .touchUpInside)
 
-        let topRow = UIStackView(arrangedSubviews: [uidField, addButton])
+        // Контейнер для кнопки "Добавить"
+        let buttonContainer = UIView()
+        buttonContainer.translatesAutoresizingMaskIntoConstraints = false
+
+        buttonContainer.addSubview(addButton)
+        addButton.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            buttonContainer.widthAnchor.constraint(equalToConstant: 88),
+            addButton.centerXAnchor.constraint(equalTo: buttonContainer.centerXAnchor),
+            addButton.centerYAnchor.constraint(equalTo: buttonContainer.centerYAnchor)
+        ])
+
+        // Верхняя строка ввода UID + кнопка
+        let topRow = UIStackView(arrangedSubviews: [uidField, buttonContainer])
         topRow.axis = .horizontal
         topRow.spacing = 10
-        addButton.setContentHuggingPriority(.required, for: .horizontal)
+        topRow.distribution = .fill
+
+        uidField.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        uidField.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
 
         listLabel.font = .systemFont(ofSize: 13, weight: .semibold)
         listLabel.textColor = .secondaryLabel
@@ -90,6 +107,8 @@ final class CollaboratorsInputView: UIView {
         let remove = UIButton(type: .system)
         remove.setTitle("Удалить", for: .normal)
         remove.addAction(UIAction { [weak self] _ in self?.onRemoveAt?(index) }, for: .touchUpInside)
+        remove.setContentCompressionResistancePriority(.required, for: .horizontal)
+        remove.setContentHuggingPriority(.required, for: .horizontal)
 
         let row = UIStackView(arrangedSubviews: [label, remove])
         row.axis = .horizontal
