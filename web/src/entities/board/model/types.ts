@@ -1,20 +1,29 @@
-export type BoardVisibility = "private" | "unlisted" | "public";
-export type BoardRole = "editor" | "viewer";
+import { Timestamp } from "firebase/firestore";
 
-export interface BoardCollaborator {
-  uid: string;
-  role: BoardRole;
-}
+export type BoardVisibility = "private" | "unlisted" | "public";
+
+export type LearningIntent = "study" | "teach";
+export type RepetitionModel = "fsrs" | "sm2";
 
 export interface BoardCounts {
   cards: number;
+  learnableNow: number;
   learners: number;
   reviews: number;
 }
 
+export interface BoardLearning {
+  intent: LearningIntent;
+  repetitionModel: RepetitionModel;
+}
+
 export interface BoardRating {
-  ratingAvg?: number;
-  ratingCount?: number;
+  avg: number;
+  count: number;
+}
+
+export interface BoardAnalytics {
+  createdFromUID?: string;
 }
 
 export interface Board {
@@ -25,32 +34,33 @@ export interface Board {
 
   ownerUID: string;
 
-  createdAt: string;
-  lastActivityAt?: string;
+  createdFromUID?: string;
 
   visibility: BoardVisibility;
 
-  collaborators: BoardCollaborator[];
-
-  category?: string;
-  subject?: string;
-  level?: string;
-
-  coverURL?: string;
-  profilePictures?: string[];
-
-  lang: string;
+  collaboratorUIDs: string[];
 
   counts: BoardCounts;
 
-  ratingAvg?: number;
-  ratingCount?: number;
+  learning: BoardLearning;
+
+  lang: string;
+
+  subject?: string;
 
   tags: string[];
 
   shareSlug?: string;
 
-  pinRank?: number;
+  rating: BoardRating;
 
   isOfficial: boolean;
+  isTemplate: boolean;
+  isArchived: boolean;
+
+  analytics?: BoardAnalytics;
+
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+  lastActivityAt: Timestamp;
 }

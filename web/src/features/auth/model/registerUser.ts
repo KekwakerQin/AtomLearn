@@ -2,9 +2,9 @@ import { FirebaseError } from "firebase/app";
 import { doc, setDoc } from "firebase/firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 
-import type { User } from "@entities";
-
 import { auth, db, generateUsername, randomAbBucket } from "@shared";
+
+import type { User } from "@entities";
 
 interface RegisterUserInput {
   email: string;
@@ -13,10 +13,13 @@ interface RegisterUserInput {
   displayName: string;
 }
 
-export async function registerUser(input: RegisterUserInput) {
+export async function registerUser({
+  email,
+  password,
+  name,
+  displayName,
+}: RegisterUserInput) {
   try {
-    const { email, password, name, displayName } = input;
-
     const cred = await createUserWithEmailAndPassword(auth, email, password);
     const fbUser = cred.user;
 
