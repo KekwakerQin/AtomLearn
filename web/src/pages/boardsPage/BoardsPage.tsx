@@ -1,22 +1,29 @@
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
 import { CreateBoardPopUp } from "@features";
 
 import { subscribeUserBoards, useAuth, type Board } from "@entities";
 
+import s from "./boardsPage.module.scss";
+
 export const BoardsPage = () => {
+  const { userId } = useParams();
+
   const { user } = useAuth();
+
+  const ownerId = userId ?? user?.uid;
 
   const [boards, setBoards] = useState<Board[]>([]);
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    if (!user) return;
+    if (!ownerId) return;
 
-    const unsubscribe = subscribeUserBoards(user.uid, setBoards);
+    const unsubscribe = subscribeUserBoards(ownerId, setBoards);
 
     return unsubscribe;
-  }, [user]);
+  }, [ownerId]);
 
   if (!user) {
     return null; // Loader
@@ -26,11 +33,14 @@ export const BoardsPage = () => {
     <div>
       <button onClick={() => setIsOpen(true)}>создать</button>
 
-      <ul>
+      <div className={s.boardsContainer}>
         {boards.map((board) => (
-          <li key={board.id}>{board.title}</li>
+          <div key={board.id} className={s.board}>
+            <h4>{board.title}</h4>
+            <p>{board.description}</p>
+          </div>
         ))}
-      </ul>
+      </div>
 
       <CreateBoardPopUp
         isOpen={isOpen}
