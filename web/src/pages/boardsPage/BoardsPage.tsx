@@ -34,12 +34,19 @@ export const BoardsPage = () => {
       <button onClick={() => setIsOpen(true)}>создать</button>
 
       <div className={s.boardsContainer}>
-        {boards.map((board) => (
-          <div key={board.id} className={s.board}>
-            <h4>{board.title}</h4>
-            <p>{board.description}</p>
-          </div>
-        ))}
+        {boards
+          .filter(
+            (board) =>
+              board.ownerUID === user.uid ||
+              board.collaboratorUIDs.includes(user.uid) ||
+              board.visibility === "public"
+          )
+          .map((board) => (
+            <div key={board.id} className={s.board}>
+              <h4>{board.title}</h4>
+              <p>{board.description}</p>
+            </div>
+          ))}
       </div>
 
       <CreateBoardPopUp
