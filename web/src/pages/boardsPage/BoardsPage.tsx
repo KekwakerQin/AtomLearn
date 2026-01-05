@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import { CreateBoardPopUp } from "@features";
 
@@ -42,10 +42,10 @@ export const BoardsPage = () => {
               board.visibility === "public"
           )
           .map((board) => (
-            <div key={board.id} className={s.board}>
+            <Link key={board.id} className={s.board} to={`/boards/${board.id}`}>
               <h4>{board.title}</h4>
               <p>{board.description}</p>
-            </div>
+            </Link>
           ))}
       </div>
 

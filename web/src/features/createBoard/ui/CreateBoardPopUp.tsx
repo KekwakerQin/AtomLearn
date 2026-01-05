@@ -14,6 +14,7 @@ export const CreateBoardPopUp = ({ isOpen, onClose, ownerUID }: Props) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [lang, setLang] = useState("en");
+  const [visibility, setVisibility] = useState("public");
 
   const { create, loading, error } = useCreateBoard();
 
@@ -25,6 +26,7 @@ export const CreateBoardPopUp = ({ isOpen, onClose, ownerUID }: Props) => {
       description,
       ownerUID,
       lang,
+      visibility,
     });
 
     setTitle("");
@@ -51,6 +53,15 @@ export const CreateBoardPopUp = ({ isOpen, onClose, ownerUID }: Props) => {
       <select value={lang} onChange={(e) => setLang(e.target.value)}>
         <option value="en">English</option>
         <option value="ru">Русский</option>
+      </select>
+
+      <select
+        value={visibility}
+        onChange={(e) => setVisibility(e.target.value)}
+      >
+        <option value="public">Public</option>
+        <option value="private">Private</option>
+        <option value="unlisted">Unlisted</option>
       </select>
 
       {error && <p>{error}</p>}

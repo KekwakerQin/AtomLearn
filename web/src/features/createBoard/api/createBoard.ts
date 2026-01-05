@@ -9,6 +9,7 @@ type CreateBoardInput = {
   description?: string;
   ownerUID: string;
   lang: string;
+  visibility: string;
 };
 
 export const createBoard = async ({
@@ -16,6 +17,7 @@ export const createBoard = async ({
   description,
   ownerUID,
   lang,
+  visibility,
 }: CreateBoardInput): Promise<Board> => {
   const ref = await addDoc(collection(db, "boards"), {
     title: title,
@@ -24,7 +26,7 @@ export const createBoard = async ({
     ownerUID: ownerUID,
     createdFromUID: ownerUID,
 
-    visibility: "private",
+    visibility: visibility,
 
     collaboratorUIDs: [],
 
