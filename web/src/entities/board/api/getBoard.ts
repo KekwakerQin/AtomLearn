@@ -35,8 +35,8 @@ export const subscribeBoard = ({
 
       if (
         !userId ||
-        (data.ownerId !== userId &&
-          !data.collaborators?.includes(userId) &&
+        (data.ownerUID !== userId &&
+          !data.collaboratorUIDs?.includes(userId) &&
           data.visibility !== "public")
       ) {
         onError?.("Access denied");
