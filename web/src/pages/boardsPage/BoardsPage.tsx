@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { CreateBoardPopUp } from "@features";
 
-import { getUserBoards, useAuth, type Board } from "@entities";
+import { subscribeUserBoards, useAuth, type Board } from "@entities";
 
 export const BoardsPage = () => {
   const { user } = useAuth();
@@ -12,7 +12,10 @@ export const BoardsPage = () => {
 
   useEffect(() => {
     if (!user) return;
-    getUserBoards(user.uid).then(setBoards);
+
+    const unsubscribe = subscribeUserBoards(user.uid, setBoards);
+
+    return unsubscribe;
   }, [user]);
 
   if (!user) {

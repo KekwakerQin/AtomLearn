@@ -1,20 +1,25 @@
-import {
-  getBoardsByCollaborator,
-  getBoardsByOwner,
-  type Board,
-} from "@entities";
+import { collection, onSnapshot, query, where, or } from "firebase/firestore";
+import { db } from "@shared";
+import type { Board } from "@entities";
 
-export const getUserBoards = async (uid: string) => {
-  const [owned, collaborated] = await Promise.all([
-    getBoardsByOwner(uid),
-    getBoardsByCollaborator(uid),
-  ]);
+export const subscribeUserBoards = (
+  uid: string,
+  cb: (boards: Board[]) => void
+) => {
+  const q = query(
+    collection(db, "boards"),
+    or(
+      where("ownerUID", "==", uid),
+      where("collaboratorUIDs", "array-contains", uid)
+    )
+  );
 
-  const map = new Map<string, Board>();
+  return onSnapshot(q, (snap) => {
+    const boards = snap.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as Board[];
 
-  [...owned, ...collaborated].forEach((board) => {
-    map.set(board.id, board);
+    cb(boards);
   });
-
-  return Array.from(map.values());
 };
