@@ -1,6 +1,5 @@
 import UIKit
 import FirebaseAuth
-import SwiftUI
 
 final class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
 
@@ -180,7 +179,8 @@ final class MainTabBarController: UITabBarController, UITabBarControllerDelegate
         let nav = UINavigationController()
         let coordinator = AddCardsCoordinator(
             navigationController: nav,
-            board: board
+            board: board,
+            user: user
         )
 
         coordinator.onCancel = { [weak self] in

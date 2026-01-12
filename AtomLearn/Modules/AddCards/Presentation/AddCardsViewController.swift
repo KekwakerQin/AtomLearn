@@ -22,17 +22,27 @@ final class AddCardsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        title = nil
         viewModel.onViewDidLoad()
-        
+
         navigationItem.leftBarButtonItem = UIBarButtonItem(
             title: "Отмена",
             style: .plain,
             target: self,
             action: #selector(cancelTapped)
         )
+
+        navigationItem.rightBarButtonItem = UIBarButtonItem(
+            title: "Добавить",
+            style: .done,
+            target: self,
+            action: #selector(addTapped)
+        )
     }
 
+    @objc private func addTapped() {
+        viewModel.addCard()
+    }
+    
     // MARK: - Actions
     
     @objc private func cancelTapped() {
