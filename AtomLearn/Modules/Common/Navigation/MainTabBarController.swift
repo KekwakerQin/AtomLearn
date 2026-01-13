@@ -11,6 +11,7 @@ final class MainTabBarController: UITabBarController, UITabBarControllerDelegate
         case addingCards(Board)
     }
     
+    private var currentIndex = 0
     private weak var addEntitySheetNav: UINavigationController?
     private weak var addEntitySheetCoordinator: AnyObject?
 
@@ -87,10 +88,27 @@ final class MainTabBarController: UITabBarController, UITabBarControllerDelegate
 
     func tabBarController(_ tabBarController: UITabBarController,
                           shouldSelect viewController: UIViewController) -> Bool {
+        
+        guard let index = tabBarController.viewControllers?.firstIndex(of: viewController) else {
+            return true
+        }
+        
+        if viewController.tabBarItem.tag != 2 {
+            currentIndex = index
+            #if DEBUG
+            print(index)
+            #endif
+        }
+        
         guard viewController.tabBarItem.tag == 2 else {
             return true
         }
-        handleAddTabTap()
+
+        if viewController.tabBarItem.tag == 2 {
+            handleAddTabTap()
+            return false
+        }
+
         return false
     }
 
@@ -130,16 +148,36 @@ final class MainTabBarController: UITabBarController, UITabBarControllerDelegate
             sheetNav?.dismiss(animated: true) { self.startCreateBoardFlow() }
         }
 
+//        coordinator.onSelectBoard = { [weak self, weak coordinator, weak sheetNav] board in
+//            guard let self else { return }
+//            if let coordinator {
+//                self.childCoordinators.removeAll { $0 === coordinator }
+//            }
+//            self.addEntitySheetNav = nil
+//            self.addEntitySheetCoordinator = nil
+//            sheetNav?.dismiss(animated: true) { self.startAddCardsFlow(board: board) }
+//        }
+        
         coordinator.onSelectBoard = { [weak self, weak coordinator, weak sheetNav] board in
             guard let self else { return }
-            if let coordinator {
-                self.childCoordinators.removeAll { $0 === coordinator }
-            }
-            self.addEntitySheetNav = nil
-            self.addEntitySheetCoordinator = nil
-            sheetNav?.dismiss(animated: true) { self.startAddCardsFlow(board: board) }
-        }
 
+            // 1) Cards
+            let cardsVM = CardsViewModel()
+            
+            let cardsVC = CardsViewController(user: self.user, board: board, viewModel: cardsVM)
+            sheetNav?.pushViewController(cardsVC, animated: true)
+
+            // 2) AddCards поверх Cards
+            let addCardsVM = AddCardsViewModel(boardId: board.id, user: self.user)
+
+            addCardsVM.onCancel = { [weak sheetNav] in
+                sheetNav?.popViewController(animated: true) // вернёмся на Cards ✅
+            }
+
+            let addCardsVC = AddCardsViewController(viewModel: addCardsVM)
+            sheetNav?.pushViewController(addCardsVC, animated: true)
+        }
+        
         childCoordinators.append(coordinator)
         coordinator.start()
         present(sheetNav, animated: true)
@@ -198,7 +236,7 @@ final class MainTabBarController: UITabBarController, UITabBarControllerDelegate
     /// Cancels the current add flow and returns to the profile tab.
     private func cancelAddFlow() {
         resetAddFlow()
-        selectedIndex = 4
+        selectedIndex = currentIndex
     }
 
     // MARK: Private helpers

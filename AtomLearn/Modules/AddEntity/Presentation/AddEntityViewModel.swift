@@ -23,7 +23,7 @@ final class AddEntityViewModel {
     
     // MARK: - Navigation
     var onCreateBoard: (() -> Void)?
-    var onSelectBoard: ((Board) -> Void)?
+    var onSelectBoard: ((Board) -> Void)?   
 
     // MARK: - Init
     init(user: AppUser,

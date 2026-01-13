@@ -39,9 +39,8 @@ final class AddEntityCoordinator {
 
         viewModel.onSelectBoard = { [weak self] board in
             guard let self else { return }
-            self.navigationController.popViewController(animated: true)
             self.onSelectBoard?(board)
-            self.onFinish?()
+//            self.onFinish?()
         }
         
         viewModel.onClose = { [weak self] in

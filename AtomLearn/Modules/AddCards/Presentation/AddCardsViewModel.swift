@@ -3,27 +3,28 @@ import Foundation
 final class AddCardsViewModel {
 
     // MARK: - Dependencies
-    private let board: Board
+    private let boardId: String
     private let user: AppUser
     private let service: AddCardsServiceProtocol
 
     // MARK: - Output
     var onCancel: (() -> Void)?
-
+    var onFinish: (() -> Void)?
+    
     // MARK: - Init
     init(
-        board: Board,
+        boardId: String,
         user: AppUser,
         service: AddCardsServiceProtocol = AddCardsService()
     ) {
-        self.board = board
+        self.boardId = boardId
         self.user = user
         self.service = service
     }
 
     // MARK: - Lifecycle
     func onViewDidLoad() {
-        print("AddCards открыт для boardId = \(board.id)")
+        print("AddCards открыт для boardId = \(boardId)")
     }
 
     // MARK: - Actions
@@ -31,10 +32,11 @@ final class AddCardsViewModel {
         Task {
             do {
                 try await service.addCard(
-                    boardId: board.id,
+                    boardId: boardId,
                     ownerId: user.uid
                 )
-                print("[LOG:INFO] Карточка добавлена в board \(board.id)")
+                print("[LOG:INFO] Карточка добавлена в board \(boardId)")
+                onFinish?()
             } catch {
                 print("[LOG:ERROR] \(error.localizedDescription)")
             }

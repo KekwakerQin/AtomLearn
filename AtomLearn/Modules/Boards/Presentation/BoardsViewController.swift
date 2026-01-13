@@ -152,7 +152,7 @@ final class BoardsViewController: UIViewController, UICollectionViewDelegateFlow
         guard let id = dataSource.itemIdentifier(for: indexPath),
               let board = boardsById[id] else { return }
 
-        let vc = CardsViewController(user: user, board: board)
+        let vc = CardsViewController(user: user, board: board, viewModel: CardsViewModel())
         navigationController?.pushViewController(vc, animated: true)
     }
 

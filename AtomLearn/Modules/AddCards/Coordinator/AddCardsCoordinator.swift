@@ -25,12 +25,16 @@ final class AddCardsCoordinator {
     // MARK: - Public API
     func start() {
         let viewModel = AddCardsViewModel(
-            board: board,
+            boardId: board.id,
             user: user
         )
 
+        viewModel.onFinish = { [weak self] in
+            self?.onFinish?()
+        }
+
         viewModel.onCancel = { [weak self] in
-            self?.onCancel?()
+            self?.navigationController.popViewController(animated: true)
         }
 
         let vc = AddCardsViewController(viewModel: viewModel)

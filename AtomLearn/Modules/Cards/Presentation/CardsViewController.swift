@@ -22,7 +22,7 @@ final class CardsViewController: UIViewController {
     private let collection = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
 
     /// Инициализация с пользователем и бордом.
-    init(user: AppUser, board: Board, viewModel: CardsViewModel = CardsViewModel(service: CardsRepository())) {
+    init(user: AppUser, board: Board, viewModel: CardsViewModel) {
         self.user = user
         self.board = board
         self.viewModel = viewModel
@@ -40,6 +40,8 @@ final class CardsViewController: UIViewController {
     // MARK: - Lifecycle
     // Настройка интерфейса и запуск наблюдения
     override func viewDidLoad() {
+        print("CardsVC VM (from vc):", ObjectIdentifier(viewModel))
+        
         super.viewDidLoad()
         title = board.title
         view.backgroundColor = .systemBackground
