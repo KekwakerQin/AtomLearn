@@ -55,9 +55,9 @@ final class AddEntityViewModel {
 
             do {
                 let boards = try await boardsService.fetchBoardsOnce(
-                    ownerUID: user.uid
+                    ownerUID: user.uid,
                 )
-
+                
                 self.allBoards = boards
                 self.applySearchAndGrouping()
 

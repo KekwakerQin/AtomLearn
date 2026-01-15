@@ -155,6 +155,9 @@ async function migrateBoard(boardDoc) {
   return { boardId, skipped: false, updatePayload, editorUIDs, viewerUIDs, memberUIDs };
 }
 
+// ================================
+// Migration runner
+// ================================
 async function main() {
   console.log("=== Firestore migration started ===");
   console.log("DRY_RUN:", DRY_RUN);

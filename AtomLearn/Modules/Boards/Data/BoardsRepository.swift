@@ -21,7 +21,7 @@ final class BoardsRepository: BoardsService {
             .order(by: "lastActivityAt", descending: order.descending)
 
         let collaboratorQuery = db.collection("boards")
-            .whereField("collaboratorUIDs", arrayContains: ownerUID)
+            .whereField("memberUIDs", arrayContains: ownerUID)
             .order(by: "lastActivityAt", descending: order.descending)
 
         var cache: [String: Board] = [:]
@@ -71,12 +71,29 @@ final class BoardsRepository: BoardsService {
     
     /// Загружает список досок один раз.
     func fetchBoardsOnce(ownerUID: String, order: BoardsOrder) async throws -> [Board] {
-        let query = db.collection("boards")
+        let base = db.collection("boards")
+
+        async let ownedSnap = base
             .whereField("ownerUID", isEqualTo: ownerUID)
-            .order(by: "lastActivityAt", descending: order.descending)
-        
-        let snapshot = try await query.getDocuments()
-        return snapshot.documents.compactMap(BoardMapper.from)
+            .getDocuments()
+
+        async let editableSnap = base
+            .whereField("editorUIDs", arrayContains: ownerUID)
+            .getDocuments()
+
+        let (owned, editable) = try await (ownedSnap, editableSnap)
+
+        let ownedBoards = owned.documents.compactMap(BoardMapper.from)
+        let editableBoards = editable.documents.compactMap(BoardMapper.from)
+
+        // merge + dedupe by board.id
+        var map: [String: Board] = [:]
+        for b in ownedBoards { map[b.id] = b }
+        for b in editableBoards { map[b.id] = b }
+
+        var result = Array(map.values)
+
+        return result
     }
     
     private func fetchBoardIDsWhereUserIsCollaborator(
