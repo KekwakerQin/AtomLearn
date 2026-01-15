@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+export const RegisterForm = () => {
+  return <div>RegisterForm</div>;
+=======
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -75,4 +79,5 @@ export const RegisterForm = () => {
       <GoogleLoginButton />
     </>
   );
+>>>>>>> dd77a964bfef0935b41c2a278ff11adf8af0484f
 };
