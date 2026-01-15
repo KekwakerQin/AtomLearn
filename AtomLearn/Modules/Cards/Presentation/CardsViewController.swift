@@ -20,7 +20,7 @@ final class CardsViewController: UIViewController {
 
     // Коллекция карточек
     private let collection = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
-
+    
     /// Инициализация с пользователем и бордом.
     init(user: AppUser, board: Board, viewModel: CardsViewModel) {
         self.user = user
@@ -101,8 +101,9 @@ final class CardsViewController: UIViewController {
     // MARK: - Actions
     // Добавление новой карточки в текущий борд
     @objc private func addCard() {
-        print("PLUS TAP")
-        viewModel.didTapAddCard()
+        navigationController?.pushViewController(AddCardsViewController(viewModel: AddCardsViewModel(boardId: board.id, user: self.user)), animated: true)
+//        print("PLUS TAP")
+//        viewModel.didTapAddCard()
     }
 // СТАРОЕ - Если не сработает - вернуть
 //    @objc private func addCard() {
