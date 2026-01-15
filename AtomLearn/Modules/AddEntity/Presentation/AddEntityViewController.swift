@@ -8,6 +8,15 @@ final class AddEntityViewController: UIViewController, UISearchBarDelegate {
     // MARK: - UI
     private let searchBar = UISearchBar()
     private let tableView = UITableView(frame: .zero, style: .plain)
+    
+    private final class WeakTarget: NSObject {
+        weak var owner: AddEntityViewController?
+        init(owner: AddEntityViewController) { self.owner = owner }
+        @objc func handleTap() { owner?.dismissKeyboard() }
+    }
+
+    private lazy var weakTapTarget = WeakTarget(owner: self)
+
 
     // MARK: - Sections
     private enum Section {
@@ -102,7 +111,8 @@ final class AddEntityViewController: UIViewController, UISearchBarDelegate {
         view.addSubview(searchBar)
         view.addSubview(tableView)
 
-        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        let tap = UITapGestureRecognizer(target: weakTapTarget,
+                                         action: #selector(WeakTarget.handleTap))
         tap.cancelsTouchesInView = false
         view.addGestureRecognizer(tap)
 

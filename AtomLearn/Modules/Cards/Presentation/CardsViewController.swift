@@ -20,9 +20,9 @@ final class CardsViewController: UIViewController {
 
     // Коллекция карточек
     private let collection = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
-
+    
     /// Инициализация с пользователем и бордом.
-    init(user: AppUser, board: Board, viewModel: CardsViewModel = CardsViewModel(service: CardsRepository())) {
+    init(user: AppUser, board: Board, viewModel: CardsViewModel) {
         self.user = user
         self.board = board
         self.viewModel = viewModel
@@ -40,6 +40,8 @@ final class CardsViewController: UIViewController {
     // MARK: - Lifecycle
     // Настройка интерфейса и запуск наблюдения
     override func viewDidLoad() {
+        print("CardsVC VM (from vc):", ObjectIdentifier(viewModel))
+        
         super.viewDidLoad()
         title = board.title
         view.backgroundColor = .systemBackground
@@ -99,18 +101,24 @@ final class CardsViewController: UIViewController {
     // MARK: - Actions
     // Добавление новой карточки в текущий борд
     @objc private func addCard() {
-        print("BOARD: \(board.id) | UID: \(user.uid)")
-        let data = Card.basic(for: board.id, ownerId: user.uid)
-        db.collection("boards").document(board.id)
-            .collection("cards")
-            .addDocument(data: data) { error in
-                if let error = error {
-                    print("[LOG:ERROR] Ошибка при добавлении карточки: \(error.localizedDescription)")
-                } else {
-                    print("[LOG:INFO] Карточка успешно добавлена пользователем \(self.user.uid)")
-                }
-            }
+        navigationController?.pushViewController(AddCardsViewController(viewModel: AddCardsViewModel(boardId: board.id, user: self.user)), animated: true)
+//        print("PLUS TAP")
+//        viewModel.didTapAddCard()
     }
+// СТАРОЕ - Если не сработает - вернуть
+//    @objc private func addCard() {
+//        print("BOARD: \(board.id) | UID: \(user.uid)")
+//        let data = Card.basic(for: board.id, ownerId: user.uid)
+//        db.collection("boards").document(board.id)
+//            .collection("cards")
+//            .addDocument(data: data) { error in
+//                if let error = error {
+//                    print("[LOG:ERROR] Ошибка при добавлении карточки: \(error.localizedDescription)")
+//                } else {
+//                    print("[LOG:INFO] Карточка успешно добавлена пользователем \(self.user.uid)")
+//                }
+//            }
+//    }
 }
 
 // MARK: - UICollectionViewDataSource & UICollectionViewDelegate
