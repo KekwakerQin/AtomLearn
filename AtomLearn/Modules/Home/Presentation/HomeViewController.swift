@@ -66,18 +66,18 @@ final class HomeViewController: UIViewController {
     private func bindViewModel() {
         viewModel.onStateChange = { [weak self] state in
             guard let self else { return }
-            status.text = state.statusText
+            self.status.text = state.statusText
             if let data = state.imageData {
-                imageView.image = UIImage(data: data)
+                self.imageView.image = UIImage(data: data)
             } else {
-                imageView.image = nil
+                self.imageView.image = nil
             }
         }
 
         viewModel.onError = { [weak self] error in
             guard let self else { return }
-            status.text = "Ошибка: \(error.localizedDescription)"
-            imageView.image = nil
+            self.status.text = "Ошибка: \(error.localizedDescription)"
+            self.imageView.image = nil
         }
     }
 }

@@ -12,6 +12,7 @@ struct HomeViewState: Equatable {
 final class HomeViewModel {
     // MARK: - Dependencies
     private let service: HomeService
+    private var loadTask: Task<Void, Never>?
 
     // MARK: - Public API
     /// Коллбэк для обновления состояния.
@@ -25,10 +26,15 @@ final class HomeViewModel {
         self.service = service
     }
 
+    deinit {
+        loadTask?.cancel()
+    }
+
     // MARK: - Lifecycle
     /// Запускает загрузку данных домашнего экрана.
     func load() {
-        Task { await loadContent() }
+        loadTask?.cancel()
+        loadTask = Task { await loadContent() }
     }
 
     // MARK: - Private helpers
