@@ -13,7 +13,7 @@ final class HomeViewController: UIViewController {
 
     // MARK: - Init
     /// Создаёт домашний экран.
-    init(viewModel: HomeViewModel = HomeViewModel(service: HomeRepository())) {
+    init(viewModel: HomeViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
