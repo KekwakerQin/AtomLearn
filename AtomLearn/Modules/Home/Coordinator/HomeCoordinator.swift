@@ -14,7 +14,9 @@ final class HomeCoordinator {
     // MARK: - Public API
     /// Запускает домашний экран.
     func start() {
-        let viewController = HomeViewController()
+        let service = HomeRepository()
+        let viewModel = HomeViewModel(service: service)
+        let viewController = HomeViewController(viewModel: viewModel)
         navigationController.pushViewController(viewController, animated: true)
     }
 }
