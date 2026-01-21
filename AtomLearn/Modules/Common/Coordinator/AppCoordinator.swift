@@ -2,8 +2,8 @@ import FirebaseAuth
 import UIKit
 
 final class AppCoordinator {
-    private weak var window: UIWindow?
-    private let authCoordinator: AuthCoordinator
+    private let window: UIWindow
+    private let rootCoordinator: AuthCoordinator
     private var authStateDidChangeHandle: AuthStateDidChangeListenerHandle?
     private var currentRoute: Route?
 
@@ -14,7 +14,7 @@ final class AppCoordinator {
 
     init(window: UIWindow) {
         self.window = window
-        self.authCoordinator = AuthCoordinator(window: window)
+        self.rootCoordinator = AuthCoordinator(window: window)
     }
 
     func start() {
@@ -56,19 +56,19 @@ final class AppCoordinator {
         let route = Route.main(userId: user.uid)
         guard currentRoute != route else { return }
         currentRoute = route
-        authCoordinator.showMain(for: makeAppUser(from: user), animated: animated)
+        rootCoordinator.showMain(for: makeAppUser(from: user), animated: animated)
     }
 
     private func showAuth(animated: Bool) {
         guard currentRoute != .auth else { return }
         currentRoute = .auth
-        authCoordinator.showAuth(animated: animated)
+        rootCoordinator.showAuth(animated: animated)
     }
 
     private func makeAppUser(from user: User) -> AppUser {
         AppUser(
             uid: user.uid,
-            name: user.displayName ?? "",
+            name: user.displayName ?? user.email?.components(separatedBy: "@").first ?? "Без имени",
             email: user.email,
             displayName: user.displayName
         )

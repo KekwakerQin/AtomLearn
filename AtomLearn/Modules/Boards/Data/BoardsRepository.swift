@@ -20,11 +20,30 @@ final class BoardsRepository: BoardsService {
             .whereField("ownerUID", isEqualTo: ownerUID)
             .order(by: "lastActivityAt", descending: order.descending)
 
-        let collaboratorQuery = db.collection("boards")
+        let memberQuery = db.collection("boards")
             .whereField("memberUIDs", arrayContains: ownerUID)
             .order(by: "lastActivityAt", descending: order.descending)
 
         var cache: [String: Board] = [:]
+
+        func applyChanges(from snapshot: QuerySnapshot?) {
+            guard let snapshot else { return }
+
+            for change in snapshot.documentChanges {
+                switch change.type {
+                case .added, .modified:
+                    if let board = BoardMapper.from(doc: change.document) {
+                        cache[board.id] = board
+                    }
+
+                case .removed:
+                    cache[change.document.documentID] = nil
+
+                @unknown default:
+                    break
+                }
+            }
+        }
 
         func emit() {
             let boards = Array(cache.values)
@@ -42,31 +61,21 @@ final class BoardsRepository: BoardsService {
                 return
             }
 
-            snapshot?.documents
-                .compactMap(BoardMapper.from)
-                .forEach { board in
-                    cache[board.id] = board
-                }
-
+            applyChanges(from: snapshot)
             emit()
         }
 
-        let collaboratorListener = collaboratorQuery.addSnapshotListener { snapshot, error in
+        let memberListener = memberQuery.addSnapshotListener { snapshot, error in
             if let error {
                 onUpdate(.failure(error))
                 return
             }
 
-            snapshot?.documents
-                .compactMap(BoardMapper.from)
-                .forEach { board in
-                    cache[board.id] = board
-                }
-
+            applyChanges(from: snapshot)
             emit()
         }
-
-        return CompositeListener(listeners: [ownerListener, collaboratorListener])
+        
+        return CompositeListener(listeners: [ownerListener, memberListener])
     }
     
     /// Загружает список досок один раз.
@@ -93,7 +102,27 @@ final class BoardsRepository: BoardsService {
 
         var result = Array(map.values)
 
+        // Keep ordering consistent with observeBoards() (currently based on lastActivityAt)
+        result.sort {
+            let lhs = $0.lastActivityAt ?? .distantPast
+            let rhs = $1.lastActivityAt ?? .distantPast
+            return order.descending ? (lhs > rhs) : (lhs < rhs)
+        }
+
         return result
+    }
+    
+    func deleteBoard(boardId: String, completion: @escaping (Result<Void, Error>) -> Void) {
+        Firestore.firestore()
+            .collection("boards")
+            .document(boardId)
+            .delete { error in
+                if let error {
+                    completion(.failure(error))
+                } else {
+                    completion(.success(()))
+                }
+            }
     }
     
     private func fetchBoardIDsWhereUserIsCollaborator(

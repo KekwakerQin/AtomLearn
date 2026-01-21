@@ -18,6 +18,7 @@
 		7D9D54A72E7C0BD4001A88BB /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 7D9D54A62E7C0BD4001A88BB /* FirebaseStorage */; };
 		7DA0E9E32E9F5DE100DD8E9D /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 7DA0E9E22E9F5DE100DD8E9D /* Storage */; };
 		7DA0E9ED2E9F63FA00DD8E9D /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 7DA0E9EC2E9F63FA00DD8E9D /* Supabase */; };
+		7DCC945D2F18C523001CC4C0 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7DCC945C2F18C523001CC4C0 /* SnapKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -87,6 +88,7 @@
 				7D9D54A72E7C0BD4001A88BB /* FirebaseStorage in Frameworks */,
 				7D9D549B2E7C0BD4001A88BB /* FirebaseAnalyticsCore in Frameworks */,
 				7D9D54A32E7C0BD4001A88BB /* FirebaseFirestore in Frameworks */,
+				7DCC945D2F18C523001CC4C0 /* SnapKit in Frameworks */,
 				7DA0E9E32E9F5DE100DD8E9D /* Storage in Frameworks */,
 				7D0986092E9354A400F19213 /* GoogleSignIn in Frameworks */,
 			);
@@ -168,6 +170,7 @@
 				7D0986082E9354A400F19213 /* GoogleSignIn */,
 				7DA0E9E22E9F5DE100DD8E9D /* Storage */,
 				7DA0E9EC2E9F63FA00DD8E9D /* Supabase */,
+				7DCC945C2F18C523001CC4C0 /* SnapKit */,
 			);
 			productName = AtomLearn;
 			productReference = 7D9D54402E7BCEC6001A88BB /* AtomLearn.app */;
@@ -252,6 +255,7 @@
 				7D9D547E2E7BEA8C001A88BB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				7D0986072E9354A400F19213 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 				7DA0E9E12E9F5DE100DD8E9D /* XCRemoteSwiftPackageReference "supabase-swift" */,
+				7DCC945B2F18C522001CC4C0 /* XCRemoteSwiftPackageReference "SnapKit" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 7D9D54412E7BCEC6001A88BB /* Products */;
@@ -354,6 +358,9 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.kekwaker.atomlearn;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -390,6 +397,9 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.kekwaker.atomlearn;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -670,6 +680,14 @@
 				minimumVersion = 2.5.1;
 			};
 		};
+		7DCC945B2F18C522001CC4C0 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.7.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -727,6 +745,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 7DA0E9E12E9F5DE100DD8E9D /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Supabase;
+		};
+		7DCC945C2F18C523001CC4C0 /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7DCC945B2F18C522001CC4C0 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

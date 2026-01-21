@@ -1,10 +1,10 @@
 import UIKit
-import FirebaseAuth
 
 // Экран профиля пользователя
 final class ProfileViewController: UIViewController {
     // MARK: - Dependencies
     private let viewModel: ProfileViewModel
+    private let authService: AuthService
 
     // Вкладки: профиль, доски, учёба
     enum Tab { case profile, boards, study }
@@ -12,9 +12,14 @@ final class ProfileViewController: UIViewController {
     // Текущий пользователь
     private let user: AppUser
     /// Создаёт экран профиля.
-    init(user: AppUser, viewModel: ProfileViewModel = ProfileViewModel(service: ProfileRepository())) {
+    init(
+        user: AppUser,
+        viewModel: ProfileViewModel = ProfileViewModel(service: ProfileRepository()),
+        authService: AuthService = AuthServiceImpl()
+    ) {
         self.user = user
         self.viewModel = viewModel
+        self.authService = authService
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -43,7 +48,10 @@ final class ProfileViewController: UIViewController {
     // MARK: - Child ViewControllers
 
     // Экран информации профиля
-    private lazy var infoVC   = ProfileInfoViewController(user: user)
+    private lazy var infoVC = ProfileInfoViewController(
+        user: user,
+        viewModel: ProfileInfoViewModel(authService: authService)
+    )
     // Экран списка досок
     private lazy var boardsVC = BoardsViewController(user: user, service: BoardsRepository())
     // Экран обучения

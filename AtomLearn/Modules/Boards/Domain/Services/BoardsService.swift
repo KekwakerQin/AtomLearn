@@ -16,6 +16,8 @@ protocol BoardsService {
         order: BoardsOrder
     ) async throws -> [Board]
     
+    func deleteBoard(boardId: String, completion: @escaping (Result<Void, Error>) -> Void)
+    
     /// Создание новой доски.
     func createBoard(
         ownerUID: String,

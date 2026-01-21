@@ -50,7 +50,11 @@ final class CardsViewController: UIViewController {
         observeCards()
         viewModel.onViewDidLoad()
 
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addCard))
+        if board.ownerUID == user.uid || board.editorUIDs.contains(user.uid) {
+            navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addCard))
+        } else {
+            navigationItem.rightBarButtonItem = nil
+        }
     }
 
     // MARK: - UI

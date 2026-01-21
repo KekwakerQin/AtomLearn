@@ -1,4 +1,5 @@
 import FirebaseAuth
+import GoogleSignIn
 
 /// Service API для работы с авторизацией без зависимостей на UIKit.
 protocol AuthService {
@@ -41,8 +42,23 @@ final class AuthServiceImpl: AuthService {
     /// Выход из аккаунта.
     @MainActor
     func signOut() async throws {
-        try await repo.signOut()  // выход из репозитория
-        print("[LOG:INFO] AuthService user signed out")
+        // 1) Google Sign-Out (если пользователь входил через Google)
+        // Это безопасно вызывать даже если не был залогинен.
+        GIDSignIn.sharedInstance.signOut()
+
+        // Если ты хочешь “жёстко” отвязать доступ (revoke), можно так:
+        // GIDSignIn.sharedInstance.disconnect { error in ... }
+        // Но disconnect async — обычно для обычного “Выйти” достаточно signOut().
+
+        // 2) Firebase Sign-Out
+        do {
+            try Auth.auth().signOut()
+        } catch {
+            throw AuthServiceError.unknown(error)
+        }
+
+        // 3) Если у тебя есть свой accessToken в Keychain/UserDefaults — почисти тут.
+        // tokenStore.clear()
     }
 
     /// Получение текущего пользователя (если авторизован).
@@ -54,5 +70,19 @@ final class AuthServiceImpl: AuthService {
             email: fbUser.email,
             displayName: fbUser.displayName
         )
+    }
+}
+
+enum AuthServiceError: LocalizedError {
+    case googleSignOutFailed
+    case unknown(Error)
+
+    var errorDescription: String? {
+        switch self {
+        case .googleSignOutFailed:
+            return "Не удалось выполнить выход из Google."
+        case .unknown(let error):
+            return "Ошибка выхода: \(error.localizedDescription)"
+        }
     }
 }

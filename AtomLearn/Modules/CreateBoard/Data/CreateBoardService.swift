@@ -81,7 +81,16 @@ final class CreateBoardService: CreateBoardServiceProtocol {
                 ], forDocument: slugRef)
 
                 // 2) board doc
-                let collaboratorUIDs = input.extraCollaborators.map { $0.uid }
+                let editorUIDs = input.extraCollaborators
+                    .filter { $0.role == .editor }
+                    .map { $0.uid }
+
+                let viewerUIDs = input.extraCollaborators
+                    .filter { $0.role == .viewer }
+                    .map { $0.uid }
+
+                // all collaborators (editors/viewers/etc.) — owner is NOT included
+                let memberUIDs = Array(Set(input.extraCollaborators.map { $0.uid }))
 
                 var boardData: [String: Any] = [
                     "id": boardId,
@@ -94,7 +103,10 @@ final class CreateBoardService: CreateBoardServiceProtocol {
                     "tags": input.tags,
 
                     "ownerUID": ownerUID,
-                    "collaboratorUIDs": collaboratorUIDs,
+                    "memberUIDs": memberUIDs,
+                    "editorUIDs": editorUIDs,
+                    "viewerUIDs": viewerUIDs,
+
                     "visibility": input.visibility.rawValue,
 
                     "isArchived": false,

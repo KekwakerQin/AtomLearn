@@ -118,6 +118,10 @@ final class BoardsViewController: UIViewController, UICollectionViewDelegateFlow
             action: #selector(addTapped)
         )
         navigationItem.rightBarButtonItem = add
+        
+        navigationItem.rightBarButtonItem?.isEnabled = boards.contains {
+            $0.ownerUID == user.uid || $0.editorUIDs.contains(user.uid)
+        }
     }
 
     // MARK: - Snapshot
@@ -156,6 +160,132 @@ final class BoardsViewController: UIViewController, UICollectionViewDelegateFlow
         navigationController?.pushViewController(vc, animated: true)
     }
 
+    // MARK: - Context Menu (long press)
+    func collectionView(
+        _ collectionView: UICollectionView,
+        contextMenuConfigurationForItemAt indexPath: IndexPath,
+        point: CGPoint
+    ) -> UIContextMenuConfiguration? {
+
+        guard let id = dataSource.itemIdentifier(for: indexPath),
+              let board = boardsById[id] else { return nil }
+
+        return UIContextMenuConfiguration(
+            identifier: id as NSString,
+            previewProvider: nil,
+            actionProvider: { [weak self] _ in
+                guard let self else { return nil }
+                return self.makeBoardContextMenu(board: board)
+            }
+        )
+    }
+
+    func collectionView(
+        _ collectionView: UICollectionView,
+        willDisplayContextMenu configuration: UIContextMenuConfiguration,
+        animator: UIContextMenuInteractionAnimating?
+    ) {
+        // Лёгкая тактильная отдача при успешном long press
+        let generator = UIImpactFeedbackGenerator(style: .light)
+        generator.prepare()
+        generator.impactOccurred()
+    }
+
+    private func makeBoardContextMenu(board: Board) -> UIMenu {
+        let edit = UIAction(title: "Изменить", image: UIImage(systemName: "pencil")) { _ in
+            print("ContextMenu: Edit board", board.id)
+        }
+
+        let pin = UIAction(title: "Закрепить / открепить", image: UIImage(systemName: "pin")) { _ in
+            print("ContextMenu: Pin/Unpin board", board.id)
+        }
+
+        let share = UIAction(title: "Поделиться", image: UIImage(systemName: "square.and.arrow.up")) { _ in
+            print("ContextMenu: Share board", board.id)
+        }
+
+        let archive = UIAction(title: "Архивировать", image: UIImage(systemName: "archivebox")) { _ in
+            print("ContextMenu: Archive board", board.id)
+        }
+
+        let settings = UIAction(title: "Настроить", image: UIImage(systemName: "gearshape")) { _ in
+            print("ContextMenu: Settings board", board.id)
+        }
+
+        // Группы
+        let main = UIMenu(title: "", options: .displayInline, children: [edit, pin, share])
+        let secondary = UIMenu(title: "", options: .displayInline, children: [archive, settings])
+
+        var children: [UIMenuElement] = [main, secondary]
+
+        // ✅ Удаление только owner'у
+        if board.ownerUID == user.uid {
+            let delete = UIAction(
+                title: "Удалить",
+                image: UIImage(systemName: "trash"),
+                attributes: [.destructive]
+            ) { [weak self] _ in
+                self?.presentDeleteConfirmation(for: board)
+            }
+
+            let danger = UIMenu(title: "", options: .displayInline, children: [delete])
+            children.append(danger)
+        }
+
+        return UIMenu(children: children)
+    }
+    
+    // MARK: - Delete
+    private func presentDeleteConfirmation(for board: Board) {
+        guard board.ownerUID == user.uid else {
+            presentNoPermissionAlert()
+            return
+        }
+
+        let alert = UIAlertController(
+            title: "Удалить доску?",
+            message: "Доска будет удалена. Это действие нельзя отменить.",
+            preferredStyle: .alert
+        )
+
+        alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Удалить", style: .destructive) { [weak self] _ in
+            self?.deleteBoard(board)
+        })
+
+        present(alert, animated: true)
+    }
+
+    private func deleteBoard(_ board: Board) {
+        guard board.ownerUID == user.uid else {
+            presentNoPermissionAlert()
+            return
+        }
+
+        service.deleteBoard(boardId: board.id) { [weak self] result in
+            guard let self else { return }
+
+            switch result {
+            case .success:
+                // listener observeBoards сам уберёт доску из списка
+                print("Board deleted:", board.id)
+
+            case .failure(let error):
+                self.showError(error)
+            }
+        }
+    }
+
+    private func presentNoPermissionAlert() {
+        let alert = UIAlertController(
+            title: "Нет прав",
+            message: "Удалять доску может только владелец.",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
+    
     // MARK: - Actions
     @objc private func addTapped() {
         let nav = UINavigationController()
@@ -194,3 +324,4 @@ final class BoardsViewController: UIViewController, UICollectionViewDelegateFlow
         present(alert, animated: true)
     }
 }
+

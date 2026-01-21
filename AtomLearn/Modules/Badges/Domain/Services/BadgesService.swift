@@ -5,3 +5,4 @@ protocol BadgesService {
     /// Загружает все бейджи.
     func fetchBadges() async throws -> [Badge]
 }
+
