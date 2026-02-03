@@ -8,7 +8,9 @@ enum FlashcardMapping {
         boardId: String,
         ownerId: String,
         draft: FlashcardDraft,
-        now: Date = Date()
+        now: Date = Date(),
+        sourceKind: Card.SourceKind = .ai,
+        sourceRef: String? = "openrouter"
     ) -> Card {
         Card(
             id: UUID().uuidString,
@@ -24,7 +26,7 @@ enum FlashcardMapping {
             difficulty: nil,
             hints: nil,
             media: nil,
-            source: .init(kind: .ai, ref: "openrouter"), // источник — AI
+            source: .init(kind: sourceKind, ref: sourceRef),
             reviewStats: .init(correct: 0, wrong: 0, lastReviewedAt: nil),
             spacedRepetition: .defaults,
             views: 0,

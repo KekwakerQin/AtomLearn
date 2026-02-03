@@ -53,6 +53,7 @@ final class AddBoardViewController: UIViewController, UITextFieldDelegate, UITex
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
+        enableKeyboardDismissOnTap()
 
         title = "Новая доска"
         if let sheet = presentationController as? UISheetPresentationController {

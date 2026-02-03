@@ -195,7 +195,7 @@ final class ProfileViewController: UIViewController {
 
     // Переход к экрану кастомизации профиля
     @objc private func avatarTapped() {
-        let vc = ProfileCustomizationViewController()
+        let vc = ProfileCustomizationViewController(user: user, authService: authService)
         navigationController?.pushViewController(vc, animated: true)
     }
 }

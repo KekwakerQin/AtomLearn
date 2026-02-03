@@ -29,6 +29,9 @@ final class AddCardsViewController: UIViewController {
     
     // MARK: - Dependencies
     private let viewModel: AddCardsViewModel
+    private let makeManualVC: () -> UIViewController
+    private let makeAIVC: () -> UIViewController
+    private let makeImportVC: () -> UIViewController
     
     // MARK: - UI
 
@@ -42,8 +45,16 @@ final class AddCardsViewController: UIViewController {
     private lazy var tabsPanGesture = UIPanGestureRecognizer(target: self, action: #selector(handleTabsPan(_:)))
 
     // MARK: - Init
-    init(viewModel: AddCardsViewModel) {
+    init(
+        viewModel: AddCardsViewModel,
+        makeManualVC: @escaping () -> UIViewController,
+        makeAIVC: @escaping () -> UIViewController,
+        makeImportVC: @escaping () -> UIViewController
+    ) {
         self.viewModel = viewModel
+        self.makeManualVC = makeManualVC
+        self.makeAIVC = makeAIVC
+        self.makeImportVC = makeImportVC
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -415,9 +426,9 @@ final class AddCardsViewController: UIViewController {
     
     // MARK: - Child ViewControllers
 
-    private lazy var manualVC = ManuallyCreateCardsViewController()
-    private lazy var aiVC = AICreateCardsViewController()
-    private lazy var importVC = DocsCreateCardsViewController()
+    private lazy var manualVC: UIViewController = makeManualVC()
+    private lazy var aiVC: UIViewController = makeAIVC()
+    private lazy var importVC: UIViewController = makeImportVC()
 
     private func switchTo(_ tab: Tab, animated: Bool, direction: SlideDirection) {
         currentTab = tab

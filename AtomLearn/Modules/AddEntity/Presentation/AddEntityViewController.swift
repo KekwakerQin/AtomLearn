@@ -7,15 +7,7 @@ final class AddEntityViewController: UIViewController, UISearchBarDelegate {
 
     // MARK: - UI
     private let searchBar = UISearchBar()
-    private let tableView = UITableView(frame: .zero, style: .plain)
-    
-    private final class WeakTarget: NSObject {
-        weak var owner: AddEntityViewController?
-        init(owner: AddEntityViewController) { self.owner = owner }
-        @objc func handleTap() { owner?.dismissKeyboard() }
-    }
-
-    private lazy var weakTapTarget = WeakTarget(owner: self)
+    private let tableView = UITableView(frame: .zero, style: .insetGrouped)
 
 
     // MARK: - Sections
@@ -24,7 +16,6 @@ final class AddEntityViewController: UIViewController, UISearchBarDelegate {
         static let boardsOffset = 1
     }
 
-    private static let cellID = "AddEntityCell"
 
     // MARK: - Init
     init(viewModel: AddEntityViewModel) {
@@ -45,6 +36,7 @@ final class AddEntityViewController: UIViewController, UISearchBarDelegate {
         setupUI()
         bind()
         viewModel.onViewDidLoad()
+        enableKeyboardDismissOnTap()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -55,6 +47,17 @@ final class AddEntityViewController: UIViewController, UISearchBarDelegate {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         animateAppearance()
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        guard let header = tableView.tableHeaderView else { return }
+        let targetSize = CGSize(width: tableView.bounds.width, height: UIView.layoutFittingCompressedSize.height)
+        let size = header.systemLayoutSizeFitting(targetSize)
+        if header.frame.height != size.height {
+            header.frame.size.height = size.height
+            tableView.tableHeaderView = header
+        }
     }
 
     // MARK: - UI
@@ -106,16 +109,16 @@ final class AddEntityViewController: UIViewController, UISearchBarDelegate {
         searchBar.delegate = self
         tableView.dataSource = self
         tableView.delegate = self
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: Self.cellID)
+        tableView.register(AddEntityActionCell.self, forCellReuseIdentifier: AddEntityActionCell.reuseID)
+        tableView.register(AddEntityBoardCell.self, forCellReuseIdentifier: AddEntityBoardCell.reuseID)
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.estimatedRowHeight = 64
 
         view.addSubview(searchBar)
         view.addSubview(tableView)
+        tableView.tableHeaderView = makeHeader()
 
-        let tap = UITapGestureRecognizer(target: weakTapTarget,
-                                         action: #selector(WeakTarget.handleTap))
-        tap.cancelsTouchesInView = false
-        view.addGestureRecognizer(tap)
-
+        searchBar.placeholder = "Найти доску"
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         tableView.translatesAutoresizingMaskIntoConstraints = false
 
@@ -129,6 +132,47 @@ final class AddEntityViewController: UIViewController, UISearchBarDelegate {
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
+    }
+
+    private func makeHeader() -> UIView {
+        let container = UIView()
+
+        let title = UILabel()
+        title.text = "Что добавим?"
+        let baseTitleFont = UIFont.systemFont(ofSize: 22, weight: .bold)
+        if let roundedDescriptor = baseTitleFont.fontDescriptor.withDesign(UIFontDescriptor.SystemDesign.rounded) {
+            // size: 0 keeps the size from the descriptor
+            title.font = UIFont(descriptor: roundedDescriptor, size: 0)
+        } else {
+            title.font = baseTitleFont
+        }
+
+        let subtitle = UILabel()
+        subtitle.text = "Выбери действие или доску"
+        subtitle.font = .systemFont(ofSize: 13, weight: .medium)
+        subtitle.textColor = .secondaryLabel
+
+        let stack = UIStackView(arrangedSubviews: [title, subtitle])
+        stack.axis = .vertical
+        stack.spacing = 6
+        stack.isLayoutMarginsRelativeArrangement = true
+        stack.directionalLayoutMargins = .init(top: 8, leading: 16, bottom: 8, trailing: 16)
+
+        container.addSubview(stack)
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            stack.topAnchor.constraint(equalTo: container.topAnchor),
+            stack.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            stack.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+            stack.bottomAnchor.constraint(equalTo: container.bottomAnchor)
+        ])
+
+        container.layoutIfNeeded()
+        let size = container.systemLayoutSizeFitting(
+            CGSize(width: view.bounds.width, height: UIView.layoutFittingCompressedSize.height)
+        )
+        container.frame = CGRect(origin: .zero, size: size)
+        return container
     }
 
     // MARK: - Binding
@@ -153,9 +197,6 @@ final class AddEntityViewController: UIViewController, UISearchBarDelegate {
         viewModel.didTapClose()
     }
     
-    @objc private func dismissKeyboard() {
-        view.endEditing(true)
-    }
 }
 
 extension AddEntityViewController: UITableViewDataSource, UITableViewDelegate {
@@ -209,29 +250,33 @@ extension AddEntityViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView,
                    cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 
-        let cell = tableView.dequeueReusableCell(
-            withIdentifier: Self.cellID,
-            for: indexPath
-        )
-
         if indexPath.section == Section.actions {
-            let titles = [
-                "➕ Добавить доску",
-                "📰 Добавить новость",
-                "📣 Добавить канал"
-            ]
-            cell.textLabel?.text = titles[indexPath.row]
-            cell.textLabel?.font = .systemFont(ofSize: 16, weight: .medium)
+            let cell = tableView.dequeueReusableCell(
+                withIdentifier: AddEntityActionCell.reuseID,
+                for: indexPath
+            ) as! AddEntityActionCell
+
+            switch indexPath.row {
+            case 0:
+                cell.configure(title: "Новая доска", subtitle: "Создай доску под тему или проект", icon: "plus", color: .systemBlue)
+            case 1:
+                cell.configure(title: "Новость", subtitle: "Добавь статью или новость", icon: "newspaper.fill", color: .systemOrange)
+            default:
+                cell.configure(title: "Канал", subtitle: "Добавь источник с обновлениями", icon: "dot.radiowaves.left.and.right", color: .systemPurple)
+            }
             cell.accessoryType = .disclosureIndicator
+            return cell
         } else {
             let key = viewModel.state.sortedKeys[indexPath.section - Section.boardsOffset]
             let board = viewModel.state.groupedBoards[key]![indexPath.row]
-            cell.textLabel?.text = board.title
-            cell.textLabel?.font = .systemFont(ofSize: 15)
-            cell.accessoryType = .none
+            let cell = tableView.dequeueReusableCell(
+                withIdentifier: AddEntityBoardCell.reuseID,
+                for: indexPath
+            ) as! AddEntityBoardCell
+            cell.configure(board: board)
+            cell.accessoryType = .disclosureIndicator
+            return cell
         }
-
-        return cell
     }
 
     func tableView(_ tableView: UITableView,

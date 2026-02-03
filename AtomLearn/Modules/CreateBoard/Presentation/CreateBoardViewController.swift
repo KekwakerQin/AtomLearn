@@ -56,11 +56,11 @@ final class CreateBoardViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .systemGroupedBackground
         
         configureNavigation()
         configureUI()
-        setupKeyboardDismiss()
+        enableKeyboardDismissOnTap()
         setupKeyboardObservers()
         bind()
         
@@ -116,9 +116,6 @@ final class CreateBoardViewController: UIViewController {
         viewModel.updateExamDate(examDatePicker.date)
     }
     
-    @objc private func dismissKeyboard() {
-        view.endEditing(true)
-    }
     
     // MARK: Private helpers
     private func configureNavigation() {
@@ -145,9 +142,15 @@ final class CreateBoardViewController: UIViewController {
         subjectView.textField.addTarget(self, action: #selector(subjectChanged), for: .editingChanged)
         
         visibilityControl.selectedSegmentIndex = 0 // public default
+        visibilityControl.selectedSegmentTintColor = .systemBlue
+        visibilityControl.setTitleTextAttributes([.foregroundColor: UIColor.white], for: .selected)
+        visibilityControl.setTitleTextAttributes([.foregroundColor: UIColor.label], for: .normal)
         visibilityControl.addTarget(self, action: #selector(visibilityChanged), for: .valueChanged)
         
         intentControl.selectedSegmentIndex = 0 // study default
+        intentControl.selectedSegmentTintColor = .systemBlue
+        intentControl.setTitleTextAttributes([.foregroundColor: UIColor.white], for: .selected)
+        intentControl.setTitleTextAttributes([.foregroundColor: UIColor.label], for: .normal)
         intentControl.addTarget(self, action: #selector(intentChanged), for: .valueChanged)
         
         repetitionControl.addTarget(self, action: #selector(repetitionChanged), for: .valueChanged)
@@ -166,7 +169,9 @@ final class CreateBoardViewController: UIViewController {
         
         // Layout
         contentStack.axis = .vertical
-        contentStack.spacing = 14
+        contentStack.spacing = 16
+
+        let header = makeHeaderCard()
         
         let main = FormSectionView(title: "Основное")
         main.addArranged(titleView)
@@ -187,7 +192,7 @@ final class CreateBoardViewController: UIViewController {
         let collabs = FormSectionView(title: "Участники (опционально)")
         collabs.addArranged(collaboratorsView)
         
-        [main, access, learning, tags, collabs].forEach { contentStack.addArrangedSubview($0) }
+        [header, main, access, learning, tags, collabs].forEach { contentStack.addArrangedSubview($0) }
         
         scrollView.addSubview(contentStack)
         view.addSubview(scrollView)
@@ -209,6 +214,46 @@ final class CreateBoardViewController: UIViewController {
             
             contentStack.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor, constant: -32)
         ])
+    }
+
+    private func makeHeaderCard() -> UIView {
+        let card = UIView()
+        card.backgroundColor = UIColor.systemBlue.withAlphaComponent(0.12)
+        card.layer.cornerRadius = 18
+
+        let title = UILabel()
+        title.text = "Создание доски"
+        // Apply rounded design if available, fall back to regular system font
+        let titleSize: CGFloat = 22
+        let titleWeight: UIFont.Weight = .bold
+        if let roundedDescriptor = UIFont.systemFont(ofSize: titleSize, weight: titleWeight).fontDescriptor.withDesign(.rounded) {
+            title.font = UIFont(descriptor: roundedDescriptor, size: titleSize)
+        } else {
+            title.font = .systemFont(ofSize: titleSize, weight: titleWeight)
+        }
+
+        let subtitle = UILabel()
+        subtitle.text = "Опиши тему, выбери режим и стартуй учебный поток"
+        subtitle.font = .systemFont(ofSize: 13, weight: .medium)
+        subtitle.textColor = .secondaryLabel
+        subtitle.numberOfLines = 2
+
+        let stack = UIStackView(arrangedSubviews: [title, subtitle])
+        stack.axis = .vertical
+        stack.spacing = 6
+        stack.isLayoutMarginsRelativeArrangement = true
+        stack.directionalLayoutMargins = .init(top: 14, leading: 14, bottom: 14, trailing: 14)
+
+        card.addSubview(stack)
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            stack.topAnchor.constraint(equalTo: card.topAnchor),
+            stack.leadingAnchor.constraint(equalTo: card.leadingAnchor),
+            stack.trailingAnchor.constraint(equalTo: card.trailingAnchor),
+            stack.bottomAnchor.constraint(equalTo: card.bottomAnchor)
+        ])
+
+        return card
     }
     
     private func bind() {
@@ -274,16 +319,6 @@ final class CreateBoardViewController: UIViewController {
         
         navigationItem.leftBarButtonItem?.isEnabled = !isLoading
         view.isUserInteractionEnabled = !isLoading
-    }
-    
-    private func setupKeyboardDismiss() {
-        let tap = UITapGestureRecognizer(
-            target: self,
-            action: #selector(dismissKeyboard)
-        )
-        tap.cancelsTouchesInView = false
-        view.addGestureRecognizer(tap)
-        
     }
     
     private func setupKeyboardObservers() {

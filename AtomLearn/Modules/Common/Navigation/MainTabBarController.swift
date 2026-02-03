@@ -26,7 +26,7 @@ final class MainTabBarController: UITabBarController, UITabBarControllerDelegate
 
     private var childCoordinators: [AnyObject] = []
 
-    private let badgeVC = UINavigationController(rootViewController: BadgesViewController())
+    private let badgeVC = UINavigationController(rootViewController: HomeViewController())
     private let searchVC = UINavigationController(rootViewController: SearchViewController())
     private let messagesVC = UINavigationController(rootViewController: MessagesViewController())
     private let profileVC: UINavigationController
@@ -166,8 +166,7 @@ final class MainTabBarController: UITabBarController, UITabBarControllerDelegate
                     viewModel: CardsViewModel(/* service */)
                 )
 
-                let addCardsVM = AddCardsViewModel(boardId: board.id, user: self.user)
-                let addCardsVC = AddCardsViewController(viewModel: addCardsVM)
+                let addCardsVC = AddCardsFactory.make(boardId: board.id, user: self.user)
 
                 // Важно: пушим в nav 4-го таба
                 nav.popToRootViewController(animated: false) // опционально

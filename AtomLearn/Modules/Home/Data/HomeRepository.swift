@@ -36,8 +36,12 @@ final class HomeRepository: HomeService {
 
         for file in sorted {
             let fullPath = "\(badgesPath)/\(file.name)"
-            let url = (try? storage.getPublicURL(path: fullPath))
-            ?? try await storage.createSignedURL(path: fullPath, expiresIn: 600)
+            let url: URL
+            do {
+                url = try storage.getPublicURL(path: fullPath)
+            } catch {
+                url = try await storage.createSignedURL(path: fullPath, expiresIn: 600)
+            }
             results.append(HomeBadgeFile(name: file.name, url: url))
         }
 

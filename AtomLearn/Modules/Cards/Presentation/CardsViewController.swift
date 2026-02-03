@@ -64,9 +64,13 @@ final class CardsViewController: UIViewController {
         let layout = UICollectionViewFlowLayout()
         layout.itemSize = CGSize(width: view.frame.width - 40, height: 80)
         layout.minimumLineSpacing = 16
+        layout.headerReferenceSize = CGSize(width: view.frame.width, height: 190)
 
         collection.collectionViewLayout = layout
         collection.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "cell")
+        collection.register(BoardInfoHeaderView.self,
+                            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+                            withReuseIdentifier: BoardInfoHeaderView.reuseID)
         collection.dataSource = self
         collection.delegate = self
         collection.frame = view.bounds
@@ -105,9 +109,11 @@ final class CardsViewController: UIViewController {
     // MARK: - Actions
     // Добавление новой карточки в текущий борд
     @objc private func addCard() {
-        navigationController?.pushViewController(AddCardsViewController(viewModel: AddCardsViewModel(boardId: board.id, user: self.user)), animated: true)
-//        print("PLUS TAP")
-//        viewModel.didTapAddCard()
+        let addVC = AddCardsFactory.make(boardId: board.id, user: user)
+
+        navigationController?.pushViewController(addVC, animated: true)
+        //        print("PLUS TAP")
+        //        viewModel.didTapAddCard()
     }
 // СТАРОЕ - Если не сработает - вернуть
 //    @objc private func addCard() {
@@ -137,9 +143,9 @@ extension CardsViewController: UICollectionViewDataSource, UICollectionViewDeleg
 
         var conf = UIListContentConfiguration.cell()
         conf.text = card.front
-        conf.secondaryText = card.back
+        conf.secondaryText = card.tags.isEmpty ? "Тап, чтобы открыть" : card.tags.map { "#\($0)" }.joined(separator: " ")
         conf.textProperties.numberOfLines = 1
-        conf.secondaryTextProperties.numberOfLines = 2
+        conf.secondaryTextProperties.numberOfLines = 1
         conf.secondaryTextProperties.adjustsFontSizeToFitWidth = true
 
         cell.contentConfiguration = conf
@@ -148,5 +154,93 @@ extension CardsViewController: UICollectionViewDataSource, UICollectionViewDeleg
         cell.layer.borderWidth = 1
         cell.layer.masksToBounds = true
         return cell
+    }
+
+    func collectionView(_ collectionView: UICollectionView,
+                        viewForSupplementaryElementOfKind kind: String,
+                        at indexPath: IndexPath) -> UICollectionReusableView {
+        guard kind == UICollectionView.elementKindSectionHeader else {
+            return UICollectionReusableView()
+        }
+        let header = collectionView.dequeueReusableSupplementaryView(
+            ofKind: kind,
+            withReuseIdentifier: BoardInfoHeaderView.reuseID,
+            for: indexPath
+        ) as! BoardInfoHeaderView
+        header.configure(board: board)
+        header.onStudyTapped = { [weak self] in
+            self?.presentStudyOptions()
+        }
+        return header
+    }
+
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let card = cards[indexPath.item]
+        let vc = CardDetailViewController(card: card)
+        navigationController?.pushViewController(vc, animated: true)
+    }
+
+    private func presentStudyOptions() {
+        guard !cards.isEmpty else {
+            let alert = UIAlertController(title: "Нет карточек", message: "Добавь карточки, чтобы начать сессию.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Ок", style: .default))
+            present(alert, animated: true)
+            return
+        }
+
+        let sheet = UIAlertController(title: "Учиться по доске", message: "Как собрать порядок?", preferredStyle: .actionSheet)
+        sheet.addAction(UIAlertAction(title: "По актуальности", style: .default) { [weak self] _ in
+            self?.startStudy(order: .recent)
+        })
+        sheet.addAction(UIAlertAction(title: "Все вперемешку", style: .default) { [weak self] _ in
+            self?.startStudy(order: .shuffle)
+        })
+        sheet.addAction(UIAlertAction(title: "Отмена", style: .cancel))
+        present(sheet, animated: true)
+    }
+
+    private func startStudy(order: StudySessionState.Order) {
+        let store = StudySessionStore.shared
+        if let existing = store.loadActiveSession(boardId: board.id) {
+            let alert = UIAlertController(
+                title: "Есть незавершённая сессия",
+                message: "Продолжить или начать заново?",
+                preferredStyle: .alert
+            )
+            alert.addAction(UIAlertAction(title: "Продолжить", style: .default) { [weak self] _ in
+                self?.openStudy(state: existing)
+            })
+            alert.addAction(UIAlertAction(title: "Заново", style: .destructive) { [weak self] _ in
+                self?.openStudy(state: self?.makeNewState(order: order))
+            })
+            alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
+            present(alert, animated: true)
+        } else {
+            openStudy(state: makeNewState(order: order))
+        }
+    }
+
+    private func makeNewState(order: StudySessionState.Order) -> StudySessionState {
+        let orderedCards: [Card]
+        switch order {
+        case .recent:
+            orderedCards = cards.sorted { $0.updatedAt > $1.updatedAt }
+        case .shuffle:
+            orderedCards = cards.shuffled()
+        }
+
+        let snapshots = orderedCards.map {
+            StudyCardSnapshot(id: $0.id, front: $0.front, back: $0.back)
+        }
+
+        let state = StudySessionState.new(boardId: board.id, boardTitle: board.title, order: order, cards: snapshots)
+        StudySessionStore.shared.save(state: state)
+        return state
+    }
+
+    private func openStudy(state: StudySessionState?) {
+        guard let state else { return }
+        let vc = StudySessionViewController(state: state, boardTitle: board.title)
+        navigationController?.pushViewController(vc, animated: true)
     }
 }

@@ -25,12 +25,19 @@ final class FormTextFieldView: UIView, UITextFieldDelegate {
 
     // MARK: Private helpers
     private func configureUI() {
-        titleLabel.font = .systemFont(ofSize: 15, weight: .semibold)
+        titleLabel.font = .systemFont(ofSize: 14, weight: .semibold)
+        titleLabel.textColor = .secondaryLabel
 
-        textField.borderStyle = .roundedRect
-        textField.font = .systemFont(ofSize: 17)
+        textField.borderStyle = .none
+        textField.font = .systemFont(ofSize: 16)
         textField.clearButtonMode = .whileEditing
         textField.delegate = self
+        textField.backgroundColor = .secondarySystemBackground
+        textField.layer.cornerRadius = 12
+        textField.layer.borderColor = UIColor.separator.cgColor
+        textField.layer.borderWidth = 1
+        textField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 1))
+        textField.leftViewMode = .always
 
         helperLabel.font = .systemFont(ofSize: 13, weight: .regular)
         helperLabel.textColor = .secondaryLabel

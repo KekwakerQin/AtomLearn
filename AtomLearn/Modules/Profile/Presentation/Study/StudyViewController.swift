@@ -3,14 +3,10 @@ import UIKit
 // Экран «Учёба» — раздел с прогрессом и модулями
 final class StudyViewController: UIViewController {
     // MARK: - Properties
-
-    // Скролл-контейнер для вертикальной прокрутки
     private let scroll = UIScrollView()
-    // Вертикальный стек для размещения элементов
     private let stack  = UIStackView()
 
     // MARK: - Lifecycle
-    // Настройка экрана и построение контента
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
@@ -19,13 +15,12 @@ final class StudyViewController: UIViewController {
     }
 
     // MARK: - Layout
-    // Настройка верстки и ограничений
     private func setupLayout() {
         scroll.alwaysBounceVertical = true
         scroll.keyboardDismissMode = .onDrag
 
         stack.axis = .vertical
-        stack.spacing = 16
+        stack.spacing = 18
         stack.alignment = .fill
 
         view.addSubview(scroll)
@@ -48,153 +43,355 @@ final class StudyViewController: UIViewController {
     }
 
     // MARK: - Content
-    // Формирование контента экрана (заглушки)
     private func buildContent() {
-        // Заголовок
-        stack.addArrangedSubview(titleLabel("Учёба"))
+        stack.addArrangedSubview(heroCard())
+        stack.addArrangedSubview(quickStatsRow())
 
-        // Прогресс (заглушка)
-        stack.addArrangedSubview(progressCard(title: "Сегодня", progress: 0.42, subtitle: "Карточек выучено: 21/50"))
+        if let activeSection = activeSessionsSection() {
+            stack.addArrangedSubview(sectionTitle("Незавершённые сессии"))
+            stack.addArrangedSubview(activeSection)
+        }
 
-        // Ближайшие модули / курсы (заглушка)
-        stack.addArrangedSubview(sectionHeader("Модули"))
-        let modules = [
-            ("Алгебра • Глава 3", "15 карточек · повторить до 20:00"),
-            ("Английский • Phrasal Verbs", "10 карточек · streak 5 дней"),
-            ("История • Петр I", "25 карточек · новый модуль")
-        ]
-        modules.forEach { stack.addArrangedSubview(moduleRow(title: $0.0, subtitle: $0.1)) }
+        stack.addArrangedSubview(sectionTitle("Сценарии"))
+        stack.addArrangedSubview(modeCard(
+            title: "Быстрый повтор",
+            subtitle: "10–12 карточек за 5 минут",
+            accent: UIColor.systemTeal,
+            icon: "bolt.fill"
+        ))
+        stack.addArrangedSubview(modeCard(
+            title: "Глубокий фокус",
+            subtitle: "25 минут, интервальные повторы",
+            accent: UIColor.systemOrange,
+            icon: "timer"
+        ))
+        stack.addArrangedSubview(modeCard(
+            title: "Экзамен",
+            subtitle: "Смешанная сессия по всем темам",
+            accent: UIColor.systemIndigo,
+            icon: "graduationcap.fill"
+        ))
 
-        // Кнопки действий
-        let actions = UIStackView()
-        actions.axis = .horizontal
-        actions.spacing = 12
-        actions.distribution = .fillEqually
-        let reviewBtn = primaryButton("Повторить")
-        let addBtn    = secondaryButton("Добавить модуль")
-        actions.addArrangedSubview(reviewBtn)
-        actions.addArrangedSubview(addBtn)
-        stack.addArrangedSubview(actions)
+        stack.addArrangedSubview(sectionTitle("План на неделю"))
+        stack.addArrangedSubview(weekPlanRow())
 
-        // Обработчики нажатий (заглушки)
-        reviewBtn.addAction(UIAction { _ in
-            // TODO: открыть экран повторения/сессии
-            print("start review tapped")
-        }, for: .touchUpInside)
-
-        addBtn.addAction(UIAction { _ in
-            // TODO: открыть создание модуля
-            print("add module tapped")
-        }, for: .touchUpInside)
+        stack.addArrangedSubview(sectionTitle("Что дальше"))
+        stack.addArrangedSubview(nextStepCard(
+            title: "Продолжить: Анатомия • Модуль 3",
+            subtitle: "Осталось 18 карточек"
+        ))
     }
 
-    // MARK: - UI Builders
+    private func activeSessionsSection() -> UIView? {
+        let sessions = StudySessionStore.shared.fetchActiveSessions()
+        guard !sessions.isEmpty else { return nil }
 
-    // Заголовок раздела
-    private func titleLabel(_ text: String) -> UILabel {
-        let l = UILabel()
-        l.text = text
-        l.font = .systemFont(ofSize: 28, weight: .bold)
-        l.numberOfLines = 0
-        return l
-    }
-
-    // Подзаголовок раздела
-    private func sectionHeader(_ text: String) -> UILabel {
-        let l = UILabel()
-        l.text = text
-        l.font = .systemFont(ofSize: 18, weight: .semibold)
-        return l
-    }
-
-    // Карточка прогресса
-    private func progressCard(title: String, progress: Float, subtitle: String) -> UIView {
         let card = UIView()
         card.backgroundColor = .secondarySystemBackground
-        card.layer.cornerRadius = 14
+        card.layer.cornerRadius = 16
 
-        let t = UILabel(); t.text = title; t.font = .systemFont(ofSize: 16, weight: .semibold)
-        let s = UILabel(); s.text = subtitle; s.textColor = .secondaryLabel; s.numberOfLines = 2
+        let stack = UIStackView()
+        stack.axis = .vertical
+        stack.spacing = 10
+        stack.isLayoutMarginsRelativeArrangement = true
+        stack.directionalLayoutMargins = .init(top: 12, leading: 12, bottom: 12, trailing: 12)
 
-        let bar = UIProgressView(progressViewStyle: .default)
-        bar.progress = progress
+        for session in sessions {
+            let row = sessionRow(session)
+            stack.addArrangedSubview(row)
+        }
 
-        let vstack = UIStackView(arrangedSubviews: [t, bar, s])
-        vstack.axis = .vertical; vstack.spacing = 8
-
-        card.addSubview(vstack)
-        vstack.translatesAutoresizingMaskIntoConstraints = false
+        card.addSubview(stack)
+        stack.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            vstack.topAnchor.constraint(equalTo: card.topAnchor, constant: 12),
-            vstack.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 12),
-            vstack.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -12),
-            vstack.bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: -12),
+            stack.topAnchor.constraint(equalTo: card.topAnchor),
+            stack.leadingAnchor.constraint(equalTo: card.leadingAnchor),
+            stack.trailingAnchor.constraint(equalTo: card.trailingAnchor),
+            stack.bottomAnchor.constraint(equalTo: card.bottomAnchor)
         ])
+
         return card
     }
 
-    // Элемент списка модулей
-    private func moduleRow(title: String, subtitle: String) -> UIView {
-        let row = UIView()
-        row.layer.cornerRadius = 12
-        row.layer.borderWidth = 1
-        row.layer.borderColor = UIColor.separator.cgColor
-        row.backgroundColor = .systemBackground
+    private func sessionRow(_ session: StudySessionState) -> UIControl {
+        let control = UIControl()
+        control.layer.cornerRadius = 12
+        control.backgroundColor = .systemBackground
 
-        let t = UILabel(); t.text = title; t.font = .systemFont(ofSize: 16, weight: .medium); t.numberOfLines = 2
-        let s = UILabel(); s.text = subtitle; s.textColor = .secondaryLabel; s.numberOfLines = 2
+        let title = UILabel()
+        title.text = session.boardTitle ?? session.boardId
+        title.font = .systemFont(ofSize: 15, weight: .semibold)
+
+        let subtitle = UILabel()
+        subtitle.text = "Раунд \(session.round) · \(session.currentIndex + 1)/\(max(session.cards.count, 1))"
+        subtitle.font = .systemFont(ofSize: 12)
+        subtitle.textColor = .secondaryLabel
+
+        let chevron = UIImageView(image: UIImage(systemName: "chevron.right"))
+        chevron.tintColor = .tertiaryLabel
+
+        let textStack = UIStackView(arrangedSubviews: [title, subtitle])
+        textStack.axis = .vertical
+        textStack.spacing = 4
+
+        let h = UIStackView(arrangedSubviews: [textStack, UIView(), chevron])
+        h.axis = .horizontal
+        h.alignment = .center
+        h.spacing = 8
+
+        control.addSubview(h)
+        h.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            h.topAnchor.constraint(equalTo: control.topAnchor, constant: 10),
+            h.leadingAnchor.constraint(equalTo: control.leadingAnchor, constant: 12),
+            h.trailingAnchor.constraint(equalTo: control.trailingAnchor, constant: -12),
+            h.bottomAnchor.constraint(equalTo: control.bottomAnchor, constant: -10)
+        ])
+
+        control.addAction(UIAction { [weak self] _ in
+            let vc = StudySessionViewController(state: session, boardTitle: session.boardTitle ?? "Учёба")
+            self?.navigationController?.pushViewController(vc, animated: true)
+        }, for: .touchUpInside)
+
+        return control
+    }
+
+    // MARK: - UI Builders
+    private func heroCard() -> UIView {
+        let card = GradientCardView(colors: [
+            UIColor(red: 0.17, green: 0.45, blue: 0.90, alpha: 1),
+            UIColor(red: 0.11, green: 0.78, blue: 0.60, alpha: 1)
+        ])
+        card.layer.cornerRadius = 22
+        card.clipsToBounds = true
+
+        let title = UILabel()
+        title.text = "Учёба"
+        title.font = .systemRounded(ofSize: 28, weight: .bold)
+        title.textColor = .white
+
+        let subtitle = UILabel()
+        subtitle.text = "Сегодня: 21 карточка · 2 модуля"
+        subtitle.font = .systemFont(ofSize: 13, weight: .medium)
+        subtitle.textColor = UIColor.white.withAlphaComponent(0.85)
+
+        let progress = UIProgressView(progressViewStyle: .default)
+        progress.progress = 0.42
+        progress.trackTintColor = UIColor.white.withAlphaComponent(0.25)
+        progress.progressTintColor = .white
+
+        let progressLabel = UILabel()
+        progressLabel.text = "Прогресс дня 42%"
+        progressLabel.font = .systemFont(ofSize: 12, weight: .semibold)
+        progressLabel.textColor = UIColor.white.withAlphaComponent(0.9)
+
+        let startButton = UIButton(type: .system)
+        startButton.setTitle("Начать сессию", for: .normal)
+        startButton.setTitleColor(.systemBlue, for: .normal)
+        startButton.backgroundColor = .white
+        startButton.layer.cornerRadius = 14
+        startButton.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
+        startButton.heightAnchor.constraint(equalToConstant: 44).isActive = true
+        startButton.addAction(UIAction { _ in
+            print("start study tapped")
+        }, for: .touchUpInside)
+
+        let v = UIStackView(arrangedSubviews: [title, subtitle, progress, progressLabel, startButton])
+        v.axis = .vertical
+        v.spacing = 10
+
+        card.addSubview(v)
+        v.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            v.topAnchor.constraint(equalTo: card.topAnchor, constant: 16),
+            v.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 16),
+            v.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -16),
+            v.bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: -16)
+        ])
+
+        return card
+    }
+
+    private func quickStatsRow() -> UIView {
+        let row = UIStackView()
+        row.axis = .horizontal
+        row.spacing = 12
+        row.distribution = .fillEqually
+
+        row.addArrangedSubview(statPill(title: "Серия", value: "7 дней", color: UIColor.systemTeal))
+        row.addArrangedSubview(statPill(title: "Время", value: "28 мин", color: UIColor.systemOrange))
+        row.addArrangedSubview(statPill(title: "Фокус", value: "82%", color: UIColor.systemBlue))
+
+        return row
+    }
+
+    private func statPill(title: String, value: String, color: UIColor) -> UIView {
+        let pill = UIView()
+        pill.layer.cornerRadius = 16
+        pill.backgroundColor = color.withAlphaComponent(0.12)
+
+        let valueLabel = UILabel()
+        valueLabel.text = value
+        valueLabel.font = .systemRounded(ofSize: 16, weight: .bold)
+        valueLabel.textColor = color
+
+        let titleLabel = UILabel()
+        titleLabel.text = title
+        titleLabel.font = .systemFont(ofSize: 11, weight: .semibold)
+        titleLabel.textColor = .secondaryLabel
+
+        let v = UIStackView(arrangedSubviews: [valueLabel, titleLabel])
+        v.axis = .vertical
+        v.spacing = 2
+        v.alignment = .center
+
+        pill.addSubview(v)
+        v.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            v.topAnchor.constraint(equalTo: pill.topAnchor, constant: 10),
+            v.leadingAnchor.constraint(equalTo: pill.leadingAnchor, constant: 8),
+            v.trailingAnchor.constraint(equalTo: pill.trailingAnchor, constant: -8),
+            v.bottomAnchor.constraint(equalTo: pill.bottomAnchor, constant: -10)
+        ])
+
+        return pill
+    }
+
+    private func sectionTitle(_ text: String) -> UILabel {
+        let l = UILabel()
+        l.text = text
+        l.font = .systemRounded(ofSize: 18, weight: .bold)
+        return l
+    }
+
+    private func modeCard(title: String, subtitle: String, accent: UIColor, icon: String) -> UIView {
+        let card = UIView()
+        card.backgroundColor = .secondarySystemBackground
+        card.layer.cornerRadius = 16
+
+        let iconView = UIImageView(image: UIImage(systemName: icon))
+        iconView.tintColor = accent
+        iconView.setContentHuggingPriority(.required, for: .horizontal)
+
+        let titleLabel = UILabel()
+        titleLabel.text = title
+        titleLabel.font = .systemFont(ofSize: 16, weight: .semibold)
+
+        let subtitleLabel = UILabel()
+        subtitleLabel.text = subtitle
+        subtitleLabel.font = .systemFont(ofSize: 13)
+        subtitleLabel.textColor = .secondaryLabel
+        subtitleLabel.numberOfLines = 2
+
+        let textStack = UIStackView(arrangedSubviews: [titleLabel, subtitleLabel])
+        textStack.axis = .vertical
+        textStack.spacing = 4
 
         let chevron = UIImageView(image: UIImage(systemName: "chevron.right"))
         chevron.tintColor = .tertiaryLabel
         chevron.setContentHuggingPriority(.required, for: .horizontal)
 
-        let v = UIStackView(arrangedSubviews: [t, s])
-        v.axis = .vertical; v.spacing = 4
+        let h = UIStackView(arrangedSubviews: [iconView, textStack, UIView(), chevron])
+        h.axis = .horizontal
+        h.alignment = .center
+        h.spacing = 10
 
-        let h = UIStackView(arrangedSubviews: [v, chevron])
-        h.axis = .horizontal; h.alignment = .center; h.spacing = 12
-
-        row.addSubview(h)
+        card.addSubview(h)
         h.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            h.topAnchor.constraint(equalTo: row.topAnchor, constant: 12),
-            h.leadingAnchor.constraint(equalTo: row.leadingAnchor, constant: 12),
-            h.trailingAnchor.constraint(equalTo: row.trailingAnchor, constant: -12),
-            h.bottomAnchor.constraint(equalTo: row.bottomAnchor, constant: -12),
+            h.topAnchor.constraint(equalTo: card.topAnchor, constant: 12),
+            h.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 12),
+            h.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -12),
+            h.bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: -12)
         ])
 
-        // Тап по строке (заглушка)
-        let tap = UITapGestureRecognizer(target: self, action: #selector(moduleTapped(_:)))
-        row.addGestureRecognizer(tap)
+        return card
+    }
+
+    private func weekPlanRow() -> UIView {
+        let row = UIStackView()
+        row.axis = .horizontal
+        row.spacing = 8
+        row.distribution = .fillEqually
+
+        let days = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
+        for (index, day) in days.enumerated() {
+            let isToday = index == 2
+            let pill = UILabel()
+            pill.text = day
+            pill.textAlignment = .center
+            pill.font = .systemFont(ofSize: 12, weight: .semibold)
+            pill.backgroundColor = isToday ? UIColor.systemBlue : UIColor.secondarySystemBackground
+            pill.textColor = isToday ? .white : .label
+            pill.layer.cornerRadius = 12
+            pill.clipsToBounds = true
+            pill.heightAnchor.constraint(equalToConstant: 28).isActive = true
+            row.addArrangedSubview(pill)
+        }
+
         return row
     }
 
-    // MARK: - Actions
-    // Обработка нажатия на модуль (заглушка)
-    @objc private func moduleTapped(_ gr: UITapGestureRecognizer) {
-        // TODO: навигация к модулю
-        print("module tapped")
+    private func nextStepCard(title: String, subtitle: String) -> UIView {
+        let card = UIView()
+        card.backgroundColor = .secondarySystemBackground
+        card.layer.cornerRadius = 16
+
+        let titleLabel = UILabel()
+        titleLabel.text = title
+        titleLabel.font = .systemFont(ofSize: 16, weight: .semibold)
+        titleLabel.numberOfLines = 2
+
+        let subtitleLabel = UILabel()
+        subtitleLabel.text = subtitle
+        subtitleLabel.font = .systemFont(ofSize: 13)
+        subtitleLabel.textColor = .secondaryLabel
+
+        let v = UIStackView(arrangedSubviews: [titleLabel, subtitleLabel])
+        v.axis = .vertical
+        v.spacing = 4
+
+        card.addSubview(v)
+        v.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            v.topAnchor.constraint(equalTo: card.topAnchor, constant: 12),
+            v.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 12),
+            v.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -12),
+            v.bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: -12)
+        ])
+
+        return card
+    }
+}
+
+private final class GradientCardView: UIView {
+    private let gradientLayer = CAGradientLayer()
+
+    init(colors: [UIColor]) {
+        super.init(frame: .zero)
+        gradientLayer.colors = colors.map { $0.cgColor }
+        gradientLayer.startPoint = CGPoint(x: 0, y: 0)
+        gradientLayer.endPoint = CGPoint(x: 1, y: 1)
+        layer.insertSublayer(gradientLayer, at: 0)
     }
 
-    // Кнопка основного действия
-    private func primaryButton(_ title: String) -> UIButton {
-        let b = UIButton(type: .system)
-        b.setTitle(title, for: .normal)
-        b.setTitleColor(.white, for: .normal)
-        b.backgroundColor = .systemBlue
-        b.layer.cornerRadius = 12
-        b.heightAnchor.constraint(equalToConstant: 46).isActive = true
-        return b
-    }
+    @available(*, unavailable)
+    required init?(coder: NSCoder) { fatalError() }
 
-    // Кнопка вторичного действия
-    private func secondaryButton(_ title: String) -> UIButton {
-        let b = UIButton(type: .system)
-        b.setTitle(title, for: .normal)
-        b.setTitleColor(.label, for: .normal)
-        b.backgroundColor = .secondarySystemBackground
-        b.layer.cornerRadius = 12
-        b.heightAnchor.constraint(equalToConstant: 46).isActive = true
-        return b
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        gradientLayer.frame = bounds
+    }
+}
+
+// MARK: - UIFont helpers
+private extension UIFont {
+    static func systemRounded(ofSize size: CGFloat, weight: UIFont.Weight) -> UIFont {
+        let base = UIFont.systemFont(ofSize: size, weight: weight)
+        if let roundedDescriptor = base.fontDescriptor.withDesign(.rounded) {
+            return UIFont(descriptor: roundedDescriptor, size: size)
+        } else {
+            return base
+        }
     }
 }

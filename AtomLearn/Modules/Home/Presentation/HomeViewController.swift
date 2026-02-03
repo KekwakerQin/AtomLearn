@@ -1,19 +1,46 @@
 import UIKit
 
-final class HomeViewController: UIViewController {
-    // MARK: - Dependencies
+final class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+    struct Item {
+        let title: String
+        let subtitle: String
+        let type: String
+        let accent: UIColor
+    }
+
+    private enum Section: Int, CaseIterable {
+        case boards
+        case news
+        case articles
+
+        var title: String {
+            switch self {
+            case .boards: return "Доски по интересам"
+            case .news: return "Новости"
+            case .articles: return "Статьи"
+            }
+        }
+    }
+
     private let viewModel: HomeViewModel
+    private let table = UITableView(frame: .zero, style: .insetGrouped)
 
-    // MARK: - UI
+    private let boards: [Item] = [
+        Item(title: "Product Discovery", subtitle: "42 карточки · 1.2k подписчиков", type: "Доска", accent: .systemTeal),
+        Item(title: "Swift Patterns", subtitle: "27 карточек · новая", type: "Доска", accent: .systemBlue)
+    ]
 
-    // Превью изображения (результат загрузки)
-    private let imageView = UIImageView()
-    // Статус/лог загрузки
-    private let status = UILabel()
+    private let news: [Item] = [
+        Item(title: "Apple обновила SwiftUI", subtitle: "Что изменилось в новых API", type: "Новость", accent: .systemOrange),
+        Item(title: "AI в обучении", subtitle: "Лучшие практики 2026", type: "Новость", accent: .systemPurple)
+    ]
 
-    // MARK: - Init
-    /// Создаёт домашний экран.
-    init(viewModel: HomeViewModel) {
+    private let articles: [Item] = [
+        Item(title: "Как строить интервальные повторения", subtitle: "7 минут чтения", type: "Статья", accent: .systemIndigo),
+        Item(title: "Метрики обучения", subtitle: "5 минут чтения", type: "Статья", accent: .systemGreen)
+    ]
+
+    init(viewModel: HomeViewModel = HomeViewModel(service: HomeRepository())) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
@@ -25,59 +52,71 @@ final class HomeViewController: UIViewController {
     @available(*, unavailable)
     required init?(coder: NSCoder) { fatalError() }
 
-    // MARK: - Lifecycle
-
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupUI()
-        bindViewModel()
-        viewModel.load()
+        view.backgroundColor = .systemGroupedBackground
+        setupTable()
     }
 
-    // MARK: - UI
-    // Настройка интерфейса
-    private func setupUI() {
-        view.backgroundColor = .systemBackground
-        imageView.contentMode = .scaleAspectFit
-        imageView.backgroundColor = .secondarySystemBackground
-        imageView.layer.cornerRadius = 12
-        imageView.clipsToBounds = true
+    private func setupTable() {
+        table.dataSource = self
+        table.delegate = self
+        table.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        table.backgroundColor = .clear
 
-        status.text = "Загрузка…"
-        status.numberOfLines = 0
-        status.textAlignment = .center
-
-        let stack = UIStackView(arrangedSubviews: [status, imageView])
-        stack.axis = .vertical
-        stack.alignment = .fill
-        stack.spacing = 16
-
-        view.addSubview(stack)
-        stack.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(table)
+        table.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            stack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            stack.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            stack.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8),
-            imageView.heightAnchor.constraint(equalToConstant: 160)
+            table.topAnchor.constraint(equalTo: view.topAnchor),
+            table.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            table.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            table.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
     }
 
-    // MARK: - Bindings
-    private func bindViewModel() {
-        viewModel.onStateChange = { [weak self] state in
-            guard let self else { return }
-            self.status.text = state.statusText
-            if let data = state.imageData {
-                self.imageView.image = UIImage(data: data)
-            } else {
-                self.imageView.image = nil
-            }
+    func numberOfSections(in tableView: UITableView) -> Int {
+        Section.allCases.count
+    }
+
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        switch Section(rawValue: section) {
+        case .boards: return boards.count
+        case .news: return news.count
+        case .articles: return articles.count
+        default: return 0
+        }
+    }
+
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        Section(rawValue: section)?.title
+    }
+
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+        let item: Item
+
+        switch Section(rawValue: indexPath.section) {
+        case .boards: item = boards[indexPath.row]
+        case .news: item = news[indexPath.row]
+        case .articles: item = articles[indexPath.row]
+        default: item = boards[0]
         }
 
-        viewModel.onError = { [weak self] error in
-            guard let self else { return }
-            self.status.text = "Ошибка: \(error.localizedDescription)"
-            self.imageView.image = nil
+        var conf = cell.defaultContentConfiguration()
+        conf.text = item.title
+        conf.secondaryText = item.subtitle
+        conf.image = UIImage(systemName: icon(for: item.type))
+        conf.imageProperties.tintColor = item.accent
+        cell.contentConfiguration = conf
+        cell.accessoryType = .disclosureIndicator
+        return cell
+    }
+
+    private func icon(for type: String) -> String {
+        switch type {
+        case "Доска": return "square.grid.2x2"
+        case "Новость": return "newspaper.fill"
+        default: return "doc.text"
         }
     }
 }

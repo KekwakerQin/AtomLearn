@@ -76,6 +76,7 @@ final class ComposeCardViewController: UIViewController,
         configurePhaseUI()
 
         loadBoardsIfNeeded()
+        enableKeyboardDismissOnTap()
 
         // Клавиатура: во sheet жест скролла не должен угонять сам лист
         if #available(iOS 15.0, *), let sheet = navigationController?.sheetPresentationController ?? self.sheetPresentationController {
@@ -115,14 +116,6 @@ final class ComposeCardViewController: UIViewController,
             stack.widthAnchor.constraint(equalTo: scroll.widthAnchor)
         ])
 
-        // Глобальные жесты скрытия клавиатуры
-        let tap = UITapGestureRecognizer(target: self, action: #selector(endEditingNow))
-        tap.cancelsTouchesInView = false
-        view.addGestureRecognizer(tap)
-
-        let pan = UIPanGestureRecognizer(target: self, action: #selector(endEditingOnPan(_:)))
-        pan.cancelsTouchesInView = false
-        view.addGestureRecognizer(pan)
     }
 
     // MARK: - UI per phase
@@ -406,8 +399,6 @@ final class ComposeCardViewController: UIViewController,
     }
 
     @objc private func endEditingNow() { view.endEditing(true) }
-    @objc private func endEditingOnPan(_ g: UIPanGestureRecognizer) { if g.state == .began { view.endEditing(true) } }
-
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) { view.endEditing(true) }
 
     func textViewDidBeginEditing(_ tv: UITextView) {

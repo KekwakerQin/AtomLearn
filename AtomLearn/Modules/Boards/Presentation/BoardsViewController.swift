@@ -147,7 +147,7 @@ final class BoardsViewController: UIViewController, UICollectionViewDelegateFlow
                   + layout.minimumInteritemSpacing
 
         let width = (collectionView.bounds.width - total) / 2.0
-        return CGSize(width: floor(width), height: 110)
+        return CGSize(width: floor(width), height: 160)
     }
 
     // MARK: - Navigation
@@ -324,4 +324,3 @@ final class BoardsViewController: UIViewController, UICollectionViewDelegateFlow
         present(alert, animated: true)
     }
 }
-

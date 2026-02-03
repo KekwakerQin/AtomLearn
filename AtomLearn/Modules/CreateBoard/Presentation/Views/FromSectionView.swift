@@ -23,18 +23,24 @@ final class FormSectionView: UIView {
 
     // MARK: Private helpers
     private func configureUI() {
-        layer.cornerRadius = 14
-        backgroundColor = UIColor.secondarySystemBackground
+        layer.cornerRadius = 16
+        layer.borderWidth = 1
+        layer.borderColor = UIColor.separator.withAlphaComponent(0.3).cgColor
+        layer.shadowColor = UIColor.black.withAlphaComponent(0.04).cgColor
+        layer.shadowOpacity = 1
+        layer.shadowOffset = CGSize(width: 0, height: 6)
+        layer.shadowRadius = 10
+        backgroundColor = UIColor.systemBackground
 
-        titleLabel.font = .systemFont(ofSize: 13, weight: .semibold)
+        titleLabel.font = .systemFont(ofSize: 12, weight: .bold)
         titleLabel.textColor = .secondaryLabel
 
         contentStack.axis = .vertical
-        contentStack.spacing = 10
+        contentStack.spacing = 12
 
         let stack = UIStackView(arrangedSubviews: [titleLabel, contentStack])
         stack.axis = .vertical
-        stack.spacing = 10
+        stack.spacing = 8
 
         addSubview(stack)
         stack.translatesAutoresizingMaskIntoConstraints = false
