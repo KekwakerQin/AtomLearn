@@ -1,5 +1,6 @@
 import UIKit
 import FirebaseFirestore
+import QuickLook
 
 // Экран карточек выбранного борда
 final class CardsViewController: UIViewController {
@@ -8,9 +9,13 @@ final class CardsViewController: UIViewController {
 
     // MARK: - UI
     // Текущий борд
-    private let board: Board
+    private var board: Board
     // Список карточек
     private var cards: [Card] = []
+    private var filteredCards: [Card] = []
+    private var documents: [BoardDocument] = []
+    private var filteredDocuments: [BoardDocument] = []
+    private var searchQuery: String = ""
     // База Firestore
     private let db = Firestore.firestore()
     // Подписка на обновления
@@ -18,8 +23,24 @@ final class CardsViewController: UIViewController {
     // Пользователь
     private let user: AppUser
 
+    private enum Section: Int, CaseIterable {
+        case info
+        case cardsTitle
+        case cardsSearch
+        case cards
+    }
+
     // Коллекция карточек
     private let collection = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+
+    private weak var infoHeader: BoardInfoHeaderView?
+    private weak var searchHeader: CardsSearchHeaderView?
+    private var isSearchEditing: Bool = false
+    private var searchWorkItem: DispatchWorkItem?
+
+    // QuickLook
+    private var previewDocuments: [BoardDocument] = []
+    private var previewIndex: Int = 0
     
     /// Инициализация с пользователем и бордом.
     init(user: AppUser, board: Board, viewModel: CardsViewModel) {
@@ -49,6 +70,7 @@ final class CardsViewController: UIViewController {
         setupCollection()
         observeCards()
         viewModel.onViewDidLoad()
+        refreshDocuments()
 
         if board.ownerUID == user.uid || board.editorUIDs.contains(user.uid) {
             navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addCard))
@@ -57,20 +79,35 @@ final class CardsViewController: UIViewController {
         }
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        refreshDocuments()
+    }
+
     // MARK: - UI
     // Настройка коллекции карточек
     private func setupCollection() {
-        // Конфигурация layout для карточек
-        let layout = UICollectionViewFlowLayout()
-        layout.itemSize = CGSize(width: view.frame.width - 40, height: 80)
-        layout.minimumLineSpacing = 16
-        layout.headerReferenceSize = CGSize(width: view.frame.width, height: 190)
+        let layout = StickySectionHeaderFlowLayout()
+        layout.itemSize = CGSize(width: view.frame.width - 32, height: 80)
+        layout.minimumLineSpacing = 12
+        layout.sectionInset = UIEdgeInsets(top: 4, left: 16, bottom: 4, right: 16)
+        layout.stickySection = Section.cardsSearch.rawValue
 
         collection.collectionViewLayout = layout
+        collection.backgroundColor = .systemBackground
+        collection.alwaysBounceVertical = true
+        collection.delaysContentTouches = false
+        collection.canCancelContentTouches = true
         collection.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "cell")
         collection.register(BoardInfoHeaderView.self,
                             forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
                             withReuseIdentifier: BoardInfoHeaderView.reuseID)
+        collection.register(CardsTitleHeaderView.self,
+                            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+                            withReuseIdentifier: CardsTitleHeaderView.reuseID)
+        collection.register(CardsSearchHeaderView.self,
+                            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+                            withReuseIdentifier: CardsSearchHeaderView.reuseID)
         collection.dataSource = self
         collection.delegate = self
         collection.frame = view.bounds
@@ -98,10 +135,7 @@ final class CardsViewController: UIViewController {
                 let parsed = docs.compactMap { Card.initFromFirestore(id: $0.documentID, data: $0.data()) }
 
                 self.cards = parsed.sorted { $0.createdAt < $1.createdAt }
-
-                DispatchQueue.main.async {
-                    self.collection.reloadData()
-                }
+                self.applySearch()
 
                 print("[LOG:INFO] CardsVC синхронизировал карточки: \(self.cards.count)")
             }
@@ -109,37 +143,36 @@ final class CardsViewController: UIViewController {
     // MARK: - Actions
     // Добавление новой карточки в текущий борд
     @objc private func addCard() {
-        let addVC = AddCardsFactory.make(boardId: board.id, user: user)
+        let addVC = AddCardsFactory.make(boardId: board.id, boardTitle: board.title, user: user)
 
         navigationController?.pushViewController(addVC, animated: true)
-        //        print("PLUS TAP")
-        //        viewModel.didTapAddCard()
+
     }
-// СТАРОЕ - Если не сработает - вернуть
-//    @objc private func addCard() {
-//        print("BOARD: \(board.id) | UID: \(user.uid)")
-//        let data = Card.basic(for: board.id, ownerId: user.uid)
-//        db.collection("boards").document(board.id)
-//            .collection("cards")
-//            .addDocument(data: data) { error in
-//                if let error = error {
-//                    print("[LOG:ERROR] Ошибка при добавлении карточки: \(error.localizedDescription)")
-//                } else {
-//                    print("[LOG:INFO] Карточка успешно добавлена пользователем \(self.user.uid)")
-//                }
-//            }
-//    }
 }
 
 // MARK: - UICollectionViewDataSource & UICollectionViewDelegate
-extension CardsViewController: UICollectionViewDataSource, UICollectionViewDelegate {
+extension CardsViewController: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        Section.allCases.count
+    }
+
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        cards.count
+        guard let section = Section(rawValue: section) else { return 0 }
+        switch section {
+        case .info:
+            return 0
+        case .cardsTitle:
+            return 0
+        case .cardsSearch:
+            return 0
+        case .cards:
+            return filteredCards.count
+        }
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
-        let card = cards[indexPath.item]
+        let card = filteredCards[indexPath.item]
 
         var conf = UIListContentConfiguration.cell()
         conf.text = card.front
@@ -159,25 +192,90 @@ extension CardsViewController: UICollectionViewDataSource, UICollectionViewDeleg
     func collectionView(_ collectionView: UICollectionView,
                         viewForSupplementaryElementOfKind kind: String,
                         at indexPath: IndexPath) -> UICollectionReusableView {
-        guard kind == UICollectionView.elementKindSectionHeader else {
+        guard kind == UICollectionView.elementKindSectionHeader,
+              let section = Section(rawValue: indexPath.section) else {
             return UICollectionReusableView()
         }
-        let header = collectionView.dequeueReusableSupplementaryView(
-            ofKind: kind,
-            withReuseIdentifier: BoardInfoHeaderView.reuseID,
-            for: indexPath
-        ) as! BoardInfoHeaderView
-        header.configure(board: board)
-        header.onStudyTapped = { [weak self] in
-            self?.presentStudyOptions()
+
+        switch section {
+        case .info:
+            let header = collectionView.dequeueReusableSupplementaryView(
+                ofKind: kind,
+                withReuseIdentifier: BoardInfoHeaderView.reuseID,
+                for: indexPath
+            ) as! BoardInfoHeaderView
+            infoHeader = header
+            header.configure(board: board, documents: visibleDocuments())
+            header.onStudyTapped = { [weak self] in
+                self?.presentStudyOptions()
+            }
+            header.onSettingsTapped = { [weak self] in
+                self?.openBoardSettings()
+            }
+            header.onDocumentTapped = { [weak self] doc in
+                self?.openDocument(doc)
+            }
+            header.onDocumentRename = { [weak self] doc in
+                self?.renameDocument(doc)
+            }
+            return header
+        case .cardsTitle:
+            let header = collectionView.dequeueReusableSupplementaryView(
+                ofKind: kind,
+                withReuseIdentifier: CardsTitleHeaderView.reuseID,
+                for: indexPath
+            ) as! CardsTitleHeaderView
+            return header
+        case .cardsSearch:
+            let header = collectionView.dequeueReusableSupplementaryView(
+                ofKind: kind,
+                withReuseIdentifier: CardsSearchHeaderView.reuseID,
+                for: indexPath
+            ) as! CardsSearchHeaderView
+            searchHeader = header
+            header.configure(query: searchQuery)
+            header.onQueryChanged = { [weak self] query in
+                self?.updateSearch(query)
+            }
+            header.onEditingEnded = { [weak self] in
+                self?.isSearchEditing = false
+            }
+            return header
+        case .cards:
+            return UICollectionReusableView()
         }
-        return header
     }
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let card = cards[indexPath.item]
-        let vc = CardDetailViewController(card: card)
-        navigationController?.pushViewController(vc, animated: true)
+        guard let section = Section(rawValue: indexPath.section), section == .cards else { return }
+        let card = filteredCards[indexPath.item]
+        collectionView.deselectItem(at: indexPath, animated: true)
+        let preview = CardPreviewViewController(card: card)
+        present(preview, animated: true)
+    }
+
+    func collectionView(_ collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let width = collectionView.bounds.width - 32
+        return CGSize(width: width, height: 80)
+    }
+
+    func collectionView(_ collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        referenceSizeForHeaderInSection section: Int) -> CGSize {
+        guard let section = Section(rawValue: section) else { return .zero }
+        switch section {
+        case .info:
+            let height = BoardInfoHeaderView.preferredHeight(docCount: visibleDocuments().count)
+            return CGSize(width: collectionView.bounds.width, height: height)
+        case .cardsTitle:
+            return CGSize(width: collectionView.bounds.width, height: CardsTitleHeaderView.preferredHeight())
+        case .cardsSearch:
+            return CGSize(width: collectionView.bounds.width, height: CardsSearchHeaderView.preferredHeight())
+        case .cards:
+            return .zero
+        }
     }
 
     private func presentStudyOptions() {
@@ -242,5 +340,131 @@ extension CardsViewController: UICollectionViewDataSource, UICollectionViewDeleg
         guard let state else { return }
         let vc = StudySessionViewController(state: state, boardTitle: board.title)
         navigationController?.pushViewController(vc, animated: true)
+    }
+
+    private func openBoardSettings() {
+        let canEdit = board.ownerUID == user.uid || board.editorUIDs.contains(user.uid)
+        guard canEdit else {
+            let alert = UIAlertController(
+                title: "Нет доступа",
+                message: "Редактировать данные может только владелец или редактор.",
+                preferredStyle: .alert
+            )
+            alert.addAction(UIAlertAction(title: "Ок", style: .default))
+            present(alert, animated: true)
+            return
+        }
+
+        let vc = BoardSettingsViewController(board: board, service: BoardsRepository())
+        vc.onUpdated = { [weak self] updated in
+            guard let self else { return }
+            self.board = updated
+            self.title = updated.title
+            self.collection.reloadData()
+        }
+        navigationController?.pushViewController(vc, animated: true)
+    }
+
+    private func refreshDocuments() {
+        documents = BoardDocumentStore.shared.load(boardId: board.id)
+        applySearch()
+    }
+
+    private func updateSearch(_ query: String) {
+        searchQuery = query
+        isSearchEditing = true
+        searchWorkItem?.cancel()
+        let work = DispatchWorkItem { [weak self] in
+            self?.applySearch()
+            self?.refocusSearchIfNeeded()
+        }
+        searchWorkItem = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15, execute: work)
+    }
+
+    private func applySearch() {
+        let shouldRefocus = searchHeader?.isFocused ?? false
+        let trimmed = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty {
+            filteredCards = cards
+            filteredDocuments = documents
+        } else {
+            let q = trimmed.lowercased()
+            filteredCards = cards.filter {
+                $0.front.lowercased().contains(q)
+                || $0.back.lowercased().contains(q)
+                || $0.tags.contains { $0.lowercased().contains(q) }
+            }
+            filteredDocuments = documents.filter {
+                $0.title.lowercased().contains(q)
+                || $0.fileName.lowercased().contains(q)
+            }
+        }
+
+        DispatchQueue.main.async {
+            self.infoHeader?.configure(board: self.board, documents: self.visibleDocuments())
+            self.collection.collectionViewLayout.invalidateLayout()
+            self.collection.reloadSections(IndexSet(integer: Section.cards.rawValue))
+            if shouldRefocus { self.isSearchEditing = true }
+            self.refocusSearchIfNeeded()
+        }
+    }
+
+    private func visibleDocuments() -> [BoardDocument] {
+        searchQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? documents : filteredDocuments
+    }
+
+    private func openDocument(_ document: BoardDocument) {
+        let docs = visibleDocuments()
+        guard let index = docs.firstIndex(where: { $0.id == document.id }) else { return }
+        previewDocuments = docs
+        previewIndex = index
+        let preview = QLPreviewController()
+        preview.dataSource = self
+        preview.currentPreviewItemIndex = previewIndex
+        present(preview, animated: true)
+    }
+
+    private func renameDocument(_ document: BoardDocument) {
+        let alert = UIAlertController(
+            title: "Переименовать",
+            message: "Новое название документа",
+            preferredStyle: .alert
+        )
+        alert.addTextField { field in
+            field.placeholder = "Название"
+            field.text = document.title
+        }
+        alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Сохранить", style: .default) { [weak self] _ in
+            guard let self else { return }
+            let text = alert.textFields?.first?.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            guard !text.isEmpty else { return }
+            if let updated = BoardDocumentStore.shared.rename(boardId: self.board.id, documentId: document.id, newTitle: text) {
+                if let idx = self.documents.firstIndex(where: { $0.id == updated.id }) {
+                    self.documents[idx] = updated
+                }
+                self.applySearch()
+            }
+        })
+        present(alert, animated: true)
+    }
+
+    private func refocusSearchIfNeeded() {
+        guard isSearchEditing else { return }
+        if searchHeader?.isFocused == false {
+            searchHeader?.focus()
+        }
+    }
+}
+
+// MARK: - QLPreviewControllerDataSource
+extension CardsViewController: QLPreviewControllerDataSource {
+    func numberOfPreviewItems(in controller: QLPreviewController) -> Int {
+        previewDocuments.count
+    }
+
+    func previewController(_ controller: QLPreviewController, previewItemAt index: Int) -> QLPreviewItem {
+        previewDocuments[index].url as NSURL
     }
 }

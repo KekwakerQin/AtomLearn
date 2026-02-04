@@ -10,13 +10,25 @@ final class BoardsViewController: UIViewController, UICollectionViewDelegateFlow
 
     // MARK: - State
     private var boards: [Board] = []
+    private var filteredBoards: [Board] = []
     private var boardsById: [String: Board] = [:]
+    private var searchQuery: String = ""
+    private weak var searchHeader: BoardsSearchHeaderView?
+    private var isSearchEditing: Bool = false
+    private var searchWorkItem: DispatchWorkItem?
     private var listener: ListenerRegistration?
     private var createBoardCoordinator: CreateBoardCoordinator?
+    private var activeSessions: [StudySessionState] = []
 
     // MARK: - UI
     private var collection: UICollectionView!
-    private var dataSource: UICollectionViewDiffableDataSource<Int, String>!
+    private var dataSource: UICollectionViewDiffableDataSource<Section, String>!
+
+    private enum Section: Int, CaseIterable {
+        case sessions
+        case search
+        case boards
+    }
 
     // MARK: - Init
     init(user: AppUser, service: BoardsService) {
@@ -42,6 +54,11 @@ final class BoardsViewController: UIViewController, UICollectionViewDelegateFlow
         observeBoards()
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        refreshActiveSessions()
+    }
+
     deinit {
         listener?.remove()
         print("DEINIT \(self)")
@@ -58,7 +75,8 @@ final class BoardsViewController: UIViewController, UICollectionViewDelegateFlow
             switch result {
             case .success(let boards):
                 self.boards = boards
-                self.applySnapshot(animated: true)
+                self.applySearch()
+                self.updateAddButtonEnabled()
 
             case .failure(let error):
                 self.showError(error)
@@ -68,17 +86,30 @@ final class BoardsViewController: UIViewController, UICollectionViewDelegateFlow
 
     // MARK: - UI setup
     private func setupCollection() {
-        let layout = UICollectionViewFlowLayout()
+        let layout = StickySectionHeaderFlowLayout()
         layout.minimumInteritemSpacing = 12
         layout.minimumLineSpacing = 12
         layout.sectionInset = UIEdgeInsets(top: 12, left: 16, bottom: 16, right: 16)
+        layout.stickySection = Section.search.rawValue
 
         collection = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collection.backgroundColor = .systemBackground
         collection.alwaysBounceVertical = true
+        collection.delaysContentTouches = false
+        collection.canCancelContentTouches = true
         collection.delegate = self
         collection.register(BoardGridCell.self,
                             forCellWithReuseIdentifier: BoardGridCell.reuseID)
+        collection.register(
+            BoardsSessionsHeaderView.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+            withReuseIdentifier: BoardsSessionsHeaderView.reuseID
+        )
+        collection.register(
+            BoardsSearchHeaderView.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+            withReuseIdentifier: BoardsSearchHeaderView.reuseID
+        )
 
         view.addSubview(collection)
         collection.translatesAutoresizingMaskIntoConstraints = false
@@ -91,7 +122,7 @@ final class BoardsViewController: UIViewController, UICollectionViewDelegateFlow
     }
 
     private func setupDataSource() {
-        dataSource = UICollectionViewDiffableDataSource<Int, String>(
+        dataSource = UICollectionViewDiffableDataSource<Section, String>(
             collectionView: collection
         ) { [weak self] collectionView, indexPath, boardId in
             guard let self else { return nil }
@@ -108,6 +139,45 @@ final class BoardsViewController: UIViewController, UICollectionViewDelegateFlow
             return cell
         }
 
+        dataSource.supplementaryViewProvider = { [weak self] collectionView, kind, indexPath in
+            guard let self else { return nil }
+            guard kind == UICollectionView.elementKindSectionHeader else { return nil }
+            guard let section = Section(rawValue: indexPath.section) else { return nil }
+
+            switch section {
+            case .sessions:
+                let header = collectionView.dequeueReusableSupplementaryView(
+                    ofKind: kind,
+                    withReuseIdentifier: BoardsSessionsHeaderView.reuseID,
+                    for: indexPath
+                ) as! BoardsSessionsHeaderView
+                header.configure(sessions: self.activeSessions)
+                header.onSessionTapped = { [weak self] session in
+                    guard let self else { return }
+                    let vc = StudySessionViewController(state: session, boardTitle: session.boardTitle ?? "Учёба")
+                    self.navigationController?.pushViewController(vc, animated: true)
+                }
+                return header
+            case .search:
+                let header = collectionView.dequeueReusableSupplementaryView(
+                    ofKind: kind,
+                    withReuseIdentifier: BoardsSearchHeaderView.reuseID,
+                    for: indexPath
+                ) as! BoardsSearchHeaderView
+                self.searchHeader = header
+                header.configure(query: self.searchQuery)
+                header.onQueryChanged = { [weak self] query in
+                    self?.updateSearch(query)
+                }
+                header.onEditingEnded = { [weak self] in
+                    self?.isSearchEditing = false
+                }
+                return header
+            case .boards:
+                return UICollectionReusableView()
+            }
+        }
+
         applySnapshot(animated: false)
     }
 
@@ -118,7 +188,11 @@ final class BoardsViewController: UIViewController, UICollectionViewDelegateFlow
             action: #selector(addTapped)
         )
         navigationItem.rightBarButtonItem = add
-        
+
+        updateAddButtonEnabled()
+    }
+
+    private func updateAddButtonEnabled() {
         navigationItem.rightBarButtonItem?.isEnabled = boards.contains {
             $0.ownerUID == user.uid || $0.editorUIDs.contains(user.uid)
         }
@@ -126,13 +200,52 @@ final class BoardsViewController: UIViewController, UICollectionViewDelegateFlow
 
     // MARK: - Snapshot
     private func applySnapshot(animated: Bool) {
-        boardsById = Dictionary(uniqueKeysWithValues: boards.map { ($0.id, $0) })
+        boardsById = Dictionary(uniqueKeysWithValues: filteredBoards.map { ($0.id, $0) })
 
-        var snap = NSDiffableDataSourceSnapshot<Int, String>()
-        snap.appendSections([0])
-        snap.appendItems(boards.map { $0.id })
+        var snap = NSDiffableDataSourceSnapshot<Section, String>()
+        snap.appendSections([.sessions, .search, .boards])
+        snap.appendItems(filteredBoards.map { $0.id }, toSection: .boards)
 
         dataSource.apply(snap, animatingDifferences: animated)
+    }
+
+    private func refreshActiveSessions() {
+        activeSessions = StudySessionStore.shared.fetchActiveSessions()
+        collection.collectionViewLayout.invalidateLayout()
+        collection.reloadData()
+    }
+
+    private func updateSearch(_ query: String) {
+        searchQuery = query
+        isSearchEditing = true
+        searchWorkItem?.cancel()
+        let work = DispatchWorkItem { [weak self] in
+            self?.applySearch()
+            self?.refocusSearchIfNeeded()
+        }
+        searchWorkItem = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15, execute: work)
+    }
+
+    private func applySearch() {
+        let shouldRefocus = isSearchEditing
+        let trimmed = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty {
+            filteredBoards = boards
+        } else {
+            let q = trimmed.lowercased()
+            filteredBoards = boards.filter { $0.title.lowercased().contains(q) }
+        }
+        applySnapshot(animated: true)
+        if shouldRefocus { isSearchEditing = true }
+        DispatchQueue.main.async { [weak self] in
+            self?.refocusSearchIfNeeded()
+        }
+    }
+
+    private func refocusSearchIfNeeded() {
+        guard isSearchEditing else { return }
+        searchHeader?.focus()
     }
 
     // MARK: - Layout (2 колонки)
@@ -148,6 +261,24 @@ final class BoardsViewController: UIViewController, UICollectionViewDelegateFlow
 
         let width = (collectionView.bounds.width - total) / 2.0
         return CGSize(width: floor(width), height: 160)
+    }
+
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        referenceSizeForHeaderInSection section: Int
+    ) -> CGSize {
+        guard let section = Section(rawValue: section) else { return .zero }
+        switch section {
+        case .sessions:
+            guard !activeSessions.isEmpty else { return .zero }
+            let height = BoardsSessionsHeaderView.preferredHeight(for: activeSessions.count)
+            return CGSize(width: collectionView.bounds.width, height: height)
+        case .search:
+            return CGSize(width: collectionView.bounds.width, height: BoardsSearchHeaderView.preferredHeight())
+        case .boards:
+            return .zero
+        }
     }
 
     // MARK: - Navigation

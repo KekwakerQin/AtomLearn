@@ -27,7 +27,8 @@ final class FlashcardsAIService: FlashcardsAIServiceProtocol {
     func generateFlashcards(prompt: String, count: Int, model: String) async throws -> [FlashcardDraft] {
         let system = "Ты помощник, который генерирует карточки для обучения. Возвращай ТОЛЬКО JSON-массив без markdown и комментариев."
         let user = """
-        Сгенерируй \(count) карточек по запросу ниже. Формат ответа: массив JSON объектов вида {\"front\": \"...\", \"back\": \"...\", \"tags\": [\"...\"]}.
+        Сгенерируй до \(count) карточек по запросу ниже.
+        Формат ответа: JSON-массив объектов, каждый объект должен содержать поля \"front\", \"back\", \"tags\". Дополнительные поля допускаются.
         Запрос: \(prompt)
         """
 

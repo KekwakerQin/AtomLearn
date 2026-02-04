@@ -166,7 +166,7 @@ final class MainTabBarController: UITabBarController, UITabBarControllerDelegate
                     viewModel: CardsViewModel(/* service */)
                 )
 
-                let addCardsVC = AddCardsFactory.make(boardId: board.id, user: self.user)
+                let addCardsVC = AddCardsFactory.make(boardId: board.id, boardTitle: board.title, user: self.user)
 
                 // Важно: пушим в nav 4-го таба
                 nav.popToRootViewController(animated: false) // опционально

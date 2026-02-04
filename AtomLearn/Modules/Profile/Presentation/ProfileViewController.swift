@@ -32,7 +32,7 @@ final class ProfileViewController: UIViewController {
     // MARK: - UI
 
     // Аватар пользователя
-    private let avatar = UIImageView(image: UIImage(systemName: "person.crop.circle"))
+    private let avatar = AvatarView()
     // Стек кнопок вкладок
     private let buttonsStack = UIStackView()
     // Контейнер для вложенных контроллеров
@@ -69,7 +69,9 @@ final class ProfileViewController: UIViewController {
         setupHeader()
         setupContainer()
         switchTo(.boards)
-        viewModel.onViewDidLoad()
+        bind()
+        applyProfile(nil)
+        viewModel.onViewDidLoad(userId: user.uid)
     }
     
     // Скрываем навбар на экране профиля
@@ -77,6 +79,7 @@ final class ProfileViewController: UIViewController {
         super.viewWillAppear(animated)
         // скрываем навбар — уберётся и слово «Профиль», всё поднимется
         navigationController?.setNavigationBarHidden(true, animated: false)
+        viewModel.onViewDidLoad(userId: user.uid)
     }
     
     // Возвращаем навбар при уходе с экрана
@@ -91,10 +94,10 @@ final class ProfileViewController: UIViewController {
     // Настройка верхней панели (аватар и вкладки)
     private func setupHeader() {
         // avatar
-        avatar.tintColor = .label
-        avatar.contentMode = .scaleAspectFit
         avatar.isUserInteractionEnabled = true
         avatar.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(avatarTapped)))
+        avatar.layer.cornerRadius = 18
+        avatar.clipsToBounds = true
 
         // верхний «табар»
         configure(btnProfile, system: "person", tag: 0)
@@ -129,6 +132,34 @@ final class ProfileViewController: UIViewController {
             avatar.widthAnchor.constraint(equalToConstant: 36),
             avatar.heightAnchor.constraint(equalToConstant: 36),
         ])
+    }
+
+    private func bind() {
+        viewModel.onProfileUpdated = { [weak self] draft in
+            self?.applyProfile(draft)
+        }
+        viewModel.onError = { [weak self] error in
+            self?.showError(error)
+        }
+    }
+
+    private func applyProfile(_ draft: ProfileDraft?) {
+        let displayName = draft?.displayName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
+        ? (draft?.displayName ?? user.name)
+        : (user.displayName ?? user.name)
+
+        let image = ProfileAvatarStore.shared.loadImage(path: draft?.avatarPath)
+        avatar.configure(name: displayName, image: image)
+    }
+
+    private func showError(_ error: Error) {
+        let alert = UIAlertController(
+            title: "Ошибка",
+            message: (error as? LocalizedError)?.errorDescription ?? error.localizedDescription,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "Ок", style: .default))
+        present(alert, animated: true)
     }
 
     // Настройка контейнера для дочерних контроллеров

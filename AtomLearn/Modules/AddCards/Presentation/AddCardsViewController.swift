@@ -76,12 +76,7 @@ final class AddCardsViewController: UIViewController {
         setupGestures()
         viewModel.onViewDidLoad()
 
-//        navigationItem.rightBarButtonItem = UIBarButtonItem(
-//            title: "Добавить",
-//            style: .done,
-//            target: self,
-//            action: #selector(addTapped)
-//        )
+
     }
 
     override func viewDidDisappear(_ animated: Bool) {

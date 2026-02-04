@@ -148,6 +148,18 @@ final class BoardsRepository: BoardsService {
         let data = input.toFirestore(ownerUID: ownerUID)
         try await db.collection("boards").addDocument(data: data)
     }
+
+    func updateBoard(
+        boardId: String,
+        input: UpdateBoardInput
+    ) async throws {
+        let data: [String: Any] = [
+            "title": input.title,
+            "description": input.description,
+            "lastActivityAt": FieldValue.serverTimestamp()
+        ]
+        try await db.collection("boards").document(boardId).updateData(data)
+    }
 }
 
 // Старое но рабочее

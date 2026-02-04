@@ -6,13 +6,9 @@ final class GeneratedCardCell: UITableViewCell {
     private let backLabel = UILabel()
     private let tagsLabel = UILabel()
     private let statusPill = UILabel()
+    private let selectButton = UIButton(type: .system)
 
-    private let acceptButton = UIButton(type: .system)
-    private let skipButton = UIButton(type: .system)
-    private let actionStack = UIStackView()
-
-    var onAccept: (() -> Void)?
-    var onSkip: (() -> Void)?
+    var onToggleSelection: (() -> Void)?
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -43,24 +39,15 @@ final class GeneratedCardCell: UITableViewCell {
         statusPill.clipsToBounds = true
         statusPill.setContentHuggingPriority(.required, for: .horizontal)
 
-        configureActionButton(acceptButton, title: "Добавить", color: .systemGreen)
-        configureActionButton(skipButton, title: "Не добавлять", color: .systemGray)
+        selectButton.addTarget(self, action: #selector(selectionTapped), for: .touchUpInside)
+        selectButton.setContentHuggingPriority(.required, for: .horizontal)
 
-        acceptButton.addTarget(self, action: #selector(acceptTapped), for: .touchUpInside)
-        skipButton.addTarget(self, action: #selector(skipTapped), for: .touchUpInside)
-
-        actionStack.axis = .horizontal
-        actionStack.spacing = 10
-        actionStack.distribution = .fillEqually
-        actionStack.addArrangedSubview(acceptButton)
-        actionStack.addArrangedSubview(skipButton)
-
-        let headerStack = UIStackView(arrangedSubviews: [frontLabel, statusPill])
+        let headerStack = UIStackView(arrangedSubviews: [selectButton, frontLabel, statusPill])
         headerStack.axis = .horizontal
         headerStack.alignment = .top
         headerStack.spacing = 8
 
-        let contentStack = UIStackView(arrangedSubviews: [headerStack, backLabel, tagsLabel, actionStack])
+        let contentStack = UIStackView(arrangedSubviews: [headerStack, backLabel, tagsLabel])
         contentStack.axis = .vertical
         contentStack.spacing = 8
 
@@ -98,45 +85,29 @@ final class GeneratedCardCell: UITableViewCell {
         }
 
         backLabel.isHidden = !item.isExpanded
-        actionStack.isHidden = !item.isExpanded
 
         switch item.status {
         case .pending:
             statusPill.isHidden = true
-            acceptButton.isEnabled = true
-            skipButton.isEnabled = true
-            acceptButton.alpha = 1
-            skipButton.alpha = 1
         case .added:
             statusPill.isHidden = false
             statusPill.text = "Добавлено"
             statusPill.backgroundColor = UIColor.systemGreen.withAlphaComponent(0.18)
             statusPill.textColor = .systemGreen
-            acceptButton.isEnabled = false
-            skipButton.isEnabled = false
-            acceptButton.alpha = 0.5
-            skipButton.alpha = 0.5
         case .skipped:
             statusPill.isHidden = false
             statusPill.text = "Пропущено"
             statusPill.backgroundColor = UIColor.systemGray.withAlphaComponent(0.18)
             statusPill.textColor = .systemGray
-            acceptButton.isEnabled = false
-            skipButton.isEnabled = false
-            acceptButton.alpha = 0.5
-            skipButton.alpha = 0.5
         }
+
+        let isSelectable = item.status == .pending
+        selectButton.isEnabled = isSelectable
+        selectButton.alpha = isSelectable ? 1 : 0.4
+        let imageName = item.isSelected ? "checkmark.circle.fill" : "circle"
+        selectButton.setImage(UIImage(systemName: imageName), for: .normal)
+        selectButton.tintColor = item.isSelected ? .systemBlue : .tertiaryLabel
     }
 
-    private func configureActionButton(_ button: UIButton, title: String, color: UIColor) {
-        button.setTitle(title, for: .normal)
-        button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = color
-        button.layer.cornerRadius = 10
-        button.titleLabel?.font = .systemFont(ofSize: 13, weight: .semibold)
-        button.heightAnchor.constraint(equalToConstant: 36).isActive = true
-    }
-
-    @objc private func acceptTapped() { onAccept?() }
-    @objc private func skipTapped() { onSkip?() }
+    @objc private func selectionTapped() { onToggleSelection?() }
 }

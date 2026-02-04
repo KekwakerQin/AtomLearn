@@ -8,4 +8,6 @@ protocol CardsService {
         sourceKind: Card.SourceKind,
         sourceRef: String?
     ) async throws
+
+    func fetchCards(boardId: String) async throws -> [Card]
 }

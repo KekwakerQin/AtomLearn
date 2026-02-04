@@ -31,4 +31,16 @@ final class CardsRepository: CardsService {
 
         try await batch.commit()
     }
+
+    func fetchCards(boardId: String) async throws -> [Card] {
+        let snapshot = try await db
+            .collection("boards")
+            .document(boardId)
+            .collection("cards")
+            .getDocuments()
+
+        return snapshot.documents.compactMap { doc in
+            Card.initFromFirestore(id: doc.documentID, data: doc.data())
+        }
+    }
 }

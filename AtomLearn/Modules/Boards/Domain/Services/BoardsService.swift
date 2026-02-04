@@ -23,6 +23,12 @@ protocol BoardsService {
         ownerUID: String,
         input: CreateBoardInput
     ) async throws
+
+    /// Обновление данных доски.
+    func updateBoard(
+        boardId: String,
+        input: UpdateBoardInput
+    ) async throws
 }
 
 extension BoardsService {

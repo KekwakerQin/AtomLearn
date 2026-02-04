@@ -1,6 +1,6 @@
 import UIKit
 
-final class ProfileCustomizationViewController: UIViewController, UITextFieldDelegate, UITextViewDelegate {
+final class ProfileCustomizationViewController: UIViewController, UITextFieldDelegate, UITextViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
     // MARK: - Dependencies
     private let user: AppUser
@@ -22,6 +22,8 @@ final class ProfileCustomizationViewController: UIViewController, UITextFieldDel
     private let saveButton = UIButton(type: .system)
     private let logoutButton = UIButton(type: .system)
     private var wasSaving = false
+    private let avatarView = AvatarView()
+    private let changeAvatarButton = UIButton(type: .system)
 
     // MARK: - Init
     init(user: AppUser, authService: AuthService = AuthServiceImpl()) {
@@ -38,7 +40,8 @@ final class ProfileCustomizationViewController: UIViewController, UITextFieldDel
             username: username,
             bio: "",
             location: "",
-            website: ""
+            website: "",
+            avatarPath: nil
         )
 
         self.viewModel = ProfileCustomizationViewModel(userId: user.uid, initialDraft: initial)
@@ -119,6 +122,9 @@ final class ProfileCustomizationViewController: UIViewController, UITextFieldDel
 
         bioPlaceholder.isHidden = !state.draft.bio.isEmpty
 
+        let avatarImage = ProfileAvatarStore.shared.loadImage(path: state.draft.avatarPath)
+        avatarView.configure(name: state.draft.displayName, image: avatarImage)
+
         saveButton.isEnabled = state.isDirty && !state.isSaving
         saveButton.alpha = (state.isDirty && !state.isSaving) ? 1 : 0.5
 
@@ -144,10 +150,13 @@ final class ProfileCustomizationViewController: UIViewController, UITextFieldDel
         card.backgroundColor = UIColor.systemTeal.withAlphaComponent(0.12)
         card.layer.cornerRadius = 18
 
-        let avatar = UIImageView(image: UIImage(systemName: "person.crop.circle.fill"))
-        avatar.tintColor = .systemTeal
-        avatar.contentMode = .scaleAspectFit
-        avatar.translatesAutoresizingMaskIntoConstraints = false
+        avatarView.translatesAutoresizingMaskIntoConstraints = false
+        avatarView.layer.cornerRadius = 30
+        avatarView.clipsToBounds = true
+
+        changeAvatarButton.setTitle("Изменить фото", for: .normal)
+        changeAvatarButton.titleLabel?.font = .systemFont(ofSize: 12, weight: .semibold)
+        changeAvatarButton.addTarget(self, action: #selector(changeAvatarTapped), for: .touchUpInside)
 
         let title = UILabel()
         title.text = "Твой профиль"
@@ -163,7 +172,12 @@ final class ProfileCustomizationViewController: UIViewController, UITextFieldDel
         v.axis = .vertical
         v.spacing = 4
 
-        let h = UIStackView(arrangedSubviews: [avatar, v])
+        let avatarStack = UIStackView(arrangedSubviews: [avatarView, changeAvatarButton])
+        avatarStack.axis = .vertical
+        avatarStack.alignment = .center
+        avatarStack.spacing = 6
+
+        let h = UIStackView(arrangedSubviews: [avatarStack, v])
         h.axis = .horizontal
         h.spacing = 12
         h.alignment = .center
@@ -171,8 +185,8 @@ final class ProfileCustomizationViewController: UIViewController, UITextFieldDel
         card.addSubview(h)
         h.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            avatar.widthAnchor.constraint(equalToConstant: 48),
-            avatar.heightAnchor.constraint(equalToConstant: 48),
+            avatarView.widthAnchor.constraint(equalToConstant: 60),
+            avatarView.heightAnchor.constraint(equalToConstant: 60),
             h.topAnchor.constraint(equalTo: card.topAnchor, constant: 14),
             h.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 14),
             h.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -14),
@@ -417,6 +431,13 @@ final class ProfileCustomizationViewController: UIViewController, UITextFieldDel
         viewModel.saveTapped()
     }
 
+    @objc private func changeAvatarTapped() {
+        let picker = UIImagePickerController()
+        picker.sourceType = .photoLibrary
+        picker.delegate = self
+        present(picker, animated: true)
+    }
+
     @objc private func logoutTapped() {
         let alert = UIAlertController(
             title: "Выйти из аккаунта?",
@@ -438,23 +459,13 @@ final class ProfileCustomizationViewController: UIViewController, UITextFieldDel
     }
 
     @objc private func openSettings() {
-        let alert = UIAlertController(
-            title: "Настройки",
-            message: "Экран настроек в разработке.",
-            preferredStyle: .alert
-        )
-        alert.addAction(UIAlertAction(title: "Ок", style: .default))
-        present(alert, animated: true)
+        let vc = SettingsStubViewController(titleText: "Настройки")
+        navigationController?.pushViewController(vc, animated: true)
     }
 
     @objc private func openPrivacy() {
-        let alert = UIAlertController(
-            title: "Приватность",
-            message: "Экран приватности в разработке.",
-            preferredStyle: .alert
-        )
-        alert.addAction(UIAlertAction(title: "Ок", style: .default))
-        present(alert, animated: true)
+        let vc = SettingsStubViewController(titleText: "Приватность")
+        navigationController?.pushViewController(vc, animated: true)
     }
 
     // MARK: - Helpers
@@ -479,6 +490,22 @@ final class ProfileCustomizationViewController: UIViewController, UITextFieldDel
             .replacingOccurrences(of: "-", with: "")
 
         return cleaned.isEmpty ? "user" : cleaned
+    }
+
+    // MARK: - UIImagePickerControllerDelegate
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        defer { picker.dismiss(animated: true) }
+        guard let image = info[.originalImage] as? UIImage else { return }
+
+        if let path = ProfileAvatarStore.shared.save(image: image, for: user.uid) {
+            var draft = viewModel.state.draft
+            draft.avatarPath = path
+            viewModel.updateDraft(draft)
+        }
+    }
+
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.dismiss(animated: true)
     }
 }
 

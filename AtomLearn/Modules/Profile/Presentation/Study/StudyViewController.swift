@@ -5,6 +5,7 @@ final class StudyViewController: UIViewController {
     // MARK: - Properties
     private let scroll = UIScrollView()
     private let stack  = UIStackView()
+    private var activeSessions: [StudySessionState] = []
 
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -12,6 +13,11 @@ final class StudyViewController: UIViewController {
         view.backgroundColor = .systemBackground
         setupLayout()
         buildContent()
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        rebuildContent()
     }
 
     // MARK: - Layout
@@ -85,6 +91,7 @@ final class StudyViewController: UIViewController {
     private func activeSessionsSection() -> UIView? {
         let sessions = StudySessionStore.shared.fetchActiveSessions()
         guard !sessions.isEmpty else { return nil }
+        activeSessions = sessions
 
         let card = UIView()
         card.backgroundColor = .secondarySystemBackground
@@ -96,8 +103,8 @@ final class StudyViewController: UIViewController {
         stack.isLayoutMarginsRelativeArrangement = true
         stack.directionalLayoutMargins = .init(top: 12, leading: 12, bottom: 12, trailing: 12)
 
-        for session in sessions {
-            let row = sessionRow(session)
+        for (index, session) in sessions.enumerated() {
+            let row = sessionRow(session, index: index)
             stack.addArrangedSubview(row)
         }
 
@@ -113,14 +120,17 @@ final class StudyViewController: UIViewController {
         return card
     }
 
-    private func sessionRow(_ session: StudySessionState) -> UIControl {
-        let control = UIControl()
+    private func sessionRow(_ session: StudySessionState, index: Int) -> UIControl {
+        let control = UIButton(type: .system)
         control.layer.cornerRadius = 12
         control.backgroundColor = .systemBackground
+        control.tag = index
+        control.addTarget(self, action: #selector(activeSessionTapped(_:)), for: .touchUpInside)
 
         let title = UILabel()
         title.text = session.boardTitle ?? session.boardId
         title.font = .systemFont(ofSize: 15, weight: .semibold)
+        title.textColor = .label
 
         let subtitle = UILabel()
         subtitle.text = "Раунд \(session.round) · \(session.currentIndex + 1)/\(max(session.cards.count, 1))"
@@ -138,6 +148,8 @@ final class StudyViewController: UIViewController {
         h.axis = .horizontal
         h.alignment = .center
         h.spacing = 8
+        // Important: the button must receive taps; otherwise, the stack view becomes the hit-test target.
+        h.isUserInteractionEnabled = false
 
         control.addSubview(h)
         h.translatesAutoresizingMaskIntoConstraints = false
@@ -148,12 +160,20 @@ final class StudyViewController: UIViewController {
             h.bottomAnchor.constraint(equalTo: control.bottomAnchor, constant: -10)
         ])
 
-        control.addAction(UIAction { [weak self] _ in
-            let vc = StudySessionViewController(state: session, boardTitle: session.boardTitle ?? "Учёба")
-            self?.navigationController?.pushViewController(vc, animated: true)
-        }, for: .touchUpInside)
-
         return control
+    }
+
+    @objc private func activeSessionTapped(_ sender: UIButton) {
+        let index = sender.tag
+        guard index >= 0, index < activeSessions.count else { return }
+        let session = activeSessions[index]
+        let vc = StudySessionViewController(state: session, boardTitle: session.boardTitle ?? "Учёба")
+        navigationController?.pushViewController(vc, animated: true)
+    }
+
+    private func rebuildContent() {
+        stack.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        buildContent()
     }
 
     // MARK: - UI Builders

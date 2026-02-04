@@ -6,6 +6,7 @@ struct ProfileDraft: Equatable {
     var bio: String
     var location: String
     var website: String
+    var avatarPath: String?
 
     static func fromFirestore(_ data: [String: Any]) -> ProfileDraft? {
         guard let displayName = data["displayName"] as? String,
@@ -16,7 +17,8 @@ struct ProfileDraft: Equatable {
             username: username,
             bio: data["bio"] as? String ?? "",
             location: data["location"] as? String ?? "",
-            website: data["website"] as? String ?? ""
+            website: data["website"] as? String ?? "",
+            avatarPath: data["avatarPath"] as? String
         )
     }
 
@@ -26,7 +28,8 @@ struct ProfileDraft: Equatable {
             "username": username,
             "bio": bio,
             "location": location,
-            "website": website
+            "website": website,
+            "avatarPath": avatarPath as Any
         ]
     }
 }

@@ -11,6 +11,14 @@ final class ProfileInfoViewController: UIViewController {
     private let scroll = UIScrollView()
     private let stack  = UIStackView()
 
+    private let avatarView = AvatarView()
+    private let nameLabel = UILabel()
+    private let handleLabel = UILabel()
+    private let taglineLabel = UILabel()
+    private let bioLabel = UILabel()
+
+    private var draft: ProfileDraft?
+
     // MARK: - Init
     init(user: AppUser, viewModel: ProfileInfoViewModel) {
         self.user = user
@@ -27,6 +35,14 @@ final class ProfileInfoViewController: UIViewController {
         view.backgroundColor = .systemBackground
         setupLayout()
         buildContent()
+        bind()
+        render(from: nil)
+        viewModel.onViewDidLoad(userId: user.uid)
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        viewModel.onViewDidLoad(userId: user.uid)
     }
 
     // MARK: - Setup
@@ -55,14 +71,11 @@ final class ProfileInfoViewController: UIViewController {
     }
 
     private func buildContent() {
-        let name = displayName()
-        let handle = "@\(makeHandle(from: name))"
-
-        stack.addArrangedSubview(profileHeader(name: name, handle: handle))
+        stack.addArrangedSubview(profileHeader())
         stack.addArrangedSubview(statsRow())
 
         stack.addArrangedSubview(sectionTitle("О себе"))
-        stack.addArrangedSubview(infoCard(text: "Изучаю продукты, языки и системное мышление. Люблю короткие сессии и заметки к карточкам."))
+        stack.addArrangedSubview(infoCard(label: bioLabel))
 
         stack.addArrangedSubview(sectionTitle("Достижения"))
         stack.addArrangedSubview(achievementsRow())
@@ -73,8 +86,41 @@ final class ProfileInfoViewController: UIViewController {
         stack.addArrangedSubview(activityRow(title: "Новые темы", subtitle: "Анатомия • 3 модуля", accent: UIColor.systemGreen))
     }
 
+    private func bind() {
+        viewModel.onProfileUpdated = { [weak self] draft in
+            self?.render(from: draft)
+        }
+        viewModel.onError = { [weak self] error in
+            self?.showError(error)
+        }
+    }
+
+    private func render(from draft: ProfileDraft?) {
+        self.draft = draft
+
+        let displayName = draft?.displayName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
+        ? (draft?.displayName ?? user.name)
+        : (user.displayName ?? user.name)
+
+        let handle = draft?.username.isEmpty == false
+        ? "@\(draft?.username ?? "user")"
+        : "@\(makeHandle(from: displayName, email: user.email))"
+
+        nameLabel.text = displayName
+        handleLabel.text = handle
+        taglineLabel.text = "Продуктовое мышление • Спринты по 20 минут"
+
+        bioLabel.text = draft?.bio.isEmpty == false
+        ? draft?.bio
+        : "Добавь описание профиля"
+        bioLabel.textColor = (draft?.bio.isEmpty == false) ? .label : .secondaryLabel
+
+        let image = ProfileAvatarStore.shared.loadImage(path: draft?.avatarPath)
+        avatarView.configure(name: displayName, image: image)
+    }
+
     // MARK: - UI Builders
-    private func profileHeader(name: String, handle: String) -> UIView {
+    private func profileHeader() -> UIView {
         let card = GradientCardView(colors: [
             UIColor(red: 0.12, green: 0.62, blue: 0.72, alpha: 1),
             UIColor(red: 0.98, green: 0.77, blue: 0.40, alpha: 1)
@@ -82,24 +128,16 @@ final class ProfileInfoViewController: UIViewController {
         card.layer.cornerRadius = 22
         card.clipsToBounds = true
 
-        let avatar = UIImageView(image: UIImage(systemName: "person.crop.circle.fill"))
-        avatar.tintColor = .white
-        avatar.contentMode = .scaleAspectFit
-        avatar.translatesAutoresizingMaskIntoConstraints = false
-        avatar.setContentHuggingPriority(.required, for: .horizontal)
+        avatarView.translatesAutoresizingMaskIntoConstraints = false
+        avatarView.layer.cornerRadius = 32
+        avatarView.clipsToBounds = true
 
-        let nameLabel = UILabel()
-        nameLabel.text = name
         nameLabel.textColor = .white
-        nameLabel.font = .roundedSystemFont(ofSize: 26, weight: .bold)
+        nameLabel.font = UIFont.systemRounded(ofSize: 26, weight: .bold)
 
-        let handleLabel = UILabel()
-        handleLabel.text = handle
         handleLabel.textColor = UIColor.white.withAlphaComponent(0.8)
         handleLabel.font = .systemFont(ofSize: 14, weight: .semibold)
 
-        let taglineLabel = UILabel()
-        taglineLabel.text = "Продуктовое мышление • Спринты по 20 минут"
         taglineLabel.textColor = UIColor.white.withAlphaComponent(0.85)
         taglineLabel.font = .systemFont(ofSize: 13, weight: .medium)
         taglineLabel.numberOfLines = 2
@@ -108,7 +146,7 @@ final class ProfileInfoViewController: UIViewController {
         vStack.axis = .vertical
         vStack.spacing = 6
 
-        let hStack = UIStackView(arrangedSubviews: [avatar, vStack])
+        let hStack = UIStackView(arrangedSubviews: [avatarView, vStack])
         hStack.axis = .horizontal
         hStack.alignment = .center
         hStack.spacing = 12
@@ -116,8 +154,8 @@ final class ProfileInfoViewController: UIViewController {
         card.addSubview(hStack)
         hStack.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            avatar.widthAnchor.constraint(equalToConstant: 64),
-            avatar.heightAnchor.constraint(equalToConstant: 64),
+            avatarView.widthAnchor.constraint(equalToConstant: 64),
+            avatarView.heightAnchor.constraint(equalToConstant: 64),
             hStack.topAnchor.constraint(equalTo: card.topAnchor, constant: 16),
             hStack.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 16),
             hStack.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -16),
@@ -149,7 +187,7 @@ final class ProfileInfoViewController: UIViewController {
 
         let valueLabel = UILabel()
         valueLabel.text = value
-        valueLabel.font = .roundedSystemFont(ofSize: 18, weight: .bold)
+        valueLabel.font = UIFont.systemRounded(ofSize: 18, weight: .bold)
         valueLabel.textColor = color
 
         let titleLabel = UILabel()
@@ -177,20 +215,17 @@ final class ProfileInfoViewController: UIViewController {
     private func sectionTitle(_ text: String) -> UILabel {
         let l = UILabel()
         l.text = text
-        l.font = .roundedSystemFont(ofSize: 18, weight: .bold)
+        l.font = UIFont.systemRounded(ofSize: 18, weight: .bold)
         return l
     }
 
-    private func infoCard(text: String) -> UIView {
+    private func infoCard(label: UILabel) -> UIView {
         let card = UIView()
         card.backgroundColor = .secondarySystemBackground
         card.layer.cornerRadius = 16
 
-        let label = UILabel()
-        label.text = text
         label.numberOfLines = 0
         label.font = .systemFont(ofSize: 14, weight: .regular)
-        label.textColor = .label
 
         card.addSubview(label)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -295,6 +330,7 @@ final class ProfileInfoViewController: UIViewController {
         return row
     }
 
+    // MARK: - Actions
     @objc private func statTapped(_ sender: UIControl) {
         let messages = [
             "Количество карточек, которые ты создал(а) и добавил(а) в избранное.",
@@ -326,13 +362,8 @@ final class ProfileInfoViewController: UIViewController {
     }
 
     // MARK: - Helpers
-    private func displayName() -> String {
-        let name = (user.displayName?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "")
-        return name.isEmpty ? user.name : name
-    }
-
-    private func makeHandle(from name: String) -> String {
-        if let email = user.email, let prefix = email.split(separator: "@").first {
+    private func makeHandle(from name: String, email: String?) -> String {
+        if let email, let prefix = email.split(separator: "@").first {
             return String(prefix)
         }
 
@@ -342,6 +373,16 @@ final class ProfileInfoViewController: UIViewController {
             .replacingOccurrences(of: "-", with: "")
 
         return cleaned.isEmpty ? "user" : cleaned
+    }
+
+    private func showError(_ error: Error) {
+        let alert = UIAlertController(
+            title: "Ошибка",
+            message: (error as? LocalizedError)?.errorDescription ?? error.localizedDescription,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "Ок", style: .default))
+        present(alert, animated: true)
     }
 }
 
@@ -365,9 +406,8 @@ private final class GradientCardView: UIView {
     }
 }
 
-// MARK: - UIFont helpers
 private extension UIFont {
-    static func roundedSystemFont(ofSize size: CGFloat, weight: UIFont.Weight) -> UIFont {
+    static func systemRounded(ofSize size: CGFloat, weight: UIFont.Weight) -> UIFont {
         let base = UIFont.systemFont(ofSize: size, weight: weight)
         if let descriptor = base.fontDescriptor.withDesign(.rounded) {
             return UIFont(descriptor: descriptor, size: size)
