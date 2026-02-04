@@ -67,6 +67,7 @@ final class CardsViewController: UIViewController {
         title = board.title
         view.backgroundColor = .systemBackground
 
+        enableKeyboardDismissOnTap()
         setupCollection()
         observeCards()
         viewModel.onViewDidLoad()

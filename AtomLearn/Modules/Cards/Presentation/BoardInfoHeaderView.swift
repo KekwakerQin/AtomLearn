@@ -241,6 +241,10 @@ final class BoardInfoHeaderView: UICollectionReusableView {
         container.backgroundColor = UIColor.systemTeal.withAlphaComponent(0.12)
         container.layer.cornerRadius = 12
 
+        container.heightAnchor.constraint(greaterThanOrEqualToConstant: 56).isActive = true
+        container.setContentHuggingPriority(.required, for: .vertical)
+        container.setContentCompressionResistancePriority(.required, for: .vertical)
+
         let titleLabel = UILabel()
         titleLabel.text = title
         titleLabel.font = .systemFont(ofSize: 11, weight: .semibold)
@@ -295,7 +299,7 @@ final class BoardInfoHeaderView: UICollectionReusableView {
     }
 
     static func preferredHeight(docCount: Int) -> CGFloat {
-        let infoHeight: CGFloat = 190
+        let infoHeight: CGFloat = 240
         let titleHeight: CGFloat = 22
         let emptyRow: CGFloat = 72
         let rowHeight: CGFloat = 64

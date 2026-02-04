@@ -65,7 +65,13 @@ final class ProfileViewController: UIViewController {
     // Настройка интерфейса и стартовая вкладка
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
+//        view.backgroundColor = .systemBackground
+        view.backgroundColor = .clear
+        view.isOpaque = false
+        container.backgroundColor = .clear
+        header.backgroundColor = .clear
+        buttonsStack.backgroundColor = .clear
+        
         setupHeader()
         setupContainer()
         switchTo(.boards)
@@ -121,7 +127,7 @@ final class ProfileViewController: UIViewController {
         header.addArrangedSubview(avatar)
         header.addArrangedSubview(spacer)
         header.addArrangedSubview(buttonsStack)
-
+        
         view.addSubview(header)
 
         NSLayoutConstraint.activate([

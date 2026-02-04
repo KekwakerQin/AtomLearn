@@ -18,16 +18,13 @@ final class BoardsSearchHeaderView: UICollectionReusableView {
     required init?(coder: NSCoder) { fatalError() }
 
     private func setupUI() {
-        backgroundColor = .systemBackground
-
-        searchField.placeholder = " м доскам"
+        searchField.placeholder = "Поиск"
         searchField.autocorrectionType = .no
         searchField.returnKeyType = .done
         searchField.font = .systemFont(ofSize: 16, weight: .medium)
         searchField.addTarget(self, action: #selector(textChanged), for: .editingChanged)
         searchField.addTarget(self, action: #selector(editingEnded), for: .editingDidEnd)
 
-//        container.backgroundColor = .secondarySystemBackground
         container.layer.cornerRadius = 14
         container.setContentCompressionResistancePriority(.required, for: .vertical)
         addSubview(container)

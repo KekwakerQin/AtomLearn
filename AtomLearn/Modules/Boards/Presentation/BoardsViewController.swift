@@ -48,6 +48,7 @@ final class BoardsViewController: UIViewController, UICollectionViewDelegateFlow
         title = "Мои доски"
         view.backgroundColor = .systemBackground
 
+        enableKeyboardDismissOnTap()
         setupCollection()
         setupDataSource()
         setupTopBar()
@@ -87,8 +88,8 @@ final class BoardsViewController: UIViewController, UICollectionViewDelegateFlow
     // MARK: - UI setup
     private func setupCollection() {
         let layout = StickySectionHeaderFlowLayout()
-        layout.minimumInteritemSpacing = 12
-        layout.minimumLineSpacing = 12
+        layout.minimumInteritemSpacing = 8
+        layout.minimumLineSpacing = 8
         layout.sectionInset = UIEdgeInsets(top: 12, left: 16, bottom: 16, right: 16)
         layout.stickySection = Section.search.rawValue
 

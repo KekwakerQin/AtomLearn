@@ -11,6 +11,10 @@ final class MainTabBarController: UITabBarController, UITabBarControllerDelegate
         case addingCards(Board)
     }
     
+    // Кнопка профиля
+    private var lastTap: (tag: Int, time: CFTimeInterval)?
+    private let doubleTapThreshold: CFTimeInterval = 0.35
+    
     private var currentIndex = 0
     private weak var addEntitySheetNav: UINavigationController?
     private weak var addEntitySheetCoordinator: AnyObject?
@@ -59,10 +63,10 @@ final class MainTabBarController: UITabBarController, UITabBarControllerDelegate
         badgeVC.tabBarItem = UITabBarItem(title: "", image: UIImage(systemName: "house"), tag: 0)
         searchVC.tabBarItem = UITabBarItem(title: "", image: UIImage(systemName: "magnifyingglass"), tag: 1)
 
-        addPlaceholderVC.view.backgroundColor = .systemBackground
+//        addPlaceholderVC.view.backgroundColor = .systemBackground
         addNavController.setViewControllers([addPlaceholderVC], animated: false)
 
-        addNavController.view.backgroundColor = .clear
+//        addNavController.view.backgroundColor = .clear
         addNavController.tabBarItem = UITabBarItem(
             title: nil,
             image: UIImage(systemName: "plus.circle"),
@@ -91,6 +95,10 @@ final class MainTabBarController: UITabBarController, UITabBarControllerDelegate
         
         guard let index = tabBarController.viewControllers?.firstIndex(of: viewController) else {
             return true
+        }
+        
+        if handleDoubleTapIfNeeded(on: viewController, index: index) {
+            return false
         }
         
         if viewController.tabBarItem.tag != 2 {
@@ -184,26 +192,6 @@ final class MainTabBarController: UITabBarController, UITabBarControllerDelegate
                 pushFlow()
             }
         }
-        
-//        coordinator.onSelectBoard = { [weak self, weak coordinator, weak sheetNav] board in
-//            guard let self else { return }
-//
-//            // 1) Cards
-//            let cardsVM = CardsViewModel()
-//            
-//            let cardsVC = CardsViewController(user: self.user, board: board, viewModel: cardsVM)
-//            sheetNav?.pushViewController(cardsVC, animated: true)
-//
-//            // 2) AddCards поверх Cards
-//            let addCardsVM = AddCardsViewModel(boardId: board.id, user: self.user)
-//
-//            addCardsVM.onCancel = { [weak sheetNav] in
-//                sheetNav?.popViewController(animated: true) // вернёмся на Cards ✅
-//            }
-//
-//            let addCardsVC = AddCardsViewController(viewModel: addCardsVM)
-//            sheetNav?.pushViewController(addCardsVC, animated: true)
-//        }
         
         childCoordinators.append(coordinator)
         coordinator.start()
@@ -304,6 +292,38 @@ final class MainTabBarController: UITabBarController, UITabBarControllerDelegate
         addFlowState = .idle
 
         addNavController.setViewControllers([addPlaceholderVC], animated: false)
+    }
+    
+    private func handleDoubleTapIfNeeded(on viewController: UIViewController, index: Int) -> Bool {
+        let tag = viewController.tabBarItem.tag
+        let now = CACurrentMediaTime()
+
+        // двойной тап считаем только когда тапнули по уже выбранному табу
+        guard index == selectedIndex else {
+            lastTap = (tag, now)
+            return false
+        }
+
+        let isDoubleTap = (lastTap?.tag == tag) && (now - (lastTap?.time ?? 0) <= doubleTapThreshold)
+        lastTap = (tag, now)
+
+        guard isDoubleTap else { return false }
+
+        if tag == 4 {
+            openBoardsInsideProfileTab()
+        }
+        return true
+    }
+    
+    private func openBoardsInsideProfileTab() {
+        selectedIndex = 4
+
+        guard let nav = viewControllers?[4] as? UINavigationController else { return }
+        nav.popToRootViewController(animated: false)
+
+        if let profile = nav.viewControllers.first as? ProfileViewController {
+            profile.openBoardsTab()
+        }
     }
 
 }
